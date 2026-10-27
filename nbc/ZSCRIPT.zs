@@ -13,6 +13,7 @@ version "4.10"
 #include "zscript/nbc/ally.zs"
 #include "zscript/nbc/runmanager.zs"
 #include "zscript/nbc/hub.zs"
+#include "zscript/nbc/kits.zs"
 
 // Corpo Wars props and decor, placeable map things (tools/import/port_cw_props.py)
 #include "zscript/cw/furniture.zs"
@@ -21,3 +22,9 @@ version "4.10"
 #include "zscript/cw/decor_apartment.zs"
 #include "zscript/cw/decor_underground.zs"
 #include "zscript/cw/decor_industrial.zs"
+
+// Our own level architecture: the Bricks kits, ported from Corpo Wars' site kits (PLAN.md §4.4, M2b)
+#include "zscript/cw/kitgen.zs"
+#include "zscript/cw/kit_street.zs"
+#include "zscript/cw/kit_residential.zs"
+#include "zscript/cw/kit_underground.zs"

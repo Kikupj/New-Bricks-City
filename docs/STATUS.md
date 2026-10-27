@@ -2,7 +2,7 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Next milestone: M2b** (our own level architecture: the Bricks kits). M2's vertical slice is playable; its playtest list is under "Needs playtest".
+**Current milestone: M2b** (our own level architecture: the Bricks kits). **The code is written but has never been compiled or booted**: it was written in a cloud session with no UZDoom. First job on the owner's machine: run the smoke test on `NBC_TEST,NBC_HUB,NBC_K1,NBC_K2,NBC_K4` and paste any script errors back. Then the M2b checklist under "Needs playtest".
 
 ### Plan changes (2026-10-27, owner + Claude)
 - **Lore:** the police are losing a megacity to its gangs; Checkpoint 9 is all that's left, and the meta progression is rebuilding the precinct room by room (PLAN.md §1, §2.6). Tone references: *Dirty Harry*, *Bad Boys II*, *Den of Thieves* (tone only).
@@ -96,12 +96,23 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **HUD:** the raid readout is top left (district, gang, the leader's distance and compass direction, crew left, squad health, day, strikes, cash). The magazine and debris readouts moved from the top centre to the bottom right. The big font is Miniplicity (`nbc/BIGFONT.lmp`, credited); the mod's own small text uses UZDoom's NewSmallFont.
 - **Loop verified by a scripted run:** new case → raid → retreat (alert +1, day 2); new case → kill the leader → exit (TOPPLED, bounty) → next raid → lethal hit (OFFICER DOWN, strike 1, half the cash lost, back at the hub, day 3). The same seed gives the same assignments.
 
+### M2b — Our own level architecture: the Bricks kits — 🔧 CODE WRITTEN, NOT YET BOOTED (2026-10-27, by Claude)
+- **Ported** Corpo Wars' site-kit generator and three kits into `nbc/zscript/cw/` as `NBC_KitGen`, `NBC_KitStreet` (K1), `NBC_KitResidential` (K2) and `NBC_KitUnderground` (K4). Renamed to `NBC_` because the mission layer is cut: no CW guards, patrol points, bystanders, drop crate, ledger, passes or contract objectives. `procgen.zs`, `stairs.zs` and `themes.zs` turned out not to be needed by these kits and weren't ported. The already-ported furniture, kitprops and decor classes are reused.
+- **What the kit gives the raid instead:** spawn spots (one per reachable cell, outdoor cells marked as perches for M4), `NBC_ResidentSpot` markers in civilian rooms (empty until M9), `NBC_ObjectiveMarker`s in the planned objective rooms, rubble piles (against walls, so corridors stay passable) and loose debris in rooms flagged `RF_RUBBLE`, and an exit: the entry farthest from the insertion, with `NBC_KitExit` (Use to leave) under a lit exit sign.
+- **Rebuilt for the Bricks:** doors 96 high; tower-floor ceilings raised to 112–144 (PLAN.md §4.4 scale); the "hacker den" is a gang den with a stash room; 1 in 4 flats on poor floors is a dark squat full of rubble; fire escapes, roofs, yards, alleys, tunnels and camps carry debris; parked cars are the Bricks' (dirty colours, a dead squad car). Street interiors keep their heights (the street facade line is 128).
+- **New code** (`nbc/zscript/nbc/kits.zs`): `NBC_KitRunner` (generates on load, never on a loaded save; inserts the player on the first tic; `nbc_kittest`, `nbc_debug_kit`), `NBC_KitDoor` (Use opens; officers waiting at a door open it; shuts after 4 s when clear), `NBC_CeilingLight` (+ pendant, strip, downlight), `NBC_LightSource`, `NBC_KitExit`, `NBC_ExitSign`, the two markers.
+- **The slice runs on kits now.** `nbc/districts.txt` lists 4 turfs (no maps). Each gang's kit floors are a new `mansion` field in `nbc/gangs.txt` (Stoop Kings: tenement, gang den, rooftops; Rust Saints: chop shop, parking garage; Iron Pit: parking garage, tunnels; Collectors: luxury apartments, gambling den). The board picks one with the case RNG and a layout seed (`NBC_RunData.raidMap/raidVariant/raidKitSeed`). The RunManager fills the kit's spawn spots and puts the leader nearest the kit's exit. A raid is still one floor; M3 adds approach → staging flat → floors.
+- **Registered:** maps `NBC_K1/K2/K4` in MAPINFO (city sky, next = hub), `NBC_KitRunner` in `AddEventHandlers` (before the RunManager), CVars `nbc_kitseed` / `nbc_kitvariant`, `SNDSEQ.txt` (`NBCDoorSilent`), MODELDEF entries for the four light fixtures and the exit sign (existing `models/props/*.obj`), KEYCONF aliases `nbc_kittest` and `nbc_debug_kit`.
+- **Obsidian is frozen:** NBC_CT01–04 are out of the raid pool but still load (`+map NBC_CT01`), with their own monsters and no raid.
+- **Not done yet (later milestones):** time of day and weather (M7c), elevated highway set pieces, perch spawns for snipers (M4), residents (M9), objectives on the markers (M4/M9).
+
 ### Side work — Obsidian city maps and Corpo Wars room sets (2026-10-27, by Claude; not a milestone)
 - `tools/Obsidian/` builds city-block maps with a New Bricks City theme (`addons/NewBricksCity/`, see its README): `powershell -File tools\Obsidian\make_bricks.ps1` writes `nbc/maps/NBC_CT01-04.wad` plus `nbc/mapinfo/city_maps.txt`.
 - **Corpo Wars props are now placeable map things.** `tools/import/port_cw_props.py` copied `furniture.zs`, `kitprops.zs` and four decor sets into `nbc/zscript/cw/` (one `// NBC:` change: `CWD_Wall` lifts itself to wall height when placed on the floor), the matching models into `nbc/MODELDEF.txt`, and DoomEdNums into `nbc/mapinfo/cw_props.txt`: furniture 26200–26258, decor sprites 26400–26600. **M2 should reuse these classes, not port them again.**
 - `tools/Obsidian/make_cw_fabs.py` remakes Corpo Wars' room recipes (kit_*.zs `Dress()`) as Obsidian prefabs: 18 room sets (living, kitchen, bedroom, bath, office, storage, utility, laundry, workshop, garage, lockers, lab, grow, den, camp, lobby, shop, bar) with furniture along the walls, free-standing groups, random wall sprites and clutter, and loose debris (26000–26004) in squats, dens, storage and on the street. Each Bricks room theme picks from its own list of room sets.
 
 ## Verified
+- **M2b static checks (2026-10-27, cloud session):** `python tools/check_lumps.py` → `0 new problem(s), 13 known`, run with Freedoom 0.13.0's `freedoom2.wad` from the Ubuntu archive. Brackets balance in every new or changed ZScript file. **Not compiled, not booted:** no UZDoom in that session.
 - **M1 baseline and final check (2026-10-27):** `python tools/check_lumps.py` → `0 new problem(s), 13 known`; `powershell -File tools/smoke_test.ps1 -Map NBC_TEST` → `PASS NBC_TEST`.
 - **M1 branch:** `m1-integration`; since committed with M1b and M1c as one commit.
 - `python tools/check_lumps.py` → `0 new problem(s), 13 known`. The known ones are pre-existing pack quirks, each with its reason in `tools/lumps_allow.txt`:
@@ -117,6 +128,14 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `python tools\build_pk3.py` → `dist\NewBricksCity.pk3`, 9,103 files, 41.5 MB. It boots and loads NBC_TEST with no errors.
 
 ## Needs playtest (owner)
+- **M2b kits (first boot):**
+  - `powershell -File tools\smoke_test.ps1 -Map NBC_TEST,NBC_HUB,NBC_K1,NBC_K2,NBC_K4` must PASS. The kit code has never been compiled; expect a round of script-error fixes.
+  - In the console: `nbc_kittest 2 0 42` (tenement), `nbc_kittest 2 5 42` (rooftops), `nbc_kittest 1 6 7` (chop shop), `nbc_kittest 4 3 9` (parking garage). Do they read as a housing tower, a city street, a garage? Any floating or missing walls, sky showing through a building, unreachable rooms (the console prints `Kit: <room> is unreachable`)?
+  - `nbc_debug_kit` on each: rooms, entries, how many spawn spots, rubble piles and loose pieces.
+  - Doors: Use opens them, they shut after a few seconds, never on you; walk an officer up to a closed door and it should open.
+  - Lights: fixtures show as models and light their rooms; squats are dark.
+  - The exit sign is over the far stair or entry; Use under it returns to the hub.
+  - Start a case at the hub and raid each gang: right kit floors, 16–24 crew, leader near the exit, two officers keeping up through doors and corridors. Save mid-raid and load.
 - **The M2 slice** (New Game starts at Checkpoint 9): use the armory, then the raid board, and open a case. Raid each district: do the officers follow, shoot and keep up over stairs and lifts, do enemies turn on them, is the leader near the exit and the compass right? Is 16–24 enemies a fair fight? Check the bottom-right magazine and debris readouts in both HUD modes, the board menu's readability with the new fonts, and that Esc closes it. Save in a raid and load; start a New Game and confirm the old case is gone. Check whether the parks and split levels read as city blocks.
 - Obsidian city maps (`+map NBC_CT01` … `NBC_CT04`): walk the furnished rooms. Check that furniture collision (CW_Blocker) matches the models, no monster or item starts inside furniture, wall sprites hang at a sensible height, and the street debris can be picked up and thrown. Doors and walk paths should stay clear.
 - `powershell -File tools\run.ps1 -Extra "+give all"`. Check:

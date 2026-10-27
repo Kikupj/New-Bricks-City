@@ -1,9 +1,11 @@
-// The vertical-slice loop (PLAN.md M2): hub -> raid board -> an Obsidian district -> back to the hub.
+// The vertical-slice loop (PLAN.md M2, M2b): hub -> raid board -> one of the gang's kit floors -> the hub.
 //
-// On a district map the manager clears Obsidian's monster layer, keeps those spots, and fills them with
-// the raiding gang (count from the gang's tier, budget and alert, not from Obsidian). The leader stands
-// nearest the map's exit with escorts; two officers come in with the player. Taking the exit resolves
-// the raid: leader down = gang toppled, otherwise a retreat. Lethal damage = OFFICER DOWN.
+// The raid board picks a turf; the raid runs on one of the holding gang's kit floors (gangs.txt "mansion"),
+// generated from the case RNG by NBC_KitRunner. The manager fills the kit's spawn spots with the raiding
+// gang (count from the gang's tier, budget and alert). The leader stands nearest the exit with escorts; two
+// officers come in with the player. Taking the exit resolves the raid: leader down = gang toppled, otherwise
+// a retreat. Lethal damage = OFFICER DOWN. (Maps without a kit, like the frozen Obsidian NBC_CT maps, still
+// work: their monster layer becomes the spawn spots.)
 
 // A spawn spot (ZScript 4.10 has no arrays of vectors).
 class NBC_Spot
@@ -59,20 +61,13 @@ class NBC_RunManager : EventHandler
 			return;
 		}
 
-		// A district loaded straight from the console (+map NBC_CT01): run it as a raid anyway.
-		int d = DistrictIndex();
-		if (d >= 0 && !rd.raidActive)
-		{
-			if (!rd.caseActive) rd.NewCase(NewSeed(), gangs.Size(), districtMaps.Size());
-			rd.BeginRaid(d);
-		}
 	}
 
 	override void WorldUnloaded(WorldEvent e)
 	{
 		if (e.IsSaveGame) return;
 		let rd = NBC_RunData.Find();
-		if (!rd || !rd.raidActive || DistrictIndex() != rd.raidDistrict) return;
+		if (!IsRaidMap(rd)) return;
 		ResolveRaid(rd);
 	}
 
@@ -82,10 +77,10 @@ class NBC_RunManager : EventHandler
 		if (cardTics > 0) cardTics--;
 
 		let rd = NBC_RunData.Find();
-		if (!rd || !rd.raidActive || DistrictIndex() != rd.raidDistrict) return;
+		if (!IsRaidMap(rd)) return;
 		if (!raidSetUp)
 		{
-			// wait a tic: Obsidian's monsters arrive as RandomSpawners that resolve on their first tick
+			// wait two tics: the kit puts the player at the insertion on the first, and spawners resolve
 			if (level.maptime >= 2) SetupRaid(rd);
 			return;
 		}
@@ -99,11 +94,50 @@ class NBC_RunManager : EventHandler
 		return level.MapName ~== HUB_MAP;
 	}
 
-	clearscope int DistrictIndex() const
+	// the map the current raid runs on
+	clearscope bool IsRaidMap(NBC_RunData rd) const
 	{
-		for (int i = 0; i < districtMaps.Size(); i++)
-			if (districtMaps[i] ~== level.MapName) return i;
-		return -1;
+		return rd && rd.raidActive && rd.raidMap != "" && rd.raidMap ~== level.MapName;
+	}
+
+	clearscope String TurfTitle(int d) const
+	{
+		return d >= 0 && d < districtTitles.Size() ? districtTitles[d] : "the block";
+	}
+
+	// Pick one of the gang's kit floors ("K2:tenement") with the case RNG and set the raid up to run on it.
+	static void PickMansion(NBC_GangDef g, NBC_RunData rd)
+	{
+		int kit = NBC_KitGen.KIT_RES, v = 0;
+		if (g && g.mansion.Size())
+		{
+			String pick = g.mansion[rd.Rand(0, g.mansion.Size() - 1)];
+			int colon = pick.IndexOf(":");
+			String kitName = colon >= 0 ? pick.Left(colon) : pick;
+			String varName = colon >= 0 ? pick.Mid(colon + 1) : "";
+			int k = NBC_KitGen.KitByName(kitName);
+			let probe = k ? NBC_KitGen.Make(k) : null;
+			if (probe)
+			{
+				kit = k;
+				v = -1;
+				for (int i = 0; i < probe.VariantCount() && v < 0; i++)
+				{
+					probe.variant = i;
+					if (probe.VariantName() ~== varName) v = i;
+				}
+				if (v < 0)
+				{
+					Console.Printf("\cggangs.txt: %s has no kit variant \"%s\"; using %s.", g.id, pick, probe.VariantName());
+					v = 0;
+				}
+			}
+			else Console.Printf("\cggangs.txt: %s mansion \"%s\" isn't a kit (K1, K2 or K4).", g.id, pick);
+		}
+		rd.raidMap = NBC_KitGen.MapOfKit(kit);
+		rd.raidVariant = v;
+		rd.raidKitSeed = rd.Rand(1, 0x7ffffff);
+		rd.raidEntry = 0;
 	}
 
 	clearscope NBC_GangDef GangAt(int i) const
@@ -133,7 +167,7 @@ class NBC_RunManager : EventHandler
 		let g = GangAt(rd.raidGang);
 		if (!p || !g) return;
 
-		// 1. Obsidian's monsters out; their spots kept
+		// 1. any placed monsters out (their spots kept for maps without a kit); a kit gives its own spots
 		Array<NBC_Spot> spots;
 		Array<Actor> remove;
 		let it = ThinkerIterator.Create("Actor");
@@ -148,10 +182,22 @@ class NBC_RunManager : EventHandler
 			}
 		}
 		for (int i = 0; i < remove.Size(); i++) if (remove[i]) remove[i].Destroy();
+		let kr = NBC_KitRunner(EventHandler.Find("NBC_KitRunner"));
+		NBC_KitGen kit = kr ? kr.kit : null;
+		if (kit)
+		{
+			spots.Clear();
+			for (int i = 0; i < kit.spotX.Size(); i++)
+			{
+				Vector2 kp = (kit.spotX[i], kit.spotY[i]);
+				spots.Push(NBC_Spot.Make((kp, kit.FloorAt(kp))));
+			}
+		}
 
-		// 2. the exit: Obsidian's exit switch or line
+		// 2. the exit: the kit's, else an exit switch or line
 		exitFound = false;
-		for (int i = 0; i < level.Lines.Size(); i++)
+		if (kit) { exitPos = (kit.exitPos, kit.FloorAt(kit.exitPos)); exitFound = true; }
+		for (int i = 0; i < level.Lines.Size() && !exitFound; i++)
 		{
 			int sp = level.Lines[i].special;
 			if (sp == 243 || sp == 244 || sp == 74)
@@ -241,11 +287,12 @@ class NBC_RunManager : EventHandler
 			squad.Push(a);
 		}
 
-		if (developer) Console.Printf("nbc raid: %s, %s. Obsidian placed %d monsters; the game placed %d crew + %s, %d officers. Exit %s.",
-			level.MapName, g.name, spots.Size(), startCount, leader ? "leader" : "no leader", squad.Size(),
-			exitFound ? "found" : "not found (far spot)");
-		String title = rd.raidDistrict < districtTitles.Size() ? districtTitles[rd.raidDistrict] : level.MapName;
-		Announce(String.Format("%s. %s hold this block (%d on the floors).\nTake down %s, then get to the exit.",
+		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers. Exit %s.",
+			level.MapName, kit ? kit.VariantName() : "no kit", g.name, spots.Size(), startCount, leader ? "leader" : "no leader",
+			squad.Size(), exitFound ? "found" : "not found (far spot)");
+		String title = TurfTitle(rd.raidDistrict);
+		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
+		Announce(String.Format("%s. %s hold this block (%d on the floor).\nTake down %s, then get to the exit sign.",
 			title, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
 	}
 
@@ -386,7 +433,7 @@ class NBC_RunManager : EventHandler
 	{
 		let g = GangAt(rd.raidGang);
 		String gname = g ? g.name : "The gang";
-		String title = rd.raidDistrict < districtTitles.Size() ? districtTitles[rd.raidDistrict] : "the district";
+		String title = TurfTitle(rd.raidDistrict);
 
 		for (int s = 0; s < squad.Size(); s++)
 		{
@@ -462,7 +509,8 @@ class NBC_RunManager : EventHandler
 		int gi = choice < rd.districtGang.Size() ? rd.districtGang[choice] : -1;
 		if (gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi]) return;
 		rd.BeginRaid(choice);
-		level.ChangeLevel(districtMaps[choice], 0, CHANGELEVEL_NOINTERMISSION);
+		PickMansion(GangAt(gi), rd);
+		level.ChangeLevel(rd.raidMap, 0, CHANGELEVEL_NOINTERMISSION);
 	}
 
 	void DebugCase()
@@ -480,8 +528,8 @@ class NBC_RunManager : EventHandler
 				gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi] ? "  TOPPLED" : "");
 		}
 		if (rd.raidActive)
-			Console.Printf("  raid: district %d gang %d crew %d/%d kills %d leader %s", rd.raidDistrict, rd.raidGang,
-				crew.Size(), startCount, rd.raidKills, rd.leaderDown ? "down" : "at large");
+			Console.Printf("  raid: turf %d gang %d on %s variant %d (kit seed %d), crew %d/%d kills %d leader %s", rd.raidDistrict,
+				rd.raidGang, rd.raidMap, rd.raidVariant, rd.raidKitSeed, crew.Size(), startCount, rd.raidKills, rd.leaderDown ? "down" : "at large");
 	}
 
 	override void UiTick()

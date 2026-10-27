@@ -58,10 +58,10 @@ class NBC_StatusBar : DoomStatusBar
 		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
 		if (!rd || !rm || !nbcSmallFont || (!rd.caseActive && !rd.raidActive)) return;
 		int y = 3;
-		if (rd.raidActive && rm.DistrictIndex() == rd.raidDistrict)
+		if (rm.IsRaidMap(rd))
 		{
 			let g = rm.GangAt(rd.raidGang);
-			String title = rd.raidDistrict < rm.districtTitles.Size() ? rm.districtTitles[rd.raidDistrict] : level.MapName;
+			String title = rm.TurfTitle(rd.raidDistrict);
 			DrawString(nbcSmallFont, title .. (g ? "  -  " .. g.name : ""), (3, y), DI_TEXT_ALIGN_LEFT, g ? g.TextColor() : Font.CR_WHITE, scale: (0.4, 0.4));
 			y += 7;
 			String lead;

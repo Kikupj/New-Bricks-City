@@ -28,6 +28,9 @@ class NBC_RunData : Thinker
 	// the current raid
 	bool raidActive, leaderDown, officerDown;
 	int raidDistrict, raidGang, raidKills, raidBounty;
+	// the kit floor the raid runs on (M2b): map, variant, layout seed and preferred entry (NBC_KitGen.EK_*)
+	String raidMap;
+	int raidVariant, raidKitSeed, raidEntry;
 	Array<int> squadHealth;
 	Array<String> squadNames;
 
@@ -136,6 +139,10 @@ class NBC_RunData : Thinker
 		officerDown = false;
 		raidKills = 0;
 		raidBounty = 0;
+		raidMap = "";
+		raidVariant = 0;
+		raidKitSeed = 0;
+		raidEntry = 0;
 	}
 
 	// One day passes: officers recover, alert decays for gangs you left alone, the case may end.

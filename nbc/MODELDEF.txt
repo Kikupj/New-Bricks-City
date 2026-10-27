@@ -531,3 +531,49 @@ Model CW_FSandbags
 	FrameIndex CWMD A 0 0
 }
 
+// Kit lighting and the exit sign (zscript/nbc/kits.zs, PLAN.md M2b)
+
+Model NBC_CeilingLight
+{
+	Path "models/props"
+	Model 0 "light_troffer.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model NBC_CeilingLightPendant
+{
+	Path "models/props"
+	Model 0 "light_pendant.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model NBC_CeilingLightStrip
+{
+	Path "models/props"
+	Model 0 "light_strip.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model NBC_CeilingLightDown
+{
+	Path "models/props"
+	Model 0 "light_downlight.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model NBC_ExitSign
+{
+	Path "models/props"
+	Model 0 "exit_sign.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}

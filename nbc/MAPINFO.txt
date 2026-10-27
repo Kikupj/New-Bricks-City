@@ -1,7 +1,7 @@
 // New Bricks City — MAPINFO
 gameinfo
 {
-	AddEventHandlers = "NBC_Loot", "NBC_RunManager"
+	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager"
 	PlayerClasses = "NBC_Player"
 	StatusBarClass = "NBC_StatusBar"
 }
@@ -45,5 +45,31 @@ map NBC_TEST "Test Room"
 	next = "NBC_TEST"
 }
 
-include "mapinfo/city_maps.txt"   // Obsidian city maps (tools/Obsidian/export_maps.py)
+// The kit template maps (PLAN.md §4.4, M2b): a blank grid that NBC_KitRunner carves into a new layout from a
+// seed every time the map loads. Raids run on these; `nbc_kittest <kit> <variant> <seed>` loads one directly.
+map NBC_K1 "The Street"
+{
+	levelnum = 201
+	sky1 = "CITYSKY", 0
+	nointermission
+	next = "NBC_HUB"
+}
+
+map NBC_K2 "The Tower"
+{
+	levelnum = 202
+	sky1 = "CITYSKY", 0
+	nointermission
+	next = "NBC_HUB"
+}
+
+map NBC_K4 "Underground"
+{
+	levelnum = 204
+	sky1 = "CITYSKY", 0
+	nointermission
+	next = "NBC_HUB"
+}
+
+include "mapinfo/city_maps.txt"   // Obsidian city maps (tools/Obsidian/export_maps.py)  (frozen, PLAN.md §4.4)
 include "mapinfo/cw_props.txt"   // Corpo Wars prop map numbers (tools/import/port_cw_props.py)

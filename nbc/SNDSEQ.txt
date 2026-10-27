@@ -1,0 +1,5 @@
+// New Bricks City sound sequences
+// Kit doors (NBC_KitDoor) move silently; the door actor plays its own open and close sounds.
+:NBCDoorSilent
+	delay 1
+end

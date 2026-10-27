@@ -9,3 +9,5 @@ alias -nbc_throw "netevent nbc_throw_release"
 defaultbind g +nbc_throw
 defaultbind h "netevent nbc_debris_next"
 alias nbc_debug_weapon "event nbc_debug_weapon"
+alias nbc_kittest "netevent nbc_kittest %1 %2 %3"
+alias nbc_debug_kit "netevent nbc_debug_kit"

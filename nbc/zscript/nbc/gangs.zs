@@ -1,5 +1,5 @@
-// Gang definitions (nbc/gangs.txt) and the district pool (nbc/districts.txt, written by
-// tools/Obsidian/export_maps.py). Both are plain data; nothing gang-specific lives in code.
+// Gang definitions (nbc/gangs.txt) and the turfs on the raid board (nbc/districts.txt). Both are plain
+// data; nothing gang-specific lives in code.
 
 class NBC_GangDef
 {
@@ -7,6 +7,7 @@ class NBC_GangDef
 	int tier, escorts;
 	double budget, health, leaderHealth, painChance;
 	Array<String> roster1, roster2, roster3;
+	Array<String> mansion;     // kit floors the gang holds, "K2:tenement" (kit:variant name); one is picked per raid
 	Array<Name> damageTypes;
 	Array<double> damageFactors;
 
@@ -97,6 +98,7 @@ class NBC_Gangs
 			else if (key == "escorts") g.escorts = w[1].ToInt();
 			else if (key == "painchance") g.painChance = w[1].ToDouble();
 			else if (key == "trait") g.trait = w[1];
+			else if (key == "mansion") { for (int k = 1; k < w.Size(); k++) g.mansion.Push(w[k]); }
 			else if (key == "roster1" || key == "roster2" || key == "roster3")
 			{
 				for (int k = 1; k < w.Size(); k++)
