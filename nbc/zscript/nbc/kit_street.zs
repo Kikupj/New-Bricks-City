@@ -87,13 +87,13 @@ class NBC_KitStreet : NBC_KitGen
 	{
 		switch (t)
 		{
-		case S_ROAD:       return Room(t, RF_OUT, -8, 0, 96, "CWASPH", "F_SKY1", "ADBRICK", "the street");
-		case S_WALK:       return Room(t, RF_OUT | RF_CIV, 0, 0, 104, "CWPAVE", "F_SKY1", "ADBRICK", "the sidewalk");
-		case S_ALLEY:      return Room(t, RF_OUT | RF_PATROL | RF_RUBBLE, 0, 0, 72, "MFLR8_1", "F_SKY1", "BRICK6", "the alley");
-		case S_COURT:      return Room(t, RF_OUT | RF_CIV | RF_PATROL | RF_RUBBLE, 0, 0, 104, "CWPAVE", "F_SKY1", "ADBRICK", "the courtyard");
-		case S_PLAY:       return Room(t, RF_OUT | RF_CIV | RF_RUBBLE, 0, 0, 96, "CWCONCF", "F_SKY1", "ADBRICK", "the playground");
-		case S_LOT:        return Room(t, RF_OUT | RF_PATROL | RF_RUBBLE, 0, 0, 88, "FLOOR4_8", "F_SKY1", "BRICK6", "the car lot");
-		case S_PARKING:    return Room(t, RF_OUT | RF_PATROL | RF_CIV, -8, 0, 92, "CWASPH", "F_SKY1", "BRICK6", "a parking lot");
+		case S_ROAD:       return Room(t, RF_OUT, -8, 0, 120, "CWASPH", "F_SKY1", "ADBRICK", "the street");
+		case S_WALK:       return Room(t, RF_OUT | RF_CIV | RF_RUBBLE, 0, 0, 128, "CWPAVE", "F_SKY1", "ADBRICK", "the sidewalk");
+		case S_ALLEY:      return Room(t, RF_OUT | RF_PATROL | RF_RUBBLE, 0, 0, 104, "MFLR8_1", "F_SKY1", "BRICK6", "the alley");
+		case S_COURT:      return Room(t, RF_OUT | RF_CIV | RF_PATROL | RF_RUBBLE, 0, 0, 120, "CWPAVE", "F_SKY1", "ADBRICK", "the courtyard");
+		case S_PLAY:       return Room(t, RF_OUT | RF_CIV | RF_RUBBLE, 0, 0, 120, "CWCONCF", "F_SKY1", "ADBRICK", "the playground");
+		case S_LOT:        return Room(t, RF_OUT | RF_PATROL | RF_RUBBLE, 0, 0, 112, "FLOOR4_8", "F_SKY1", "BRICK6", "the car lot");
+		case S_PARKING:    return Room(t, RF_OUT | RF_PATROL | RF_CIV, -8, 0, 120, "CWASPH", "F_SKY1", "BRICK6", "a parking lot");
 		case S_UNDER:      return Room(t, RF_PATROL | RF_CIV, -8, 176, 88, "CWASPH", "CWDECKUN", "CWVIADUC", "under the el");
 		case S_LOBBY:      return Room(t, RF_CIV | RF_PATROL, 0, 108, 144, "CWTILEF", "CWCEILL", "ADGREYW", "the tower entrance");
 		case S_SECURITY:   return Room(t, RF_PEOPLE, 0, 96, 136, "CWCONCF", "CWCEILT", "ADGREYW", "the security booth");
@@ -122,10 +122,10 @@ class NBC_KitStreet : NBC_KitGen
 		// the public space: the road across the middle and down the west side, a sidewalk either side of it
 		roadR = MakeRoom(S_ROAD);
 		Rect(roadR, 0, ROW_ROAD, NX - 1, ROW_ROAD);
-		Rect(roadR, 0, 0, 0, NY - 1);
+		Rect(roadR, 0, 0, 0, ROW_ALLEY);
 		walkN = MakeRoom(S_WALK); rName[walkN] = "the north sidewalk";
 		Rect(walkN, 1, ROW_NWALK, NX - 1, ROW_NWALK);
-		Rect(walkN, 1, ROW_NWALK, 1, NY - 1);
+		Rect(walkN, 1, ROW_NWALK, 1, ROW_ALLEY);
 		walkS = MakeRoom(S_WALK); rName[walkS] = "the south sidewalk";
 		Rect(walkS, 1, ROW_SWALK, NX - 1, ROW_SWALK);
 		Rect(walkS, 1, 0, 1, ROW_SWALK);
@@ -153,7 +153,7 @@ class NBC_KitStreet : NBC_KitGen
 		Link(1, ROW_CANAL, LOT0, ROW_CANAL, E_WIDE);
 		Link(COL_PASS, ROW_SFRONT, COL_PASS, ROW_SWALK, E_WIDE);
 		// the Wall closes the block to the north
-		for (int i = LOT0; i < NX; i++) cellFac[ROW_WALL * NX + i] = WALL_TEX;
+		for (int i = 0; i < NX; i++) cellFac[ROW_WALL * NX + i] = WALL_TEX;
 
 		switch (variant)
 		{
@@ -368,6 +368,37 @@ class NBC_KitStreet : NBC_KitGen
 				else if (roll < 55) PutWall("CW_FScrap", ci[k], cj[k], side, Rand(-40, 40));
 			}
 			break;
+		case S_WALK:
+			// NBC: street furniture against the building fronts: bins, benches, planters, junk, a scaffold now and then
+			for (int k = 0; k < ci.Size(); k++)
+			{
+				int roll = Rand(0, 99);
+				Class<Actor> what = null;
+				if (roll < 16) what = "CW_FBin";
+				else if (roll < 26) what = "CW_FPew";
+				else if (roll < 34) what = "CW_FPlanter";
+				else if (roll < 42) what = "CW_FPallet";
+				else if (roll < 50) what = "CW_FCrates";
+				else if (roll < 56) what = "CW_FScrap";
+				else if (roll < 60) what = "CW_FScaffold";
+				else if (roll < 66) what = "CW_FDumpster";
+				if (!what) continue;
+				int d0 = Rand(0, 3);
+				for (int t = 0; t < 4; t++) if (PutWall(what, ci[k], cj[k], (d0 + t) % 4, Rand(-40, 40))) break;
+			}
+			break;
+		case S_ROAD:
+			// NBC: a wreck or two, and barriers where someone blocked the road
+			for (int k = 0; k < ci.Size(); k++)
+			{
+				if (cj[k] != ROW_ROAD || ci[k] < LOT0) continue;
+				int roll = Rand(0, 99);
+				Vector2 c = CellCenter(ci[k], cj[k]);
+				if (roll < 8) Car(c + (Rand(-30, 30), Rand(-20, 20)), Rand(0, 359), "ModernCarDirtyGreen");
+				else if (roll < 16) Put("CW_FBarrier", c + (Rand(-40, 40), Rand(-60, 60)), Rand(0, 1) * 90 + Rand(-15, 15));
+				else if (roll < 22) Put("CW_FScrap", c + (Rand(-40, 40), Rand(-60, 60)), Rand(0, 359));
+			}
+			break;
 		case S_COURT:
 			for (int k = 0; k < ci.Size(); k++)
 			{
@@ -387,7 +418,7 @@ class NBC_KitStreet : NBC_KitGen
 			break;
 		case S_PARKING:
 			for (int k = 0; k < ci.Size(); k++) if (Chance(65)) Car(CellCenter(ci[k], cj[k]) + (0, Rand(-12, 12)), Chance(50) ? 90 : 270);
-			if (ci.Size()) PoleLight(CellCenter(ci[0], cj[0]) + (-60, -60), 200);
+			if (ci.Size()) PoleLight(CellCenter(ci[0], cj[0]) + (-60, -60), 300);
 			break;
 		case S_UNDER:
 			for (int k = 0; k < ci.Size(); k++)
@@ -447,10 +478,12 @@ class NBC_KitStreet : NBC_KitGen
 		// floodlights on the Wall
 		for (int i = LOT0; i < NX; i += 2)
 		{
-			PoleLight((colX[i] + colw[i] / 2, rowY[ROW_NWALK] + 16), 220);
-			PoleLight((colX[i + 1 < NX ? i + 1 : i] + colw[i] / 2, rowY[ROW_SWALK] + rowh[ROW_SWALK] - 16), 220);
+			PoleLight((colX[i] + colw[i] / 2, rowY[ROW_NWALK] + 16), 320);
+			PoleLight((colX[i + 1 < NX ? i + 1 : i] + colw[i] / 2, rowY[ROW_SWALK] + rowh[ROW_SWALK] - 16), 320);
 		}
-		for (int j = 0; j < NY; j += 2) if (j != ROW_ROAD) PoleLight((colX[1] + 16, rowY[j] + rowh[j] / 2), 220);
+		for (int j = 0; j < ROW_WALL; j++) if (j != ROW_ROAD) PoleLight((colX[1] + 16, rowY[j] + rowh[j] / 2), 300);
+		// NBC: fill light down the middle of the road, so there are no black gaps between the lamps
+		for (int i = 0; i < NX; i += 2) NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_ROAD] + rowh[ROW_ROAD] / 2, 160), 200, 180, 150, 260);
 		if (variant != V_UNDER)
 			for (double x = colX[LOT0] + 80; x < colX[NX - 1]; x += 240)
 			{
@@ -461,8 +494,8 @@ class NBC_KitStreet : NBC_KitGen
 			if (Chance(50)) Car((colX[0] + colw[0] - 64, y), Chance(50) ? 90 : 270);
 		for (int i = LOT0; i < NX; i += 3)
 		{
-			NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_ALLEY] + 16, 84), 255, 170, 90, 140);
-			NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_CANAL] + rowh[ROW_CANAL] - 16, 84), 255, 170, 90, 140);
+			NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_ALLEY] + 16, 84), 255, 170, 90, 220);
+			NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_CANAL] + rowh[ROW_CANAL] - 16, 84), 255, 170, 90, 220);
 			NBC_LightSource.Make((colX[i] + colw[i] / 2, rowY[ROW_WALL] - 24, 200), 220, 230, 255, 260);   // the Wall's floodlights
 		}
 		if (variant == V_UNDER)

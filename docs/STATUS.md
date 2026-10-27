@@ -109,6 +109,14 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **The slice runs on kits now.** `nbc/districts.txt` lists 4 turfs (no maps). Each gang's kit floors are a new `mansion` field in `nbc/gangs.txt` (Stoop Kings: tenement, gang den, rooftops; Rust Saints: chop shop, parking garage; Iron Pit: parking garage, tunnels; Collectors: luxury apartments, gambling den). The board picks one with the case RNG and a layout seed (`NBC_RunData.raidMap/raidVariant/raidKitSeed`). The RunManager fills the kit's spawn spots and puts the leader nearest the kit's exit. A raid is still one floor; M3 adds approach → staging flat → floors.
 - **Registered:** maps `NBC_K1/K2/K4` in MAPINFO (city sky, next = hub), `NBC_KitRunner` in `AddEventHandlers` (before the RunManager), CVars `nbc_kitseed` / `nbc_kitvariant`, `SNDSEQ.txt` (`NBCDoorSilent`), MODELDEF entries for the four light fixtures and the exit sign (existing `models/props/*.obj`), KEYCONF aliases `nbc_kittest` and `nbc_debug_kit`.
 - **Obsidian is frozen:** NBC_CT01–04 are out of the raid pool but still load (`+map NBC_CT01`), with their own monsters and no raid.
+- **Owner feedback round 2 (2026-10-27):**
+  - Street doors (outdoor to indoor) are open archways now, so no door art slides up the building face. Indoor doors open to the lower ceiling; their art is pinned to the ceiling and squeezed onto the shut opening, and on the taller side the gap over an open door shows the room's wall (`NBC_KitDoor` transoms).
+  - Outdoor exits put the exit sign on a barricade behind the exit instead of floating in the air; indoors it hangs just under the ceiling.
+  - Open outdoor edges show what stops you: chain-link (`CWFENCE`) on the street and tower, a rail (`CWRAIL2`) on the roof (`EdgeRail` hook). The Wall now closes the north end of the cross street too.
+  - The canal is rebuilt: a quay ledge, seawalls (`CWSEAWAL`), a road bridge with railings carrying the cross street over it, lamp posts and lights on the far bank. The east retaining wall uses `CWRETAIN`. `make_kit_maps.py` now splits T-junctions and writes things.
+  - The far-bank buildings are 3-6 storeys, and window facades are scaled to 0.4 (a storey is 80 units next to a 56-unit person), the towers too.
+  - Street clutter: bins, benches, planters, pallets, crates, scrap, dumpsters and scaffolds along the sidewalks; wrecks, barriers and scrap on the road; loose debris on the sidewalks.
+  - Lighting: outdoor light levels raised (road 120, sidewalk 128, alley 104, lots 112-120), lamp radius 320, lamps the length of the cross street, fill lights down the road.
 - **Not done yet (later milestones):** time of day and weather (M7c), elevated highway set pieces, perch spawns for snipers (M4), residents (M9), objectives on the markers (M4/M9).
 
 ### Side work — Obsidian city maps and Corpo Wars room sets (2026-10-27, by Claude; not a milestone)
@@ -147,6 +155,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **M2c kits:**
   - In the console: `nbc_kittest 1 0 3` (tower, occupied), `nbc_kittest 1 1 10` (gallery), `nbc_kittest 1 2 17` (gang floor), `nbc_kittest 1 3 24` (burned-out), `nbc_kittest 1 4 31` (penthouse); `nbc_kittest 2 <0-3> 5` (street); `nbc_kittest 3 <0-4> 7` (basement); `nbc_kittest 4 <0-2> 9` (roof). Do they read as a housing tower, a city street, a basement, a roof, at the right size next to you and the gang?
   - The flats' windows (CWWINDO) look like windows onto the city, not a painted wall; the boarded ones read as boarded.
+  - Round 2 fixes: no door art on building faces or above open doors; exit signs sit on a barricade outdoors; fences visible at every open street edge; the canal, bridge and quay look right; the far-bank buildings and tower windows look the right size next to you; enough street clutter, nothing blocking a sidewalk; no dark gaps between street lamps.
   - Doors: Use opens them, they shut after a few seconds, never on you; walk an officer up to a closed door and it opens. The squeezed door art looks like a door.
   - The gallery rail and the rooftop gap's rails stop you; the plank bridges carry you across.
   - Fences and gates: no thin columns, no gaps in the courtyard, playground or car-lot fences.

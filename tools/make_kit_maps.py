@@ -43,6 +43,9 @@ SCENERY = {
     "NBC_KT": dict(z=-768, canal=True, wall=False, seed=37, tiers=[(420, 980), (620, 1400), (900, 2000)]),
     "NBC_KR": dict(z=-768, canal=True, wall=False, seed=23, tiers=[(360, 980), (600, 1400), (900, 2100)]),
 }
+# NBC: the facade art has a storey every 32 texels; at this scale a storey is 80 units (2.6 m), right for a
+# 56-unit person (window facades only: plain brick keeps its scale)
+FACADE_SCALE = 0.4
 FACADES = ["CWNRESA", "CWNRESB", "CWNRESC", "CWNRESA", "CWNRESB", "CWNTOWA", "CWNTOWB", "CWNTOWC", "CWNTOWD", "CWNINDA"]
 
 # name: (column widths west->east, row heights south->north). Keep in sync with the kits' Setup().
@@ -85,7 +88,7 @@ LOW_FACADES = ["CWNRESA", "CWNRESB", "CWNRESC", "BRICK12", "BIGBRIK1", "CWWALLD"
 
 
 def low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, a0, a1, b0, b1, along_x):
-    """A continuous row of low buildings (4-10 m) across [a0, a1] deep and from b0 to b1 along the row.
+    """A continuous row of low buildings (3-6 storeys) across [a0, a1] deep and from b0 to b1 along the row.
     Neighbouring blocks share their side walls exactly, so the row has no gaps."""
     b = b0
     while b < b1 - 64:
@@ -93,19 +96,19 @@ def low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, a0, a1, b0
         if b1 - (b + w) < 128:
             w = b1 - b
         loop = clockwise(rect(b, a0, w, a1 - a0) if along_x else rect(a0, b, a1 - a0, w))
-        h = rnd.randint(16, 36) * 8
+        h = rnd.randint(32, 60) * 8
         sectors.append(([loop], dict(floor=z + h, ceil=sky, ftex="FLAT5_5", ctex="F_SKY1", light=112, tag=0)))
         holes.append(loop)
         tex, light = rnd.choice(LOW_FACADES), rnd.randint(0, 32)
         for k in range(4):
             key = frozenset((loop[k], loop[(k + 1) % 4]))
-            edge_tex[key] = tex
+            edge_tex[key] = (tex, FACADE_SCALE if tex.startswith("CWN") else 1.0)
             edge_light[key] = light
         b += w
     avoid.append((b0, a0, b1, a1) if along_x else (a0, b0, a1, b1))
 
 
-def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
+def scenery(name, X, Y, hole, sectors, edge_tex, edge_light, edge_mid, things):
     """The world past the grid: band ring, canal, retaining wall, towers, ground, the sky-hack horizon."""
     cfg = SCENERY[name]
     rnd = random.Random(cfg["seed"])
@@ -115,18 +118,48 @@ def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
     sectors.append(([ring, hole], dict(floor=z, ceil=sky, ftex="CWPAVE", ctex="F_SKY1", light=128, tag=12000)))
     holes, avoid = [ring], [(-M - 96, -M - 96, X + M + 96, Y + M + 96)]
     if cfg["canal"]:
-        # an L of water along the south and the west, a 112 drop below the ground, embankment walls
-        i0, w = M + 32, 352
+        # an L of water along the south and the west: a stone quay ledge on the near side 56 down, the water 112
+        # down, seawalls, a road bridge carrying the cross street (x 0-224) over the south arm, lamps on the far bank
+        i0, w, q = M + 32, 352, 48
         xe, yn = X + R - 420, Y + R - 420
-        canal = clockwise([(-i0 - w, -i0 - w), (xe, -i0 - w), (xe, -i0), (-i0, -i0), (-i0, yn), (-i0 - w, yn)])
-        sectors.append(([canal], dict(floor=z - 112, ceil=sky, ftex="CWWATER", ctex="F_SKY1", light=120, tag=0)))
-        holes.append(canal)
+        bx0, bx1 = 0, 224
+        wat = dict(floor=z - 112, ceil=sky, ftex="CWWATER", ctex="F_SKY1", light=120, tag=0)
+        quay = dict(floor=z - 56, ceil=sky, ftex="CWCONCF", ctex="F_SKY1", light=120, tag=0)
+        deck = dict(floor=z, ceil=sky, ftex="CWASPH", ctex="F_SKY1", light=128, tag=0)
+        pieces = [
+            (rect(-i0 - w, -i0 - w, w - q, yn + i0 + w), wat),             # the west arm and the corner
+            (rect(-i0 - q, -i0 - w, bx0 + i0 + q, w - q), wat),            # the south arm west of the bridge
+            (rect(bx1, -i0 - w, xe - bx1, w - q), wat),                    # and east of it
+            (rect(-i0 - q, -i0 - q, q, yn + i0 + q), quay),                # the quay along the west arm and the corner
+            (rect(-i0, -i0 - q, bx0 + i0, q), quay),                       # the quay along the south arm
+            (rect(bx1, -i0 - q, xe - bx1, q), quay),
+            (rect(bx0, -i0 - w - 32, bx1 - bx0, w + 32), deck),            # the bridge
+        ]
+        for loop, props in pieces:
+            loop = clockwise(loop)
+            sectors.append(([loop], dict(props)))
+            holes.append(loop)
+            for k in range(4):
+                key = frozenset((loop[k], loop[(k + 1) % 4]))
+                if props is deck and loop[k][0] == loop[(k + 1) % 4][0]:
+                    edge_mid[key] = "CWRAIL2"          # the bridge's railings, over the water
+                else:
+                    edge_tex.setdefault(key, ("CWSEAWAL", 1.0))
         avoid += [(-i0 - w, -i0 - w, xe, -i0), (-i0 - w, -i0 - w, -i0, yn)]
-        # the far bank: a row of low buildings along both arms, so the ground plane never shows from the street
+        # the far bank: a row of low buildings along both arms, so the ground plane never shows from the street;
+        # a gap where the bridge lands
         bank = -i0 - w - 32
         d = 224
-        low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bank - d, xe, True)      # south, west to east
+        low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bank - d, bx0 - 64, True)  # south, west of the bridge
+        low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bx1 + 64, xe, True)       # and east of it
         low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bank + 16, yn, False)   # west, south to north
+        # lamps along the far bank
+        for x in range(bank + 64, xe - 64, 384):
+            things.append(dict(type=26233, x=float(x), y=float(bank + 16), angle=90))
+            things.append(dict(type=9800, x=float(x), y=float(bank + 24), height=96.0, arg0=255, arg1=210, arg2=150, arg3=280))
+        for y in range(bank + 400, yn - 64, 384):
+            things.append(dict(type=26233, x=float(bank + 16), y=float(y), angle=0))
+            things.append(dict(type=9800, x=float(bank + 24), y=float(y), height=96.0, arg0=255, arg1=210, arg2=150, arg3=280))
     if cfg["wall"]:
         # a high retaining wall closing off the east side
         x0 = X + M + 32
@@ -134,7 +167,7 @@ def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
         sectors.append(([wall], dict(floor=z + 224, ceil=sky, ftex="CWCONCF", ctex="F_SKY1", light=104, tag=0)))
         holes.append(wall)
         for k in range(4):
-            edge_tex[frozenset((wall[k], wall[(k + 1) % 4]))] = "CWWALLD"
+            edge_tex[frozenset((wall[k], wall[(k + 1) % 4]))] = ("CWRETAIN", 1.0)
         avoid.append((x0, -M - 16, x0 + 48, Y + R - 300 + -M - 16))
     # tower blocks in three tiers of distance from the band
     bounds = (-R + 200, -R + 200, X + R - 200, Y + R - 200)
@@ -168,7 +201,7 @@ def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
             tex, light = rnd.choice(FACADES), rnd.randint(8, 40)
             for k in range(4):
                 key = frozenset((loop[k], loop[(k + 1) % 4]))
-                edge_tex[key] = tex
+                edge_tex[key] = (tex, FACADE_SCALE if tex.startswith("CWN") else 1.0)
                 edge_light[key] = light
     ground = clockwise(rect(-R + 48, -R + 48, X + 2 * R - 96, Y + 2 * R - 96))
     sectors.append(([ground] + holes[1:] + [ring], dict(floor=z, ceil=sky, ftex="CWASPH", ctex="F_SKY1", light=120, tag=0)))
@@ -225,18 +258,50 @@ def template(name, colw, rowh):
     xs = sorted({v for i in range(nx) for v in (cx[i], cx[i] + colw[i])})
     ys = sorted({v for j in range(ny) for v in (cy[j], cy[j] + rowh[j])})
     hole = [(x, 0) for x in xs] + [(X, y) for y in ys[1:]] + [(x, Y) for x in reversed(xs[:-1])] + [(0, y) for y in reversed(ys[1:-1])]
-    edge_tex, edge_light, towers = {}, {}, 0
+    edge_tex, edge_light, edge_mid, things, towers = {}, {}, {}, [], 0
     if name in SCENERY:
-        towers = scenery(name, X, Y, hole, sectors, edge_tex, edge_light)
+        towers = scenery(name, X, Y, hole, sectors, edge_tex, edge_light, edge_mid, things)
     else:
         outer = clockwise(rect(-VIEW, -VIEW, X + 2 * VIEW, Y + 2 * VIEW))
         sectors.append(([outer, hole], dict(floor=-768, ceil=1024, ftex="ADFCITY", ctex="F_SKY1", light=144, tag=12000)))
     blocking = {frozenset((hole[k], hole[(k + 1) % len(hole)])) for k in range(len(hole))}
     start = (cx[0] + colw[0] // 2, cy[0] + rowh[0] // 2)
-    return sectors, blocking, start, edge_tex, edge_light, towers
+    return sectors, blocking, start, edge_tex, edge_light, edge_mid, things, towers
 
 
-def udmf(sectors, blocking, start, edge_tex, edge_light):
+def split_tees(sectors):
+    """Cut every axis-aligned loop edge at any vertex lying inside it, so pieces that meet part-way along a
+    side (the canal's quay, water and bridge) share whole lines. Returns {piece: the whole edge it came from}."""
+    parent = {}
+    pts = {p for loops, _ in sectors for loop in loops for p in loop}
+    by_x, by_y = {}, {}
+    for x, y in pts:
+        by_x.setdefault(x, []).append(y)
+        by_y.setdefault(y, []).append(x)
+    for loops, _ in sectors:
+        for n, loop in enumerate(loops):
+            out = []
+            for k in range(len(loop)):
+                a, b = loop[k], loop[(k + 1) % len(loop)]
+                out.append(a)
+                if a[0] == b[0]:
+                    mids = sorted((y for y in by_x.get(a[0], []) if min(a[1], b[1]) < y < max(a[1], b[1])), reverse=a[1] > b[1])
+                    out += [(a[0], y) for y in mids]
+                    chain = [a] + [(a[0], y) for y in mids] + [b]
+                elif a[1] == b[1]:
+                    mids = sorted((x for x in by_y.get(a[1], []) if min(a[0], b[0]) < x < max(a[0], b[0])), reverse=a[0] > b[0])
+                    out += [(x, a[1]) for x in mids]
+                    chain = [a] + [(x, a[1]) for x in mids] + [b]
+                else:
+                    continue
+                for c in range(len(chain) - 1):
+                    parent[frozenset((chain[c], chain[c + 1]))] = frozenset((a, b))
+            loops[n] = out
+    return parent
+
+
+def udmf(sectors, blocking, start, edge_tex, edge_light, edge_mid, things):
+    parent = split_tees(sectors)
     verts, vid = [], {}
 
     def v(p):
@@ -254,18 +319,26 @@ def udmf(sectors, blocking, start, edge_tex, edge_light):
     lines, sides = [], []
     for key, uses in edges.items():
         a, b, s = uses[0]
+        whole = parent.get(key, key)
         if len(uses) == 1:
             sides.append(dict(sector=s, texturemiddle="CWCONCW"))
             lines.append(dict(v1=v(a), v2=v(b), sidefront=len(sides) - 1, blocking=True))
         else:
-            tex = edge_tex.get(key, "CWCONCW")
-            sides.append(dict(sector=s, texturetop=tex, texturebottom=tex))
-            sides.append(dict(sector=uses[1][2], texturetop=tex, texturebottom=tex))
-            if key in edge_light:
-                sides[-2]["light"] = edge_light[key]
-                sides[-1]["light"] = edge_light[key]
+            tex, sc = edge_tex.get(key, edge_tex.get(whole, ("CWCONCW", 1.0)))
+            for sec in (s, uses[1][2]):
+                sd = dict(sector=sec, texturetop=tex, texturebottom=tex)
+                if sc != 1.0:
+                    sd.update(scalex_top=sc, scaley_top=sc, scalex_bottom=sc, scaley_bottom=sc)
+                if whole in edge_mid:
+                    sd["texturemiddle"] = edge_mid[whole]
+                sides.append(sd)
+            if whole in edge_light:
+                sides[-2]["light"] = edge_light[whole]
+                sides[-1]["light"] = edge_light[whole]
             ln = dict(v1=v(a), v2=v(b), sidefront=len(sides) - 2, sideback=len(sides) - 1, twosided=True)
-            if key in blocking:
+            if whole in edge_mid:
+                ln["dontpegbottom"] = True
+            if whole in blocking:
                 ln.update(blocking=True, blockmonsters=True)
             lines.append(ln)
 
@@ -286,6 +359,7 @@ def udmf(sectors, blocking, start, edge_tex, edge_light):
     for _, p in sectors:
         out.append(block("sector", dict(heightfloor=p["floor"], heightceiling=p["ceil"], texturefloor=p.get("ftex", "FLAT5_4"),
                                         textureceiling=p.get("ctex", "CEIL1_1"), lightlevel=p.get("light", 128), id=p["tag"])))
+    out += [block("thing", dict(t, skill1=True, skill2=True, skill3=True, skill4=True, skill5=True, single=True)) for t in things]
     out.append(block("thing", dict(type=1, x=float(start[0]), y=float(start[1]), angle=90, skill1=True, skill2=True,
                                    skill3=True, skill4=True, skill5=True, single=True, coop=True, dm=True)))
     return "\n".join(out).encode()
@@ -304,7 +378,7 @@ def write_wad(path, name, textmap):
 
 if __name__ == "__main__":
     for name, (colw, rowh) in GRIDS.items():
-        sectors, blocking, start, edge_tex, edge_light, towers = template(name, colw, rowh)
+        sectors, blocking, start, edge_tex, edge_light, edge_mid, things, towers = template(name, colw, rowh)
         path = os.path.join(OUT, name + ".wad")
-        write_wad(path, name, udmf(sectors, blocking, start, edge_tex, edge_light))
+        write_wad(path, name, udmf(sectors, blocking, start, edge_tex, edge_light, edge_mid, things))
         print("%s: %d x %d cells, %d sectors, %d towers -> %s" % (name, len(colw), len(rowh), len(sectors), towers, os.path.relpath(path, ROOT)))

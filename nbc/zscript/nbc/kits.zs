@@ -99,6 +99,10 @@ class NBC_KitDoor : Actor
 	int doorIdx;
 	int idle;
 	bool isOpen, primed;
+	// NBC: the faces on the taller side of a doorway: open, the gap over the door shows the room's wall, not door art
+	Array<Side> transom;
+	Array<TextureID> transomArt;
+	Array<double> transomSX, transomSY;
 
 	const SPEED = 48;
 	const USE_SPECIAL = 47;        // Ceiling_MoveToValue
@@ -135,8 +139,39 @@ class NBC_KitDoor : Actor
 	double CurTop() { return level.PointInSector(pos.xy).ceilingplane.ZAtPoint(pos.xy); }
 	bool IsShut() { return CurTop() <= shutZ + 4; }
 
+	void FindTransoms()
+	{
+		Sector strip = level.PointInSector(pos.xy);
+		if (!strip) return;
+		for (int l = 0; l < strip.lines.Size(); l++)
+		{
+			Line ln = strip.lines[l];
+			if (!ln.sidedef[1] || ln.delta.Length() < 40) continue;
+			for (int z = 0; z < 2; z++)
+			{
+				Side sd = ln.sidedef[z];
+				if (sd.sector == strip || sd.sector.ceilingplane.ZAtPoint(sd.sector.centerspot) <= openZ + 1) continue;
+				transom.Push(sd); transomArt.Push(sd.GetTexture(Side.top));
+				transomSX.Push(sd.GetTextureXScale(Side.top)); transomSY.Push(sd.GetTextureYScale(Side.top));
+			}
+		}
+	}
+
+	void SetTransoms(bool open)
+	{
+		for (int k = 0; k < transom.Size(); k++)
+		{
+			Side sd = transom[k];
+			sd.SetTexture(Side.top, open ? sd.GetTexture(Side.bottom) : transomArt[k]);
+			sd.SetTextureXScale(Side.top, open ? 1 : transomSX[k]);
+			sd.SetTextureYScale(Side.top, open ? 1 : transomSY[k]);
+		}
+	}
+
 	void SetDoor(bool open)
 	{
+		if (!primed) FindTransoms();
+		SetTransoms(open);
 		double z = open ? openZ : shutZ;
 		level.ExecuteSpecial(USE_SPECIAL, null, null, false, doorTag, SPEED, abs(int(z)), z < 0 ? 1 : 0);
 		if (primed) DoorSound(open);
@@ -289,8 +324,22 @@ class NBC_KitExit : Actor
 	override void PostBeginPlay()
 	{
 		Super.PostBeginPlay();
-		NBC_LightSource.Make(pos + (0, 0, 88), 60, 220, 90, 72);
-		let sign = Spawn("NBC_ExitSign", pos + (0, 0, 92));
+		// NBC: indoors the sign hangs under the ceiling; outdoors (no ceiling) it sits on a barricade behind the exit
+		double signZ = 92;
+		Sector sec = level.PointInSector(pos.xy);
+		if (sec && sec.GetTexture(Sector.ceiling) == skyflatnum)
+		{
+			Vector2 back = pos.xy - AngleToVector(angle, 28);
+			let bar = Spawn("CW_FBarrier", (back, pos.z));
+			if (bar) bar.angle = angle + 90;
+			NBC_LightSource.Make((back, pos.z + 56), 60, 220, 90, 72);
+			let sign = Spawn("NBC_ExitSign", (back, pos.z + 34));
+			if (sign) sign.angle = angle;
+			return;
+		}
+		if (sec) signZ = min(signZ, sec.ceilingplane.ZAtPoint(pos.xy) - pos.z - 12);
+		NBC_LightSource.Make(pos + (0, 0, signZ - 4), 60, 220, 90, 72);
+		let sign = Spawn("NBC_ExitSign", pos + (0, 0, signZ));
 		if (sign) sign.angle = angle;
 	}
 

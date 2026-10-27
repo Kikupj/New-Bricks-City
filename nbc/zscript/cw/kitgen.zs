@@ -679,11 +679,14 @@ class NBC_KitGen play
 		if (a < 0 || b < 0 || a == b) return;
 		double f = max(rF[a], rF[b]);
 		double c = min(CeilOf(a), CeilOf(b));
+		// NBC: a street door is an open entrance: a door whose ceiling slides up into a building face drags its
+		// art up the whole facade, so from outside it's an archway with the facade above
+		if (lKind[k] == E_DOOR && IsOut(a) != IsOut(b)) lKind[k] = E_ARCH;
 		switch (lKind[k])
 		{
 		case E_DOOR:
 		{
-			double top = min(c, f + DOOR_H);
+			double top = c;          // NBC: opens to the lower ceiling, so no door art hangs over the doorway
 			Segs(ei, ej, vert, 1, 1, f, top);
 			SetEdgeState(ei, ej, vert, 1);
 			let dr = NBC_KitDoor(Actor.Spawn("NBC_KitDoor", ((lX[k], lY[k]), f)));
@@ -798,6 +801,7 @@ class NBC_KitGen play
 	Array<String> bandWalls;
 	int bandLight;
 	String kerbTex;             // the step between an open outdoor edge and the band (a kerb)              // >0: the band's light level    // the band's outer wall (the buildings across the street); empty = edgeTex
+	virtual String EdgeRail(int r) { return "CWFENCE"; }   // NBC: the see-through barrier on an open edge ("" = none)
 	virtual bool EdgeOpen(int r) { return false; }   // true: this outdoor room's edge is a railing / fence with the view beyond
 	// NBC: how high a fence or rail between two rooms stands (chain-link 64; a balcony rail is lower)
 	virtual double FenceH(int a, int b) { return 64; }
@@ -845,6 +849,14 @@ class NBC_KitGen play
 		{
 			inner.SetTexture(Side.mid, TexMan.CheckForTexture("-", TexMan.Type_Any));
 			if (kerbTex.Length()) { inner.SetTexture(Side.bottom, Tx(kerbTex)); band.SetTexture(Side.bottom, Tx(kerbTex)); }
+			// NBC: an open edge you can't cross shows what stops you: a chain-link fence or a rail
+			String rail = EdgeRail(r);
+			if (rail.Length())
+			{
+				inner.SetTexture(Side.mid, Tx(rail)); band.SetTexture(Side.mid, Tx(rail));
+				ln.flags &= ~Line.ML_WRAP_MIDTEX;
+				ln.flags |= Line.ML_DONTPEGBOTTOM | Line.ML_BLOCKING;
+			}
 			return true;
 		}
 		inner.SetTexture(Side.mid, Tx(IsOut(r) ? face : EdgeWall(r)));
@@ -932,15 +944,18 @@ class NBC_KitGen play
 					if (IsDoorStrip(o))
 					{
 						sd.SetTexture(Side.top, door);
-						ln.flags &= ~Line.ML_DONTPEGTOP;
-						// NBC: doors are smaller than the door art: squeeze the whole door onto the opening
+						// NBC: the art is pinned to the room's ceiling and squeezed onto the shut opening (floor to that
+						// ceiling), so it stays still while the door slides up and never repeats up the wall
+						ln.flags |= Line.ML_DONTPEGTOP;
 						int tw, th;
 						[tw, th] = TexMan.GetSize(door);
 						double len = ln.delta.Length();
-						if (tw > 0 && th > 0 && len > 0)
+						Sector ss = sd.sector;
+						double hgt = ss.ceilingplane.ZAtPoint(ss.centerspot) - level.sectors[o].floorplane.ZAtPoint(level.sectors[o].centerspot);
+						if (tw > 0 && th > 0 && len > 0 && hgt > 8)
 						{
 							sd.SetTextureXScale(Side.top, tw / len);
-							sd.SetTextureYScale(Side.top, th / double(DOOR_H));
+							sd.SetTextureYScale(Side.top, th / hgt);
 						}
 						sd.SetTextureYOffset(Side.top, 0);
 						sd.SetTexture(Side.bottom, Tx(rWallT[r]));

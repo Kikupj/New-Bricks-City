@@ -23,6 +23,7 @@ class NBC_KitRoof : NBC_KitGen
 		doorTex = "CWDOORF"; jambTex = "SUPPORT3"; edgeTex = "ADBRICK";
 	}
 	override bool EdgeOpen(int r) { return IsOut(r); }
+	override String EdgeRail(int r) { return "CWRAIL2"; }
 	override double FenceH(int a, int b) { return 36; }     // rails at the gap's edge: 1.1 m, and they block
 	override int VariantCount() { return V_COUNT; }
 	override String VariantName()
