@@ -80,6 +80,30 @@ def overlaps(a, b, pad):
     return not (a[2] + pad <= b[0] or b[2] + pad <= a[0] or a[3] + pad <= b[1] or b[3] + pad <= a[1])
 
 
+LOW_FACADES = ["CWNRESA", "CWNRESB", "CWNRESC", "BRICK12", "BIGBRIK1", "CWWALLD", "CWNRESB", "STUCCO1"]
+
+
+def low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, a0, a1, b0, b1, along_x):
+    """A continuous row of low buildings (4-10 m) across [a0, a1] deep and from b0 to b1 along the row.
+    Neighbouring blocks share their side walls exactly, so the row has no gaps."""
+    b = b0
+    while b < b1 - 64:
+        w = min(rnd.randint(12, 24) * 16, b1 - b)
+        if b1 - (b + w) < 128:
+            w = b1 - b
+        loop = clockwise(rect(b, a0, w, a1 - a0) if along_x else rect(a0, b, a1 - a0, w))
+        h = rnd.randint(16, 36) * 8
+        sectors.append(([loop], dict(floor=z + h, ceil=sky, ftex="FLAT5_5", ctex="F_SKY1", light=112, tag=0)))
+        holes.append(loop)
+        tex, light = rnd.choice(LOW_FACADES), rnd.randint(0, 32)
+        for k in range(4):
+            key = frozenset((loop[k], loop[(k + 1) % 4]))
+            edge_tex[key] = tex
+            edge_light[key] = light
+        b += w
+    avoid.append((b0, a0, b1, a1) if along_x else (a0, b0, a1, b1))
+
+
 def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
     """The world past the grid: band ring, canal, retaining wall, towers, ground, the sky-hack horizon."""
     cfg = SCENERY[name]
@@ -97,6 +121,11 @@ def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
         sectors.append(([canal], dict(floor=z - 112, ceil=sky, ftex="CWWATER", ctex="F_SKY1", light=120, tag=0)))
         holes.append(canal)
         avoid += [(-i0 - w, -i0 - w, xe, -i0), (-i0 - w, -i0 - w, -i0, yn)]
+        # the far bank: a row of low buildings along both arms, so the ground plane never shows from the street
+        bank = -i0 - w - 32
+        d = 224
+        low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bank - d, xe, True)      # south, west to east
+        low_row(rnd, sectors, holes, avoid, edge_tex, edge_light, z, sky, bank - d, bank, bank + 16, yn, False)   # west, south to north
     if cfg["wall"]:
         # a high retaining wall closing off the east side
         x0 = X + M + 32
