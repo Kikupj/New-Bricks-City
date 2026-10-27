@@ -13,10 +13,8 @@
 //   painchance        multiplier on gang members' pain chance (stagger resistance < 1)
 //   trait             one line for the raid board dossier
 //   mansion           the kit floors the gang holds (PLAN.md §6.7, §6.9), "<kit>:<variant>"; a raid picks one with
-//                     the case RNG. Kits: K1 street (club, restaurant, pawn shop, street market, mall, drug lab,
-//                     chop shop, gambling den), K2 tower floor (tenement, apartment block, luxury apartments,
-//                     hotel, gang den, rooftops), K4 underground (maintenance tunnels, underpass, transit station,
-//                     parking garage, hydroponic farm, bunker)
+//                     the case RNG. Kits and variants: tower (occupied floor, gallery floor, gang floor,
+//                     burned-out floor, penthouse floor); street, basement and roof arrive with M2c
 
 gang stoop_kings
 {
@@ -34,7 +32,7 @@ gang stoop_kings
 	leaderhealth = 6
 	escorts = 3
 	trait = "Swarm: more of them on every stoop, but they drop fast."
-	mansion = "K2:tenement" "K2:gang den" "K2:rooftops"
+	mansion = "tower:gang floor" "tower:gallery floor" "tower:burned-out floor"
 }
 
 gang rust_saints
@@ -54,7 +52,7 @@ gang rust_saints
 	escorts = 2
 	damage = Fire 0
 	trait = "Pyros: fire and explosives, and fire won't touch them."
-	mansion = "K1:chop shop" "K4:parking garage"
+	mansion = "tower:gang floor" "tower:burned-out floor"
 }
 
 gang iron_pit
@@ -75,7 +73,7 @@ gang iron_pit
 	damage = Fire 1.5
 	painchance = 0.4
 	trait = "Roiders: they shrug off stagger. Fire hurts them half again."
-	mansion = "K4:parking garage" "K4:maintenance tunnels"
+	mansion = "tower:gang floor"
 }
 
 gang collectors
@@ -95,5 +93,5 @@ gang collectors
 	escorts = 3
 	damage = NBC_Light 0.6
 	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles."
-	mansion = "K2:luxury apartments" "K1:gambling den"
+	mansion = "tower:penthouse floor"
 }

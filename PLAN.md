@@ -474,12 +474,13 @@ How the smoke test works:
 
 **Obsidian is frozen.** NBC_CT01–04 stay in the game as the M2 slice's districts until M2b replaces them, then they're dropped from the district pool. `tools/Obsidian/` stays in the repo as a record; don't extend it. Its Corpo Wars furniture classes (`nbc/zscript/cw/`) are reused by the kits' `Dress()`.
 
-**Scale (every kit and hand-built map uses it).** About 32 map units to a metre, bent where Doom's actors need room:
-- floor to floor 160, flat ceilings 120–128, lobby and shop ceilings 160–192
-- doors 64 wide and 96 high; double doors 128
-- corridors 96–128 wide (the squad has to pass you); stairs 16 high and 32 deep per step, stairwells 128 wide
-- windows start 40 above the floor; rows of identical windows on every facade
-- streets: a 256–384 roadway between 96–128 sidewalks
+**Scale (every kit and hand-built map uses it).** Measured from the actors: the player, the officers and every gang member are 56 units tall (their sprites draw 54–60 pixels tall), so a person is 56 units = 1.8 m. That makes a metre about **31 units up**; with Doom's 1.2 vertical stretch it's about **37 units across**. Real sizes, bent only where actors need room to move:
+- flat, corridor and service ceilings 80 (2.5 m); lobbies 88–100; penthouse flats 96 (3 m); shops and halls 108–128
+- doors 68 high (2.1 m) and 48 wide (1.3 m; a real 1 m door is 37, too narrow for radius-20 actors)
+- corridors 80 wide (2.2 m, so two officers can pass); rooms 112–144 deep (3–4 m); stair cores 176 wide
+- rails over a drop 36 high (1.1 m) and blocking; fences 64 (2 m)
+- streets: a 256 roadway (6.9 m), 112–128 sidewalks
+- window sills 24, window openings 40 high
 
 Doom engines can't create new geometry at runtime, but they can **move** it. Corpo Wars' site kits (§0.1) use that: each kit map is a fixed grid of closed-off sectors, and when the map loads the kit code picks a layout from the seed and raises or lowers floors and ceilings to carve out rooms, doors, windows and fire escapes. It then furnishes and lights them, and marks entries and objective rooms. So **every block in every case is a new layout**, with no map files to author per block. On top of that come randomized objectives, spawns, loot and elite modifiers.
 
@@ -647,6 +648,16 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 - Can two officers follow you through every corridor, door and stairwell without blocking you?
 - Raid every gang in a case and confirm their floors use the right kit variants.
 - Look out of the windows: skyline, rows of windows on the facades opposite.
+
+
+---
+
+### M2c — The Bricks kit layouts, from scratch — 🔄 IN PROGRESS (2026-10-27, by Claude)
+**Decision (owner, 2026-10-27):** the Corpo Wars kit layouts aren't up to standard and cover settings the Bricks doesn't need, so every layout is written new for New Bricks City. Only M2b's carving engine (`nbc/zscript/cw/kitgen.zs`) stays. The kits are `nbc/zscript/nbc/kit_*.zs` on new template grids (`tools/make_kit_maps.py`), at the measured scale in §4.4:
+- **Tower floor** (`NBC_KT`): stair cores at both ends, a corridor, flats on both sides (studios to four-bay flats: bathroom, hall and kitchen by the corridor, bedrooms either side of the living room at the windows), the lift lobby with the trash chute and laundry. Variants: occupied, gallery (an open-air deck along one face), gang floor (knocked-through flats, barricades, stash/cook/counting/lookout flats), burned-out, penthouse.
+- **Street** (`NBC_KS`): the foot of the towers: the tower entrance, a courtyard, a bodega and corner stores, a chain-link lot, the alley, the Wall.
+- **Basement** (`NBC_KB`): boiler and laundry, storage cages, a cook lab, the fight pit, the garage, a tunnel under the Wall.
+- **Roof** (`NBC_KR`): parapets, the stair hut and lift machine room, water tanks, plank bridges to the next tower.
 
 ---
 

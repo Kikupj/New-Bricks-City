@@ -59,13 +59,25 @@ class NBC_KitRunner : EventHandler
 			else Console.Printf(NBC_KitGen.KitOfMap(level.MapName) ? "nbc: this floor was loaded from a save; its plan isn't kept." : "nbc: not a kit map (NBC_K1, NBC_K2, NBC_K4).");
 			return;
 		}
+		if (e.Name ~== "nbc_goto")
+		{
+			// testing: netevent nbc_goto <x> <y> <angle> puts the player there on the floor, facing that way
+			let pm = players[consoleplayer].mo;
+			if (!pm) return;
+			Vector2 at = (e.Args[0], e.Args[1]);
+			pm.SetOrigin((at, level.PointInSector(at).floorplane.ZAtPoint(at)), false);
+			pm.angle = e.Args[2];
+			pm.pitch = 0;
+			pm.vel = (0, 0, 0);
+			return;
+		}
 		if (!(e.Name ~== "nbc_kittest")) return;
 		// netevent nbc_kittest <kit 1/2/4> <variant, -1 = from the seed> <seed, 0 = random>
 		int k = e.Args[0];
 		String m = NBC_KitGen.MapOfKit(k);
 		if (m == "")
 		{
-			Console.Printf("nbc_kittest <kit> <variant> <seed>: kit is 1 (street), 2 (tower floor / rooftops) or 4 (underground).");
+			Console.Printf("nbc_kittest <kit> <variant> <seed>: kit is 1 (tower floor), 2 (street), 3 (basement) or 4 (roof).");
 			return;
 		}
 		CVar.GetCVar("nbc_kitvariant").SetInt(e.Args[1]);
@@ -112,7 +124,7 @@ class NBC_KitDoor : Actor
 		for (int l = 0; l < strip.lines.Size(); l++)
 		{
 			Line ln = strip.lines[l];
-			if (!ln.sidedef[1] || ln.delta.Length() < 48) continue;
+			if (!ln.sidedef[1] || ln.delta.Length() < 40) continue;   // the two door faces, not the 16u jambs
 			ln.special = USE_SPECIAL;
 			ln.args[0] = doorTag; ln.args[1] = SPEED; ln.args[2] = abs(int(openZ)); ln.args[3] = openZ < 0 ? 1 : 0;
 			ln.activation = SPAC_Use | SPAC_UseBack | SPAC_MUse;

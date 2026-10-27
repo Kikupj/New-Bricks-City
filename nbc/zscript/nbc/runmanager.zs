@@ -105,10 +105,10 @@ class NBC_RunManager : EventHandler
 		return d >= 0 && d < districtTitles.Size() ? districtTitles[d] : "the block";
 	}
 
-	// Pick one of the gang's kit floors ("K2:tenement") with the case RNG and set the raid up to run on it.
+	// Pick one of the gang's kit floors ("tower:gang floor") with the case RNG and set the raid up to run on it.
 	static void PickMansion(NBC_GangDef g, NBC_RunData rd)
 	{
-		int kit = NBC_KitGen.KIT_RES, v = 0;
+		int kit = NBC_KitGen.KIT_TOWER, v = 0;
 		if (g && g.mansion.Size())
 		{
 			String pick = g.mansion[rd.Rand(0, g.mansion.Size() - 1)];
@@ -132,7 +132,7 @@ class NBC_RunManager : EventHandler
 					v = 0;
 				}
 			}
-			else Console.Printf("\cggangs.txt: %s mansion \"%s\" isn't a kit (K1, K2 or K4).", g.id, pick);
+			else Console.Printf("\cggangs.txt: %s mansion \"%s\" isn't a kit (tower, street, basement or roof).", g.id, pick);
 		}
 		rd.raidMap = NBC_KitGen.MapOfKit(kit);
 		rd.raidVariant = v;

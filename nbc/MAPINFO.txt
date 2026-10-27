@@ -45,9 +45,10 @@ map NBC_TEST "Test Room"
 	next = "NBC_TEST"
 }
 
-// The kit template maps (PLAN.md §4.4, M2b): a blank grid that NBC_KitRunner carves into a new layout from a
-// seed every time the map loads. Raids run on these; `nbc_kittest <kit> <variant> <seed>` loads one directly.
-map NBC_K1 "The Street"
+// The kit template maps (PLAN.md §4.4, M2c; tools/make_kit_maps.py builds them): a blank grid that
+// NBC_KitRunner carves into a new layout from a seed every time the map loads. Raids run on these;
+// `nbc_kittest <kit> <variant> <seed>` loads one directly (kits: 1 tower, 2 street, 3 basement, 4 roof).
+map NBC_KT "The Tower"
 {
 	levelnum = 201
 	sky1 = "CITYSKY", 0
@@ -55,7 +56,7 @@ map NBC_K1 "The Street"
 	next = "NBC_HUB"
 }
 
-map NBC_K2 "The Tower"
+map NBC_KS "The Street"
 {
 	levelnum = 202
 	sky1 = "CITYSKY", 0
@@ -63,7 +64,15 @@ map NBC_K2 "The Tower"
 	next = "NBC_HUB"
 }
 
-map NBC_K4 "Underground"
+map NBC_KB "The Basement"
+{
+	levelnum = 203
+	sky1 = "CITYSKY", 0
+	nointermission
+	next = "NBC_HUB"
+}
+
+map NBC_KR "The Roof"
 {
 	levelnum = 204
 	sky1 = "CITYSKY", 0

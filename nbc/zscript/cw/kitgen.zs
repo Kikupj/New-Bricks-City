@@ -1,5 +1,5 @@
-// Ported from Corpo Wars (reference/corpowars/zscript/corpowars/kitgen.zs) for PLAN.md M2b.
-// NBC: renamed to NBC_ because the mission layer is cut and the look is rebuilt for the Bricks.
+// Ported from Corpo Wars (reference/corpowars/zscript/corpowars/kitgen.zs) for PLAN.md M2b: the carving engine only.
+// NBC: renamed to NBC_ because the mission layer is cut. The Bricks kits' layouts are new (nbc/zscript/nbc/kit_*.zs, M2c).
 // =============================================================================
 // Corpo Wars — site kits: the shared generator (design: Design Docs/building-types.md, kit notes in
 // Design Docs/site-kits.md)
@@ -25,7 +25,7 @@
 class NBC_KitGen play
 {
 	const WALL = 16;
-	const DOOR_H = 96;
+	const DOOR_H = 68;           // NBC: 2.1 m against a 56-unit (1.8 m) person; PLAN.md §4.4
 	const SKY_H = 384;
 	const SAFE_R = 480;          // no gang spawn spots this close to the insertion point
 
@@ -34,7 +34,8 @@ class NBC_KitGen play
 	const OBJ_DESTROY = 2;       // something to wreck: a cook station, an alarm panel
 	const OBJ_TURN = 3;          // someone to reach: an informant, a lieutenant
 
-	enum EKit { KIT_NONE, KIT_STREET, KIT_RES, KIT_IND, KIT_UNDER, KIT_CIVIC, KIT_TECH }
+	// NBC: the Bricks kits (layouts written for New Bricks City, nbc/zscript/nbc/kit_*.zs)
+	enum EKit { KIT_NONE, KIT_TOWER, KIT_STREET, KIT_BASEMENT, KIT_ROOF, KIT_COUNT }
 	enum ELink { E_DOOR, E_ARCH, E_WIDE, E_WINDOW, E_FENCE, E_VENT }
 	enum ERoomFlag
 	{
@@ -87,31 +88,32 @@ class NBC_KitGen play
 	Array<int> secRole, secIdx, secK;
 
 	// ================================================================ factory
-	// NBC: only the street (K1), residential (K2) and underground (K4) kits are ported
+	// NBC: the template map of each kit (tools/make_kit_maps.py builds them)
 	static clearscope int KitOfMap(String m)
 	{
-		static const String names[] = { "NBC_K1", "NBC_K2", "", "NBC_K4", "", "" };
-		for (int k = 0; k < 6; k++) if (names[k] != "" && m ~== names[k]) return k + 1;
+		static const String names[] = { "NBC_KT", "NBC_KS", "NBC_KB", "NBC_KR" };
+		for (int k = 0; k < 4; k++) if (m ~== names[k]) return k + 1;
 		return 0;
 	}
 	static clearscope String MapOfKit(int k)
 	{
-		static const String names[] = { "", "NBC_K1", "NBC_K2", "", "NBC_K4", "", "" };
-		return names[clamp(k, 0, 6)];
+		static const String names[] = { "", "NBC_KT", "NBC_KS", "NBC_KB", "NBC_KR" };
+		return names[clamp(k, 0, 4)];
 	}
-	// "K1", "k2", "NBC_K4" or "street" / "residential" / "underground" -> the kit number (0 = none)
+	// "tower" / "street" / "basement" / "roof" (or the map name) -> the kit number (0 = none)
 	static clearscope int KitByName(String s)
 	{
 		s = s.MakeLower();
-		if (s == "k1" || s == "nbc_k1" || s == "street") return KIT_STREET;
-		if (s == "k2" || s == "nbc_k2" || s == "residential") return KIT_RES;
-		if (s == "k4" || s == "nbc_k4" || s == "underground") return KIT_UNDER;
+		if (s == "tower" || s == "nbc_kt") return KIT_TOWER;
+		if (s == "street" || s == "nbc_ks") return KIT_STREET;
+		if (s == "basement" || s == "nbc_kb") return KIT_BASEMENT;
+		if (s == "roof" || s == "nbc_kr") return KIT_ROOF;
 		return KIT_NONE;
 	}
 	static NBC_KitGen Make(int k)
 	{
-		static const String cls[] = { "", "NBC_KitStreet", "NBC_KitResidential", "", "NBC_KitUnderground", "", "" };
-		if (k < 1 || k > 6) return null;
+		static const String cls[] = { "", "NBC_KitTower", "NBC_KitStreet", "NBC_KitBasement", "NBC_KitRoof" };
+		if (k < 1 || k > 4) return null;
 		String cn = cls[k];
 		if (cn == "") return null;
 		class<NBC_KitGen> c = cn;   // looked up at run time: a kit that isn't built yet just isn't there
@@ -613,8 +615,6 @@ class NBC_KitGen play
 				dr.doorTag = vert ? VTag(ei, ej, 1) : HTag(ei, ej, 1);
 				dr.shutZ = f; dr.openZ = top; dr.doorIdx = doors.Size();
 				doors.Push(dr);
-				let fr = Actor.Spawn(IsOut(a) || IsOut(b) ? "CW_FDoorFrame" : "CW_FDoorFrameW", ((lX[k], lY[k]), f));
-				if (fr) fr.angle = vert ? 0 : 90;
 			}
 			break;
 		}
@@ -635,8 +635,10 @@ class NBC_KitGen play
 			SetEdgeState(ei, ej, vert, 1);
 			break;
 		case E_FENCE:    // a low wall you can see over but not cross
-			Segs(ei, ej, vert, 0, 2, f + 72, (IsOut(a) || IsOut(b)) ? SkyH() : c);
+			Segs(ei, ej, vert, 0, 2, f + FenceH(a, b), (IsOut(a) || IsOut(b)) ? SkyH() : c);
 			SetEdgeState(ei, ej, vert, -1);
+			// NBC: a rail over a drop must hold: its edges block, so nobody steps or jumps onto it
+			if (Has(a, RF_WATER) || Has(b, RF_WATER)) BlockSegs(ei, ej, vert);
 			break;
 		}
 	}
@@ -720,6 +722,28 @@ class NBC_KitGen play
 	int bandLight;
 	String kerbTex;             // the step between an open outdoor edge and the band (a kerb)              // >0: the band's light level    // the band's outer wall (the buildings across the street); empty = edgeTex
 	virtual bool EdgeOpen(int r) { return false; }   // true: this outdoor room's edge is a railing / fence with the view beyond
+	// NBC: how high a fence or rail between two rooms stands (chain-link 64; a balcony rail is lower)
+	virtual double FenceH(int a, int b) { return 64; }
+	// NBC: make every line round a strip's pieces block (a rail over a drop)
+	void BlockSegs(int ei, int ej, bool vert)
+	{
+		int n = Three(EdgeLen(ei, ej, vert)) ? 3 : 1;
+		for (int k = 0; k < 3; k++)
+		{
+			if (n == 1 && k != 1) continue;
+			let it = level.CreateSectorTagIterator(vert ? VTag(ei, ej, k) : HTag(ei, ej, k));
+			int s;
+			while ((s = it.Next()) >= 0)
+			{
+				Sector sec = level.sectors[s];
+				for (int l = 0; l < sec.lines.Size(); l++) sec.lines[l].flags |= Line.ML_BLOCKING;
+			}
+		}
+	}
+	// NBC: the inside face of an indoor room's outer wall (a tower flat's windows onto the city)
+	virtual String EdgeWall(int r) { return rWallT[r]; }
+	// NBC: the far wall of the view band at this point (towers across the street, the Wall ...)
+	virtual String BandWall(Vector2 at) { return bandWalls.Size() ? bandWalls[Rand(0, bandWalls.Size() - 1)] : edgeTex; }
 
 	// A boundary line between the grid and the view band. Indoors: a wall (wrapped mid texture). Outdoors:
 	// open (a railing you can't cross) or a wall, as the kit decides. Solid cells: the building's face.
@@ -745,7 +769,7 @@ class NBC_KitGen play
 			if (kerbTex.Length()) { inner.SetTexture(Side.bottom, Tx(kerbTex)); band.SetTexture(Side.bottom, Tx(kerbTex)); }
 			return true;
 		}
-		inner.SetTexture(Side.mid, Tx(IsOut(r) ? face : rWallT[r]));
+		inner.SetTexture(Side.mid, Tx(IsOut(r) ? face : EdgeWall(r)));
 		ln.flags |= Line.ML_WRAP_MIDTEX;
 		return true;
 	}
@@ -800,9 +824,9 @@ class NBC_KitGen play
 				// the edge of the map: outside walls
 				Side sd = ln.sidedef[0];
 				int si = sd.sector.Index();
-				if (secRole[si] == 5 && bandWalls.Size())
+				if (secRole[si] == 5 && (bandWalls.Size() || BandWall((ln.v1.p + ln.v2.p) / 2) != edgeTex))
 				{
-					sd.SetTexture(Side.mid, Tx(bandWalls[Rand(0, bandWalls.Size() - 1)], edgeTex));
+					sd.SetTexture(Side.mid, Tx(BandWall((ln.v1.p + ln.v2.p) / 2), edgeTex));
 					ln.flags |= Line.ML_DONTPEGBOTTOM;       // windows line up from the pavement
 					continue;
 				}
@@ -824,7 +848,16 @@ class NBC_KitGen play
 					{
 						sd.SetTexture(Side.top, door);
 						ln.flags &= ~Line.ML_DONTPEGTOP;
-						sd.SetTextureYOffset(Side.top, -8);
+						// NBC: doors are smaller than the door art: squeeze the whole door onto the opening
+						int tw, th;
+						[tw, th] = TexMan.GetSize(door);
+						double len = ln.delta.Length();
+						if (tw > 0 && th > 0 && len > 0)
+						{
+							sd.SetTextureXScale(Side.top, tw / len);
+							sd.SetTextureYScale(Side.top, th / double(DOOR_H));
+						}
+						sd.SetTextureYOffset(Side.top, 0);
 						sd.SetTexture(Side.bottom, Tx(rWallT[r]));
 						continue;
 					}
@@ -1057,6 +1090,13 @@ class NBC_KitGen play
 				if (r < 0 || depth[r] < 0 || Has(r, RF_NOGUARD | RF_WATER)) continue;
 				if (!CellPoint(i, j) || !Safe(rp)) continue;
 				spotX.Push(rp.x); spotY.Push(rp.y); spotRole.Push(IsOut(r) ? 1 : 0);
+				// NBC: a second spot in the same cell when there's room, well apart from the first
+				Vector2 first = rp, c = CellCenter(i, j);
+				for (int t = 0; t < 8; t++)
+				{
+					Vector2 q = c + Actor.AngleToVector(t * 45 + 22.5) * 36;
+					if ((q - first).Length() >= 48 && Clear(q, 20)) { spotX.Push(q.x); spotY.Push(q.y); spotRole.Push(IsOut(r) ? 1 : 0); break; }
+				}
 			}
 	}
 

@@ -23,8 +23,7 @@ version "4.10"
 #include "zscript/cw/decor_underground.zs"
 #include "zscript/cw/decor_industrial.zs"
 
-// Our own level architecture: the Bricks kits, ported from Corpo Wars' site kits (PLAN.md §4.4, M2b)
+// Our own level architecture (PLAN.md §4.4): the carving engine ported from Corpo Wars (M2b), and the Bricks
+// kits' layouts, written for New Bricks City (M2c)
 #include "zscript/cw/kitgen.zs"
-#include "zscript/cw/kit_street.zs"
-#include "zscript/cw/kit_residential.zs"
-#include "zscript/cw/kit_underground.zs"
+#include "zscript/nbc/kit_tower.zs"
