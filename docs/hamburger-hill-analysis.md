@@ -1,6 +1,6 @@
 # Hamburger Hill: what to take for New Bricks City
 
-Source: the review video and transcript in `docs/` (an 11-minute review of **Hamburger Hill**, a free early-access Vietnam War FPS on itch.io with an old-school Doom look). Frames were checked at 8-second steps plus close-ups of the menus.
+Source: the review video (854×480 copy) and transcript in `docs/` (an 11-minute review of **Hamburger Hill**, a free early-access Vietnam War FPS on itch.io with an old-school Doom look). Frames were checked at 8-second steps plus close-ups of the menus.
 
 We take **mechanics and screen layouts only**. Names, art, text and audio stay original (AGENTS.md). Nothing here is built yet; the owner picks which items go into `PLAN.md`.
 
@@ -46,6 +46,17 @@ We take **mechanics and screen layouts only**. Names, art, text and audio stay o
 - Rescue missions are unfair: the rescued men won't follow or take cover.
 - Difficulty swings: some fights are trivial, others unfair. It gets repetitive after about an hour.
 
+### Details from a closer pass of the menus
+- **Every region on the map shows a number**: the size of the force holding it (2 and 4 on the quiet ground, 27–46 on the strongholds). Faction borders are colored, and the front line is hatched. You can judge how hard an attack will be before you commit.
+- **The top bar shows income per turn** (`+$25M`) next to the money, and the date moves forward a month each turn.
+- **The army header counts men by class** (12 total, then riflemen, machine gunners, medics, engineers, flamers), so gaps are easy to see.
+- **Two cards under End Turn** show the regions that are threatened right now.
+- **A mission briefing card** opens before a bonus mission: a picture, two lines of orders, the reward, then **Accept** or **Decline**.
+- **The squad portraits show damage on the faces**, Doom-style (bloodied, then grey when down), with a class icon in one corner and a rank chevron in the other. The portrait of the man you're controlling is bigger.
+- **A commanding officer's portrait** sits in the map's corner and gives out the missions.
+- **The battle doesn't end by itself**: once the area is secure, "press Enter to leave" appears, so you can loot and gather the wounded first.
+- **The message log** carries both squad orders and enemy news, such as an alert that the enemy faction is running.
+
 ## How it maps onto New Bricks City
 
 | Hamburger Hill | New Bricks City today (PLAN.md) | Verdict |
@@ -70,6 +81,11 @@ We take **mechanics and screen layouts only**. Names, art, text and audio stay o
 | Sell loot | Seized weapons go to the evidence locker | **Adapt:** let surplus seized weapons be **turned in for Cash** at the armory. |
 | Permadeath soldiers | Hospital 2 days (M6) | **Owner's call.** Options: keep the hospital; or make a downed officer who bleeds out **dead for good**, which makes ranks matter much more. A middle path: bleed-out = 2 days in hospital, but bleed-out *on a raid you then retreat from* = killed. |
 | Bottom-bar HUD with squad portraits | Raid readout top left, ammo bottom right (M2) | **Adapt (later, M12):** one bottom bar. Original portraits are needed; none exist yet. |
+| Force size shown on each region | Gang tier and alert on the dossier (M7b) | **Adapt:** print each district's estimated crew size on the raid board. It's exact with intel, a range without. |
+| Income per turn in the top bar | Cash on the HUD (M2) | **Adapt:** show tomorrow's turf income next to Cash on the board. |
+| Mission briefing card with Accept/Decline | Raid board menu (M2) | **Adapt:** side jobs open a briefing card (two lines, reward, Accept/Decline). Written by us; the captain at Checkpoint 9 can give them. |
+| Damage shown on squad faces, with class and rank icons | Squad health readout (M2) | **Adapt (M6/M12):** the squad strip gets a face per officer that bloodies as health drops, with a class icon and rank chevron. Needs original face art. |
+| "Press Enter to leave" once secure | Exit line ends the raid (M2) | **Already ours** in effect: you walk to the exit when ready. Add a "Block secure: head for the exit" message once the leader and most of the crew are down. |
 
 ## Things to avoid (from the criticism)
 - **Cap enemy explosives:** at most one grenade or Molotov thrower active at a time, with a visible wind-up and a sound cue. The DeePayback pack's grenade users need a check in M4.
