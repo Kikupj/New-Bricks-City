@@ -27,3 +27,4 @@ version "4.10"
 // kits' layouts, written for New Bricks City (M2c)
 #include "zscript/cw/kitgen.zs"
 #include "zscript/nbc/kit_tower.zs"
+#include "zscript/nbc/kit_street.zs"
