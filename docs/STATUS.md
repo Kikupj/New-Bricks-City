@@ -2,12 +2,12 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Next milestone: M2** (The Bricks level generator and placeholder hub).
+**Next milestone: M3** (the case and raid loop). M2's vertical slice is playable; its playtest list is under "Needs playtest".
 
 ## Done
 
 ### M0 — Repo, toolchain and asset import (2026-10-26, by Claude)
-- A git repo with `.gitignore`. Nothing is committed yet; the owner decides when.
+- A git repo with `.gitignore`. (Since committed: M0/M0b, M1–M1c and M2 each have a commit.)
 - `nbc/` is loadable with `-file nbc` and holds:
 
   | From | Where in `nbc/` |
@@ -98,7 +98,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Verified
 - **M1 baseline and final check (2026-10-27):** `python tools/check_lumps.py` → `0 new problem(s), 13 known`; `powershell -File tools/smoke_test.ps1 -Map NBC_TEST` → `PASS NBC_TEST`.
-- **M1 branch:** `m1-integration`; no commit created.
+- **M1 branch:** `m1-integration`; since committed with M1b and M1c as one commit.
 - `python tools/check_lumps.py` → `0 new problem(s), 13 known`. The known ones are pre-existing pack quirks, each with its reason in `tools/lumps_allow.txt`:
   - 10 SNDINFO entries for sounds the enemy pack never shipped
   - 3 sprites used only on 0-tic weapon frames
@@ -141,7 +141,6 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Owner TODO
 - **Credits:** the Machete pack and Civilians2 ship no credits. Add their authors to `nbc/CREDITS.txt` (TODO lines are marked).
-- **Commit:** the repo is initialized but has no commits yet.
 
 ## Known issues / notes for Codex
 - Human M1b and M1c gameplay, pickup, HUD, save/load, weapon interruption and damage playtests remain outstanding; see the checklists above. The M9 arrest/noise hooks are intentionally stubs.
@@ -149,4 +148,4 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `+logfile` produced no file in testing. Use `-stdout` with redirected output (the smoke test does).
 - In `+console commands`, use forward slashes in paths (a backslash is an escape character).
 - Some vehicle class names contain `&` (e.g. `PlaneGreen&Gold`). That's valid; don't "fix" it.
-- Weapon slots still clash: the fists and knife share slot 1, the machete has no slot, and the Colt, Uzi and Dual Berettas share slot 2. Enemies still drop vanilla weapons. **This is M1's job.**
+- `check_lumps.py` needs `freedoom-0.13.0/freedoom2.wad` and `uzdoom.exe`'s `uzdoom.pk3`, which aren't in git. In a checkout without them (such as a cloud session) it reports IWAD sprites (`AMMO`, `CLIP`, `SBOX`, `ROCK`, `BROK`, `BAL1`) and the `dsbarexp` sound as new problems. Those are false alarms; run it on the owner's machine for the real count.
