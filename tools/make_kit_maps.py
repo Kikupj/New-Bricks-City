@@ -50,8 +50,9 @@ GRIDS = {
     # tower floor: stair cores at both ends (4.7 m), 12 flat bays (3.9 m); rows: south window rooms (3.9 m),
     # south inner rooms (3 m), corridor (2.2 m), north inner rooms, north window rooms
     "NBC_KT": ([176] + [144] * 12 + [176], [144, 112, 80, 112, 144]),
-    # street: cross street, sidewalk, 12 lots, side passage; rows: road, sidewalk, 4 lot rows, alley, the Wall
-    "NBC_KS": ([224, 112] + [176] * 12 + [128], [256, 128, 176, 176, 176, 176, 128, 160]),
+    # street, two-sided: cross street, sidewalk, 12 lots, side passage; rows: the canal walk, south back rooms,
+    # south shops, south sidewalk, road, north sidewalk, 4 north lot rows, the north alley, the Wall
+    "NBC_KS": ([224, 112] + [176] * 12 + [128], [128, 176, 176, 112, 256, 128, 176, 176, 176, 176, 128, 160]),
     # basement: a 16 x 12 grid of 128 cells
     "NBC_KB": ([128] * 16, [128] * 12),
     # roofs: 14 x 9 cells of 160
