@@ -628,7 +628,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 
 ---
 
-### M2b — Our own level architecture: the Bricks kits — 🔧 CODE WRITTEN, NOT YET BOOTED (2026-10-27, by Claude; see STATUS.md)
+### M2b — Our own level architecture: the Bricks kits — ✅ BOOTS, NEEDS PLAYTEST (2026-10-27, by Claude; see STATUS.md)
 **Prompt:**
 > Do PLAN.md milestone M2b (§4.4, §6.7, the "Runtime level generator" row of §0.1). Read `reference/corpowars/Design Docs/site-kits.md` and the "Site kits" section of `docs/corpowars-port-map.md` first. Port the kit base (`kitgen.zs`) and three kits into `nbc/zscript/cw/`: `kit_street.zs` (K01), `kit_residential.zs` (K02) and `kit_underground.zs` (K04), plus `procgen.zs`, `stairs.zs` and `themes.zs`. **Reuse** the furniture, kitprops and decor classes already ported in `nbc/zscript/cw/`; don't port them again. Cut every tie to Corpo Wars' mission layer listed in the port map (contracts, ledger, city, CW guards, bystanders, the drop crate): replace guard placement with NBC_SpawnSpot output, bystanders with resident spots (empty until M9), and extraction with NBC_Exit. Rename a class to `NBC_` once you change what it does.
 >

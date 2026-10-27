@@ -2,7 +2,7 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Current milestone: M2b** (our own level architecture: the Bricks kits). **The code is written but has never been compiled or booted**: it was written in a cloud session with no UZDoom. First job on the owner's machine: run the smoke test on `NBC_TEST,NBC_HUB,NBC_K1,NBC_K2,NBC_K4` and paste any script errors back. Then the M2b checklist under "Needs playtest".
+**Current milestone: M2b** (our own level architecture: the Bricks kits). The code compiles and the smoke test passes on a Linux build of UZDoom 5.0.3 (see Verified). What's left is the human playtest: the M2b checklist under "Needs playtest".
 
 ### Plan changes (2026-10-27, owner + Claude)
 - **Lore:** the police are losing a megacity to its gangs; Checkpoint 9 is all that's left, and the meta progression is rebuilding the precinct room by room (PLAN.md §1, §2.6). Tone references: *Dirty Harry*, *Bad Boys II*, *Den of Thieves* (tone only).
@@ -96,7 +96,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **HUD:** the raid readout is top left (district, gang, the leader's distance and compass direction, crew left, squad health, day, strikes, cash). The magazine and debris readouts moved from the top centre to the bottom right. The big font is Miniplicity (`nbc/BIGFONT.lmp`, credited); the mod's own small text uses UZDoom's NewSmallFont.
 - **Loop verified by a scripted run:** new case → raid → retreat (alert +1, day 2); new case → kill the leader → exit (TOPPLED, bounty) → next raid → lethal hit (OFFICER DOWN, strike 1, half the cash lost, back at the hub, day 3). The same seed gives the same assignments.
 
-### M2b — Our own level architecture: the Bricks kits — 🔧 CODE WRITTEN, NOT YET BOOTED (2026-10-27, by Claude)
+### M2b — Our own level architecture: the Bricks kits — ✅ BOOTS, NEEDS PLAYTEST (2026-10-27, by Claude)
 - **Ported** Corpo Wars' site-kit generator and three kits into `nbc/zscript/cw/` as `NBC_KitGen`, `NBC_KitStreet` (K1), `NBC_KitResidential` (K2) and `NBC_KitUnderground` (K4). Renamed to `NBC_` because the mission layer is cut: no CW guards, patrol points, bystanders, drop crate, ledger, passes or contract objectives. `procgen.zs`, `stairs.zs` and `themes.zs` turned out not to be needed by these kits and weren't ported. The already-ported furniture, kitprops and decor classes are reused.
 - **What the kit gives the raid instead:** spawn spots (one per reachable cell, outdoor cells marked as perches for M4), `NBC_ResidentSpot` markers in civilian rooms (empty until M9), `NBC_ObjectiveMarker`s in the planned objective rooms, rubble piles (against walls, so corridors stay passable) and loose debris in rooms flagged `RF_RUBBLE`, and an exit: the entry farthest from the insertion, with `NBC_KitExit` (Use to leave) under a lit exit sign.
 - **Rebuilt for the Bricks:** doors 96 high; tower-floor ceilings raised to 112–144 (PLAN.md §4.4 scale); the "hacker den" is a gang den with a stash room; 1 in 4 flats on poor floors is a dark squat full of rubble; fire escapes, roofs, yards, alleys, tunnels and camps carry debris; parked cars are the Bricks' (dirty colours, a dead squad car). Street interiors keep their heights (the street facade line is 128).
@@ -112,7 +112,11 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `tools/Obsidian/make_cw_fabs.py` remakes Corpo Wars' room recipes (kit_*.zs `Dress()`) as Obsidian prefabs: 18 room sets (living, kitchen, bedroom, bath, office, storage, utility, laundry, workshop, garage, lockers, lab, grow, den, camp, lobby, shop, bar) with furniture along the walls, free-standing groups, random wall sprites and clutter, and loose debris (26000–26004) in squats, dens, storage and on the street. Each Bricks room theme picks from its own list of room sets.
 
 ## Verified
-- **M2b static checks (2026-10-27, cloud session):** `python tools/check_lumps.py` → `0 new problem(s), 13 known`, run with Freedoom 0.13.0's `freedoom2.wad` from the Ubuntu archive. Brackets balance in every new or changed ZScript file. **Not compiled, not booted:** no UZDoom in that session.
+- **M2b checks (2026-10-27, cloud session, UZDoom 5.0.3 built from source on Linux):**
+  - `python tools/check_lumps.py` → `0 new problem(s), 13 known` (Freedoom 0.13.0's `freedoom2.wad` from the Ubuntu archive).
+  - `tools/smoke_test.sh NBC_TEST NBC_HUB NBC_K1 NBC_K2 NBC_K4` → PASS on all five (software renderer under xvfb; no script errors, no warnings).
+  - With `+developer 1` each kit generates a full floor and reports no unreachable rooms, e.g. K1 chop shop: 15 rooms, 7 doors, 88 spawn spots, 3 rubble piles, 11 loose pieces, in by the street, out by the alley; K2 apartment block: 35 rooms, 27 doors, 49 spawn spots; K4 underpass: 31 rooms, 24 doors, 109 spawn spots.
+  - A screenshot of the K2 tenement (seed 42) shows the stairwell and the shut corridor door as expected. The Corpo Wars **door-frame models render as bright orange outlines** there; their textures (CWFMETL, CWFWDSD) are grey metal and brown wood, so check them on a real GPU (see Needs playtest). The same furniture models were already in the M2 maps.
 - **M1 baseline and final check (2026-10-27):** `python tools/check_lumps.py` → `0 new problem(s), 13 known`; `powershell -File tools/smoke_test.ps1 -Map NBC_TEST` → `PASS NBC_TEST`.
 - **M1 branch:** `m1-integration`; since committed with M1b and M1c as one commit.
 - `python tools/check_lumps.py` → `0 new problem(s), 13 known`. The known ones are pre-existing pack quirks, each with its reason in `tools/lumps_allow.txt`:
@@ -129,7 +133,8 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Needs playtest (owner)
 - **M2b kits (first boot):**
-  - `powershell -File tools\smoke_test.ps1 -Map NBC_TEST,NBC_HUB,NBC_K1,NBC_K2,NBC_K4` must PASS. The kit code has never been compiled; expect a round of script-error fixes.
+  - `powershell -File tools\smoke_test.ps1 -Map NBC_TEST,NBC_HUB,NBC_K1,NBC_K2,NBC_K4` should PASS on Windows too (it passed on the Linux build).
+  - Door frames and other Corpo Wars furniture models: textured (grey metal, wood), not glowing orange outlines.
   - In the console: `nbc_kittest 2 0 42` (tenement), `nbc_kittest 2 5 42` (rooftops), `nbc_kittest 1 6 7` (chop shop), `nbc_kittest 4 3 9` (parking garage). Do they read as a housing tower, a city street, a garage? Any floating or missing walls, sky showing through a building, unreachable rooms (the console prints `Kit: <room> is unreachable`)?
   - `nbc_debug_kit` on each: rooms, entries, how many spawn spots, rubble piles and loose pieces.
   - Doors: Use opens them, they shut after a few seconds, never on you; walk an officer up to a closed door and it should open.
@@ -167,6 +172,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **Credits:** the Machete pack and Civilians2 ship no credits. Add their authors to `nbc/CREDITS.txt` (TODO lines are marked).
 
 ## Known issues / notes for Codex
+- **Testing in a cloud (Linux) session:** install `freedoom` from the Ubuntu archive and copy `/usr/share/games/doom/freedoom2.wad` to `freedoom-0.13.0/` (gitignored); clone UZDoom's `5.0.3` tag from github.com/UZDoom/uzdoom to `/home/user/uzdoom/uzdoom`, build it with CMake + Ninja (deps: cmake, ninja-build, build-essential, libsdl2-dev, libgl1-mesa-dev, libvpx-dev, libbz2-dev, libgtk-3-dev; about 30 minutes on 4 cores), then run `tools/smoke_test.sh <maps>`. It uses the software renderer under xvfb, about 90 s per map. Don't commit engine binaries or source zips (too large for the repo).
 - Human M1b and M1c gameplay, pickup, HUD, save/load, weapon interruption and damage playtests remain outstanding; see the checklists above. The M9 arrest/noise hooks are intentionally stubs.
 - The enemy pack's SNDINFO names 10 sounds it doesn't ship. Those enemies are silent for that line. Fixing it means finding or replacing the sounds; low priority.
 - `+logfile` produced no file in testing. Use `-stdout` with redirected output (the smoke test does).

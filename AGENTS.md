@@ -64,6 +64,7 @@ Engine notes:
 Launch.bat                                                    # menu launcher: pick a map, cheats, skill, tests, build
 powershell -File tools\run.ps1 -Extra "+give all"            # play (NBC_TEST until the hub exists)
 powershell -File tools\smoke_test.ps1 -Map NBC_TEST           # smoke test
+tools/smoke_test.sh NBC_TEST NBC_K2                           # smoke test on Linux (cloud sessions; see docs/STATUS.md notes)
 python tools\check_lumps.py                                   # static checks
 python tools\list_textures.py BRICK                           # find texture names
 python tools\build_pk3.py                                     # release build → dist\NewBricksCity.pk3
