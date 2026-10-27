@@ -5,7 +5,7 @@ Actor AK47 : Weapon
 	Inventory.PickupMessage "You got the AK47 assault rifle!"
 	Weapon.SlotNumber 4
 	Weapon.Kickback 100
-	Weapon.AmmoType "Clip"
+	Weapon.AmmoType "NBC_RifleAmmo" // NBC: use the shared rifle reserve.
 	Weapon.AmmoUse 1
 	Weapon.AmmoGive 20
 	Decal "BulletChip"

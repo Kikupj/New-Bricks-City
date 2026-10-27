@@ -1,0 +1,533 @@
+// Ported from Corpo Wars' modeldef.props.txt by tools/import/port_cw_props.py (ported classes only).
+
+Model CW_FDeskWork
+{
+	Path "models/props"
+	Model 0 "desk_work.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FDeskCode
+{
+	Path "models/props"
+	Model 0 "desk_code.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FDeskExec
+{
+	Path "models/props"
+	Model 0 "desk_exec.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FChair
+{
+	Path "models/props"
+	Model 0 "chair_office.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FChairExec
+{
+	Path "models/props"
+	Model 0 "chair_exec.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FChairGuest
+{
+	Path "models/props"
+	Model 0 "chair_guest.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FSofa
+{
+	Path "models/props"
+	Model 0 "sofa.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FArmchair
+{
+	Path "models/props"
+	Model 0 "armchair.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FCoffeeTable
+{
+	Path "models/props"
+	Model 0 "coffee_table.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FConfTable
+{
+	Path "models/props"
+	Model 0 "conf_table.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FRoundTable
+{
+	Path "models/props"
+	Model 0 "round_table.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FWhiteboard
+{
+	Path "models/props"
+	Model 0 "whiteboard.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FWallTV
+{
+	Path "models/props"
+	Model 0 "wall_tv.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FReception
+{
+	Path "models/props"
+	Model 0 "reception.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FFileCabinet
+{
+	Path "models/props"
+	Model 0 "file_cabinet.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FBookshelf
+{
+	Path "models/props"
+	Model 0 "bookshelf.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FServerRack
+{
+	Path "models/props"
+	Model 0 "server_rack.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FShelving
+{
+	Path "models/props"
+	Model 0 "shelving.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FVending
+{
+	Path "models/props"
+	Model 0 "vending.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FCopier
+{
+	Path "models/props"
+	Model 0 "copier.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FWaterCooler
+{
+	Path "models/props"
+	Model 0 "water_cooler.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FCounter
+{
+	Path "models/props"
+	Model 0 "kitchen_counter.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FLabBench
+{
+	Path "models/props"
+	Model 0 "lab_bench.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FBin
+{
+	Path "models/props"
+	Model 0 "bin.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FPlanter
+{
+	Path "models/props"
+	Model 0 "planter.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FCredenza
+{
+	Path "models/props"
+	Model 0 "credenza.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FStalls
+{
+	Path "models/props"
+	Model 0 "stalls.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FVanity
+{
+	Path "models/props"
+	Model 0 "vanity.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FStairFlight
+{
+	Path "models/props"
+	Model 0 "stair_flight.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FElevRail
+{
+	Path "models/props"
+	Model 0 "elev_rail.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FDoorFrame
+{
+	Path "models/props"
+	Model 0 "door_frame.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FDoorFrameW
+{
+	Path "models/props"
+	Model 0 "door_frame_wood.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FPartition
+{
+	Path "models/props"
+	Model 0 "partition.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FLampPost
+{
+	Path "models/props"
+	Model 0 "lamp_post.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FContainer
+{
+	Path "models/props"
+	Model 0 "container_red.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FContainerB
+{
+	Path "models/props"
+	Model 0 "container_blue.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FCrates
+{
+	Path "models/props"
+	Model 0 "crates.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FPallet
+{
+	Path "models/props"
+	Model 0 "pallet.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FBarCounter
+{
+	Path "models/props"
+	Model 0 "bar_counter.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FStool
+{
+	Path "models/props"
+	Model 0 "stool.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FBed
+{
+	Path "models/props"
+	Model 0 "bed.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FPew
+{
+	Path "models/props"
+	Model 0 "pew.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FTank
+{
+	Path "models/props"
+	Model 0 "tank.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FTransformer
+{
+	Path "models/props"
+	Model 0 "transformer.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FScaffold
+{
+	Path "models/props"
+	Model 0 "scaffold.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FDumpster
+{
+	Path "models/props"
+	Model 0 "dumpster.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FStall
+{
+	Path "models/props"
+	Model 0 "stall.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FGrowBed
+{
+	Path "models/props"
+	Model 0 "grow_bed.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FTurbine
+{
+	Path "models/props"
+	Model 0 "turbine.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FPipes
+{
+	Path "models/props"
+	Model 0 "pipes.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FGenerator
+{
+	Path "models/props"
+	Model 0 "generator.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FTurnstile
+{
+	Path "models/props"
+	Model 0 "turnstile.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FLocker
+{
+	Path "models/props"
+	Model 0 "locker.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FScrap
+{
+	Path "models/props"
+	Model 0 "scrap.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FWorkbench
+{
+	Path "models/props"
+	Model 0 "workbench.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FAcUnit
+{
+	Path "models/props"
+	Model 0 "ac_unit.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FWaterTower
+{
+	Path "models/props"
+	Model 0 "water_tower.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FBarrier
+{
+	Path "models/props"
+	Model 0 "barrier.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+
+Model CW_FSandbags
+{
+	Path "models/props"
+	Model 0 "sandbags.obj"
+	Scale 1.0 1.0 1.0
+	DONTCULLBACKFACES
+	FrameIndex CWMD A 0 0
+}
+

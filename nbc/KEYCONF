@@ -1,0 +1,11 @@
+addkeysection "New Bricks City" nbc_keys
+addmenukey "Toggle flashlight" "netevent nbc_flashlight"
+addmenukey "Quick throw debris" "+nbc_throw"
+addmenukey "Cycle debris type" "netevent nbc_debris_next"
+defaultbind f "netevent nbc_flashlight"
+defaultbind r +reload
+alias +nbc_throw "netevent nbc_throw_start"
+alias -nbc_throw "netevent nbc_throw_release"
+defaultbind g +nbc_throw
+defaultbind h "netevent nbc_debris_next"
+alias nbc_debug_weapon "event nbc_debug_weapon"

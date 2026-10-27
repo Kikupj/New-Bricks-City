@@ -1363,12 +1363,21 @@ $limit Weapons/Molotov/Fire 0
 // ===== PumpActionShotgun (Weapons/PumpActionShotgun.zip) =====
 weapons/Xshotgr		XMSGCOCK
 weapons/Xshotgf		XMSHOTGN
+nbc_dryclick	B92REL3
+nbc_shotgun_open	XMDBOPN
+nbc_shotgun_load	XMDBLOAD
+nbc_shotgun_close	XMDBCLS
 
 // ===== FragGrenade (Weapons/FragGrenade.zip) =====
 FragGrenade/Explode GEXPLODE
 FragGrenade/Bounce	GRNBNCE
 FragGrenade/pin 	GREN_USE
 FragGrenade/throw	GRNTHROW
+// NBC M1c reuses pack sounds through project-prefixed aliases.
+nbc_debris_throw GRNTHROW
+nbc_debris_bounce GRNBNCE
+nbc_debris_impact eFISTHIT
+nbc_debris_glass MOLTVXP1
 // ===== Corpo Wars: breaching charge (Spring Mine by Mor'ladim), for M9 booby traps =====
 cw/breach/arm   SMNSET1
 cw/breach/beep  SMNSET2

@@ -8,11 +8,11 @@ Default
   attacksound "MicroUzi/Fire";
   inventory.pickupmessage "You got the micro-uzi!";
   weapon.kickback 100;
-  weapon.ammotype "UziAmmo";
+  weapon.ammotype "NBC_LightAmmo"; // NBC: use the shared light reserve.
   weapon.ammouse 1;
   weapon.ammogive 40;
   Decal "BulletChip";
-  Weapon.SlotNumber 2;
+  Weapon.SlotNumber 4; // NBC: dedicated Uzi slot.
   Scale 0.75;
   }
   states
@@ -43,36 +43,4 @@ Default
   }
 }
 
-Class UziAmmo : Ammo 
-{
-Default
-{
-  Inventory.PickupMessage "Picked up an uzi clip.";
-  Inventory.Amount 30;
-  Inventory.MaxAmount 300;
-  Ammo.BackpackAmount 30;
-  Ammo.BackpackMaxAmount 600;
-  Inventory.Icon "UZIAB0";
-  }
-  States
-  {
-  Spawn:
-    UZIA B -1;
-    Stop;
-  }
-}
-
-Class UziAmmo2 : UziAmmo 
-{
-Default
-{
-  Inventory.PickupMessage "Picked up some uzi clips.";
-  Inventory.Amount 60;
-  }
-  States
-  {
-  Spawn:
-    UZIA A -1;
-    Stop;
-  }
-}
+// NBC: The pack-specific UziAmmo/UziAmmo2 classes were removed; all Uzi ammo uses NBC_LightAmmo.

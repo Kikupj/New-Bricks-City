@@ -20,6 +20,11 @@ THINGS = [  # (x, y, angle, type)
     (1120, 300, 180, 65),    # ChaingunGuy -> Russians / bandits
     (1120, 740, 180, 3004),
     (448, 704, 90, 10600),   # 60sCarRed: Corpo Wars voxel car, proves the voxels and vehicles.txt load
+    (256, 512, 0, 26004),    # M1c interactable rubble pile, immediately reachable from the start
+    (480, 512, 0, 26000),    # M1c loose-brick pickup
+    (480, 544, 0, 26001),    # M1c loose half-brick pickup
+    (480, 576, 0, 26002),    # M1c loose concrete pickup
+    (480, 608, 0, 26003),    # M1c loose bottle pickup
 ]
 
 

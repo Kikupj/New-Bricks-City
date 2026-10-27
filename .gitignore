@@ -32,3 +32,15 @@
 /art/**/out/
 __pycache__/
 *.pyc
+
+# --- Level generators: the programs stay local; only our addon and scripts are tracked ---
+/tools/Oblige-7.70/
+/tools/Obsidian/*
+!/tools/Obsidian/addons/
+/tools/Obsidian/addons/*
+!/tools/Obsidian/addons/NewBricksCity/
+!/tools/Obsidian/make_bricks.ps1
+!/tools/Obsidian/export_maps.py
+!/tools/Obsidian/inspect_udmf.py
+!/tools/Obsidian/make_cw_fabs.py
+/nbc/maps/*.zip

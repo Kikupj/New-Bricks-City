@@ -86,6 +86,7 @@ States
 
 Actor FuryPuff
 {
+DamageType "Melee" // NBC: standardize melee damage for gang profiles.
 VSpeed 1
 Renderstyle Translucent
 Alpha 0.5

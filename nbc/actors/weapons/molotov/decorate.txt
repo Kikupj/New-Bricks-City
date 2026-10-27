@@ -14,7 +14,7 @@ Sprites:
 Sounds: Blood & Clive Barker's Undying.
 */
 
-Actor MolotovCocktail : Weapon 25013
+Actor MolotovCocktail : Weapon // NBC: dropped the conflicting 25013 editor number.
 {
 //$Category Weapons
 //$Title "Molotov Cocktail"
@@ -340,9 +340,9 @@ States
 Actor MolotovAmmo : Ammo
 {
 Inventory.Amount 1
-Inventory.MaxAmount 25
+Inventory.MaxAmount 5 // NBC: cap carried Molotovs at the M1 limit.
 Ammo.BackpackAmount 1
-Ammo.BackpackMaxAmount 50
+Ammo.BackpackMaxAmount 5 // NBC: match the carried cap.
 Inventory.Icon MOLPA0
 Inventory.PickupMessage "you shouldn't ever see this message because this item will be replaced by the actual weapon"
 States

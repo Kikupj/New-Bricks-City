@@ -1,5 +1,20 @@
 // New Bricks City — MAPINFO
-// NBC map things use DoomEdNums from 26000 (25013 is the imported Molotov's; 10600-10803 are the voxel cars).
+gameinfo
+{
+	AddEventHandlers = "NBC_Loot"
+	PlayerClasses = "NBC_Player"
+	StatusBarClass = "NBC_StatusBar"
+}
+
+// NBC map things use DoomEdNums from 26000 (10600-10803 are the voxel cars).
+DoomEdNums
+{
+	26000 = NBC_LooseBrick
+	26001 = NBC_LooseHalfBrick
+	26002 = NBC_LooseConcrete
+	26003 = NBC_LooseBottle
+	26004 = NBC_RubblePile
+}
 
 // Test room for smoke tests: a brick box with a pillar and a few vanilla monsters,
 // which the enemy pack replaces with human enemies. Rebuild with tools/make_test_map.py.
@@ -10,3 +25,6 @@ map NBC_TEST "Test Room"
 	nointermission
 	next = "NBC_TEST"
 }
+
+include "mapinfo/city_maps.txt"   // Obsidian city maps (tools/Obsidian/export_maps.py)
+include "mapinfo/cw_props.txt"   // Corpo Wars prop map numbers (tools/import/port_cw_props.py)

@@ -289,32 +289,9 @@ dropitem robberFgreen
 //wolfenstein SS spawner
 actor eWOLFSpawner : RandomSpawner replaces WolfensteinSS
 {
-dropitem eSPECFEMchoice
-dropitem eSPECMANchoice
+// NBC: ally-looking specops are removed; only terrorist variants remain in the enemy pool.
 dropitem eTERRORchoice
 dropitem eTERRORchoice
-}
-
-actor eSPECMANchoice : RandomSpawner
-{
-dropitem specopMgrey
-dropitem specopMbrown
-dropitem specopMsilver
-dropitem specopM
-dropitem specopMkak
-dropitem specopMbrowngrey
-dropitem specopMbrownsilver
-dropitem specopMbrownkak
-}
-
-actor eSPECFEMchoice : RandomSpawner
-{
-dropitem specopF
-dropitem specopFbrowngrey
-dropitem specopFbrownkak
-dropitem specopFgrey
-dropitem specopFbrown
-dropitem specopFkak
 }
 
 actor eTERRORchoice : RandomSpawner
@@ -628,8 +605,7 @@ actor eREVENSpawner : RandomSpawner replaces Revenant
 dropitem ePMCchoice
 dropitem ePMCchoice
 dropitem ePMCBIGchoice
-dropitem eMILSHOTchoice
-dropitem eMILSHOTchoice
+// NBC: MiltiaShotgun ally classes are excluded from the enemy pool.
 dropitem eMILSMGchoice
 dropitem eMILSMGchoice
 dropitem eMILFEMchoice
@@ -649,8 +625,7 @@ actor ePMCBIGchoice : RandomSpawner
 {
 dropitem PMCBig
 dropitem PMCBig2
-dropitem Sniper
-dropitem Sniper2
+// NBC: Sniper and Sniper2 are reserved as allied officer bases.
 }
 
 actor eMILFEMchoice : RandomSpawner
@@ -662,14 +637,7 @@ dropitem MiltiaSMGfgrey
 dropitem MiltiaSMGfnavy
 }
 
-actor eMILSHOTchoice : RandomSpawner
-{
-dropitem MiltiaShotgun
-dropitem MiltiaShotgunTan
-dropitem MiltiaShotgunBrown
-dropitem MiltiaShotgunGrey
-dropitem MiltiaShotgunRed
-}
+// NBC: eSPECMANchoice, eSPECFEMchoice and eMILSHOTchoice contained only allied officer bases and are intentionally removed.
 
 actor eMILSMGchoice : RandomSpawner
 {

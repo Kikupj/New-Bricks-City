@@ -3,8 +3,8 @@ actor Colt45 : Weapon 5757
 	Weapon.SlotNumber 2
 	Weapon.SelectionOrder 1900
 	Weapon.AmmoUse 1
-	Weapon.AmmoGive 20
-	Weapon.AmmoType "Clip"
+	Weapon.AmmoGive 0 // NBC: starting ammo is set by NBC_Player.
+	Weapon.AmmoType "NBC_LightAmmo" // NBC: use the shared light reserve.
 	AttackSound "Weapon/COLTFIRE"
 	Obituary "%o was killed by %k's Colt45."
 	+WEAPON.WIMPY_WEAPON

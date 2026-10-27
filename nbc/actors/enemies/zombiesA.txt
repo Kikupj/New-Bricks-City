@@ -19,6 +19,7 @@ actor Redneck
   deathsound "Hood1/die"
   activesound ""
   dropitem "Clip" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Redneck"
   Translation "118:127=80:95"
   DamageFactor "Enemy", 0.0
@@ -212,6 +213,7 @@ actor GoonM : HumanMb
   deathsound "milMex/die"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Goon"
   DamageFactor "Enemy", 0.0
   MONSTER
@@ -329,6 +331,7 @@ actor PunkM : HumanMb
   deathsound "prison/Death"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Punk"
   Translation "112:127=64:78"
   DamageFactor "Enemy", 0.0
@@ -457,6 +460,7 @@ actor scumF : HumanFb
   deathsound "fthug/die"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Scum"
   Translation "192:207=96:111"
   DamageFactor "Enemy", 0.0
@@ -602,6 +606,7 @@ actor goonF : HumanFb
   deathsound "fthug/die"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Goon"
   Translation "192:207=80:111"
   DamageFactor "Enemy", 0.0
@@ -709,6 +714,7 @@ actor Tramp : HumanFb
   deathsound "rastf/pan"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Tramp"
   Translation "192:207=5:8"
   DamageFactor "Enemy", 0.0
@@ -858,6 +864,7 @@ actor ScumM : HumanMb
   deathsound "drugy/Death"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Translation "192:207=80:109"
   Tag "Scum"
   DamageFactor "Enemy", 0.0
@@ -1065,6 +1072,7 @@ actor crook : HumanMb
   deathsound "drugy/Death"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Criminal"
   Translation "192:207=80:111"
   DamageFactor "Enemy", 0.0
@@ -1263,6 +1271,7 @@ actor Hoody : HumanMb
   deathsound "drugy/Death"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Hoodlum"
   Translation "48:79=64:79","192:207=80:110"
   DamageFactor "Enemy", 0.0

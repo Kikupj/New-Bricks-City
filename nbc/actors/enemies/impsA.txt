@@ -13,6 +13,7 @@ actor StreetThugM : HumanMb
   deathsound "milMex/die"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Street Thug"
   Translation "192:207=80:109"
   DamageFactor "Enemy", 0.0
@@ -130,6 +131,7 @@ actor robberM : HumanMb
   deathsound "Hood1/die"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Robber"
   Translation "192:207=96:111","250:254=104:111"
   DamageFactor "Enemy", 0.0
@@ -272,6 +274,7 @@ actor StreetThugF : HumanFb
   deathsound "milChic/pan"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Street Thug"
   Translation "192:207=80:111"
   DamageFactor "Enemy", 0.0
@@ -666,6 +669,7 @@ actor PunkF : HumanFb
   activesound ""
   dropitem "Thuggundropper" 256
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Punk"
   Translation "192:207=96:111"
   DamageFactor "Enemy", 0.0
@@ -821,6 +825,7 @@ actor robberF : HumanFb
   deathsound "daisy/hit"
   activesound ""
   dropitem "Thuggundropper" 256
+  dropitem "MolotovCocktail" 20 // NBC: 20/256 gives the requested ~8% tier-1 drop.
   Tag "Robber"
   DamageFactor "Enemy", 0.0
   MONSTER

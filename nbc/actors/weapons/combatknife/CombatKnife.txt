@@ -157,7 +157,7 @@ ACTOR KnifePuff
   +FLOORCLIP
   +FORCEXYBILLBOARD
   +PUFFONACTORS
-  DamageType "Knife"
+  DamageType "Melee" // NBC: standardize knife damage for gang profiles.
   RenderStyle Translucent
   Alpha 0.6
   VSpeed 1

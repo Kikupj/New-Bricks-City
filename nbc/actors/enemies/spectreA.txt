@@ -88,6 +88,7 @@ actor Ninja2 : HumanMb
   attacksound "en/slash"
   painsound "Yaka/pain"
   deathsound "Yaka/die"
+  dropitem "Machete" 256 // NBC: katana-style melee enemy drops the Machete.
    Tag "Ninja"
    Translation "112:127=96:111"
     DamageFactor "Enemy", 0.0
