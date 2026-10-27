@@ -60,6 +60,7 @@ Engine notes:
 
 ## Commands
 ```powershell
+Launch.bat                                                    # menu launcher: pick a map, cheats, skill, tests, build
 powershell -File tools\run.ps1 -Extra "+give all"            # play (NBC_TEST until the hub exists)
 powershell -File tools\smoke_test.ps1 -Map NBC_TEST           # smoke test
 python tools\check_lumps.py                                   # static checks
