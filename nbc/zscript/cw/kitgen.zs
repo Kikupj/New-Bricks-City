@@ -83,6 +83,7 @@ class NBC_KitGen play
 	int exitIdx;
 	Vector2 exitPos;
 	int rubblePiles, loosePieces;
+	Array<int> topTags;          // sectors carved as free-standing structures (sky above)
 	String doorTex, jambTex, edgeTex;
 	// sector lookup (filled after carving): role 1 cell, 2 v-strip, 3 h-strip, 4 post; idx = cell / edge / corner
 	Array<int> secRole, secIdx, secK;
@@ -532,7 +533,13 @@ class NBC_KitGen play
 			for (int i = 0; i < NX; i++)
 			{
 				int r = At(i, j);
-				if (r < 0) { Planes(CTag(i, j), 0, 0); continue; }
+				if (r < 0)
+				{
+					double top = SolidTop(i, j);
+					if (top > 0) { Planes(CTag(i, j), top, SkyH()); topTags.Push(CTag(i, j)); }
+					else Planes(CTag(i, j), 0, 0);
+					continue;
+				}
 				Planes(CTag(i, j), rF[r], CeilOf(r));
 			}
 		// same-room neighbours: the whole strip opens
@@ -562,6 +569,47 @@ class NBC_KitGen play
 				{
 					double top = f + max(max(FenceH(a, b), FenceH(c, d)), max(FenceH(a, c), FenceH(b, d)));
 					Planes(PTag(i, j), top, SkyH());
+				}
+			}
+	}
+
+	// NBC: a solid cell with a SolidTop is a free-standing structure (the Wall): its strips and posts toward
+	// other such cells or open ground stand at the same height, open to the sky, instead of being raised as facade.
+	virtual double SolidTop(int i, int j) { return 0; }
+	double TopOrOpen(int i, int j)    // >0 the structure's height; 0 open ground; -1 anything else
+	{
+		if (!InGrid(i, j)) return -1;
+		int r = At(i, j);
+		if (r < 0) { double t = SolidTop(i, j); return t > 0 ? t : -1; }
+		return IsOut(r) ? 0 : -1;
+	}
+	void CarveSolidTops()
+	{
+		for (int j = 0; j < NY; j++)
+			for (int i = 0; i < NX; i++)
+			{
+				for (int d = 0; d < 2; d++)
+				{
+					int i2 = d == 0 ? i + 1 : i, j2 = d == 0 ? j : j + 1;
+					if (!InGrid(i2, j2)) continue;
+					double a = TopOrOpen(i, j), b = TopOrOpen(i2, j2);
+					if (a < 0 || b < 0 || (a <= 0 && b <= 0)) continue;
+					double h = max(a, b);
+					bool vert = d == 0;
+					for (int k = 0; k < 3; k++)
+					{
+						if (!Three(EdgeLen(i, j, vert)) && k != 1) continue;
+						int tag = vert ? VTag(i, j, k) : HTag(i, j, k);
+						Planes(tag, h, SkyH()); topTags.Push(tag);
+					}
+				}
+				if (i + 1 < NX && j + 1 < NY)
+				{
+					double a = TopOrOpen(i, j), b = TopOrOpen(i + 1, j), c = TopOrOpen(i, j + 1), e = TopOrOpen(i + 1, j + 1);
+					if (a < 0 || b < 0 || c < 0 || e < 0) continue;
+					double h = max(max(a, b), max(c, e));
+					if (h <= 0) continue;
+					Planes(PTag(i, j), h, SkyH()); topTags.Push(PTag(i, j));
 				}
 			}
 	}
@@ -783,6 +831,7 @@ class NBC_KitGen play
 		if (zb < 0) return false;
 		Side band = ln.sidedef[zb], inner = ln.sidedef[1 - zb];
 		int si = inner.sector.Index();
+		if (!secRole[si]) return false;     // NBC: the band's outer edge meets the template's scenery, not the grid
 		int r = SecRoom(si);
 		Sector isec = inner.sector;
 		bool closed = isec.ceilingplane.ZAtPoint(isec.centerspot) <= isec.floorplane.ZAtPoint(isec.centerspot) + 1;
@@ -835,6 +884,13 @@ class NBC_KitGen play
 			else sec.SetTexture(Sector.ceiling, IsOut(ind) ? Tx("CEIL1_1") : Tx(rCeilT[ind], "CEIL1_1"));
 			int la = a >= 0 ? rLight[a] : 0, lb = b >= 0 ? rLight[b] : 0;
 			sec.SetLightLevel(max(la, lb));
+		}
+		// NBC: free-standing structures are open to the sky, with a concrete top
+		for (int k = 0; k < topTags.Size(); k++)
+		{
+			let it = level.CreateSectorTagIterator(topTags[k]);
+			int ts;
+			while ((ts = it.Next()) >= 0) { level.sectors[ts].SetTexture(Sector.ceiling, skyflatnum); level.sectors[ts].SetTexture(Sector.floor, Tx("CWCONCF")); }
 		}
 		FloorTo(12000, bandFloor);
 		if (bandCeil > 0) CeilTo(12000, bandCeil);
@@ -1256,6 +1312,7 @@ class NBC_KitGen play
 		}
 		FenceOpenGround();
 		Carve();
+		CarveSolidTops();
 		RaiseFacades();
 		Paint();
 		for (int r = 0; r < rtype.Size(); r++) if (CellCount(r)) { Dress(r); if (!IsOut(r)) LightRoom(r, LampStyle(r)); }

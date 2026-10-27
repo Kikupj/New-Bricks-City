@@ -13,6 +13,11 @@ contract between this file and NBC_KitGen:
     corner post between (i, j) and (i+1, j+1)      tag 11000 + j*(NX-1) + i
     the view band round the grid                   tag 12000 (blocking lines on its inner edge)
 
+Past the band, the street, tower and roof templates carry fixed scenery (SCENERY below): a gravel ground plane,
+a canal with embankment walls, a high retaining wall, and tower blocks as real raised rectangles at three
+distances, faced with lit-window and glass-tower textures, so the city has depth and parallax. The world's
+edge is a sealed ring with a sky ceiling (the classic sky hack), so the horizon is sky, not a wall.
+
 Strips are WALL units thick. An edge longer than 96 is cut into three: two side pieces and a DOOR-wide middle
 piece, which is where doors and windows go. The grid sizes below must match each kit's Setup().
 
@@ -20,13 +25,25 @@ Scale (PLAN.md §4.4): a person is 56 units tall (1.8 m), so a metre is about 31
 1.2 vertical stretch, about 37 units across. Doors are 48 wide (radius-20 actors need 40).
 """
 import os
+import random
 import struct
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "nbc", "maps")
 WALL = 16
 DOOR = 48           # the doorway piece of a strip
-VIEW = 384          # how far the view band reaches past the grid
+VIEW = 384          # how far the plain view band reaches past the grid (templates without scenery)
+BAND = 64           # with scenery: the kit-painted ring round the grid
+REACH = 3200        # with scenery: how far the world reaches past the grid
+
+# per template: ground height (the street is 0; seen from a tower or a roof it's 768 below), the canal, the
+# retaining wall, tower heights above the ground per distance tier, and the layout seed
+SCENERY = {
+    "NBC_KS": dict(z=0, canal=True, wall=True, seed=11, tiers=[(380, 760), (560, 1100), (820, 1700)]),
+    "NBC_KT": dict(z=-768, canal=True, wall=False, seed=37, tiers=[(420, 980), (620, 1400), (900, 2000)]),
+    "NBC_KR": dict(z=-768, canal=True, wall=False, seed=23, tiers=[(360, 980), (600, 1400), (900, 2100)]),
+}
+FACADES = ["CWNRESA", "CWNRESB", "CWNRESC", "CWNRESA", "CWNRESB", "CWNTOWA", "CWNTOWB", "CWNTOWC", "CWNTOWD", "CWNINDA"]
 
 # name: (column widths west->east, row heights south->north). Keep in sync with the kits' Setup().
 GRIDS = {
@@ -59,7 +76,78 @@ def rect(x, y, w, h):
     return [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
 
 
-def template(colw, rowh):
+def overlaps(a, b, pad):
+    return not (a[2] + pad <= b[0] or b[2] + pad <= a[0] or a[3] + pad <= b[1] or b[3] + pad <= a[1])
+
+
+def scenery(name, X, Y, hole, sectors, edge_tex, edge_light):
+    """The world past the grid: band ring, canal, retaining wall, towers, ground, the sky-hack horizon."""
+    cfg = SCENERY[name]
+    rnd = random.Random(cfg["seed"])
+    z, sky = cfg["z"], cfg["z"] + 2800
+    M, R = BAND, REACH
+    ring = clockwise(rect(-M, -M, X + 2 * M, Y + 2 * M))
+    sectors.append(([ring, hole], dict(floor=z, ceil=sky, ftex="CWPAVE", ctex="F_SKY1", light=128, tag=12000)))
+    holes, avoid = [ring], [(-M - 96, -M - 96, X + M + 96, Y + M + 96)]
+    if cfg["canal"]:
+        # an L of water along the south and the west, a 112 drop below the ground, embankment walls
+        i0, w = M + 32, 352
+        xe, yn = X + R - 420, Y + R - 420
+        canal = clockwise([(-i0 - w, -i0 - w), (xe, -i0 - w), (xe, -i0), (-i0, -i0), (-i0, yn), (-i0 - w, yn)])
+        sectors.append(([canal], dict(floor=z - 112, ceil=sky, ftex="CWWATER", ctex="F_SKY1", light=120, tag=0)))
+        holes.append(canal)
+        avoid += [(-i0 - w, -i0 - w, xe, -i0), (-i0 - w, -i0 - w, -i0, yn)]
+    if cfg["wall"]:
+        # a high retaining wall closing off the east side
+        x0 = X + M + 32
+        wall = clockwise(rect(x0, -M - 16, 48, Y + R - 300))
+        sectors.append(([wall], dict(floor=z + 224, ceil=sky, ftex="CWCONCF", ctex="F_SKY1", light=104, tag=0)))
+        holes.append(wall)
+        for k in range(4):
+            edge_tex[frozenset((wall[k], wall[(k + 1) % 4]))] = "CWWALLD"
+        avoid.append((x0, -M - 16, x0 + 48, Y + R - 300 + -M - 16))
+    # tower blocks in three tiers of distance from the band
+    bounds = (-R + 200, -R + 200, X + R - 200, Y + R - 200)
+    placed = []
+    tiers = [(260, 900, 192, 384), (900, 1700, 256, 512), (1700, 2700, 320, 640)]
+    for t, (d0, d1, w0, w1) in enumerate(tiers):
+        h0, h1 = cfg["tiers"][t]
+        for _ in range(900):
+            if len([1 for p in placed if p[4] == t]) >= (26, 22, 18)[t]:
+                break
+            side = rnd.choice((0, 0, 1, 1, 2, 3))   # 0 south, 1 north, 2 west, 3 east (long sides twice as often)
+            d = rnd.randint(d0, d1)
+            bw, bd = rnd.randint(w0, w1) // 16 * 16, rnd.randint(w0, w1) // 16 * 16
+            if side in (0, 1):
+                x = rnd.randint(-R + 300, X + R - 300 - bw) // 16 * 16
+                y = (-M - d - bd) if side == 0 else (Y + M + d)
+                r = (x, y, x + bw, y + bd)
+            else:
+                y = rnd.randint(-R + 300, Y + R - 300 - bd) // 16 * 16
+                x = (-M - d - bw) if side == 2 else (X + M + d)
+                r = (x, y, x + bw, y + bd)
+            if r[0] < bounds[0] or r[1] < bounds[1] or r[2] > bounds[2] or r[3] > bounds[3]:
+                continue
+            if any(overlaps(r, a, 48) for a in avoid) or any(overlaps(r, p, 40) for p in placed):
+                continue
+            placed.append(r + (t,))
+            h = rnd.randint(h0, h1) // 8 * 8
+            loop = clockwise(rect(r[0], r[1], bw, bd))
+            sectors.append(([loop], dict(floor=z + h, ceil=sky, ftex="FLAT5_5", ctex="F_SKY1", light=112, tag=0)))
+            holes.append(loop)
+            tex, light = rnd.choice(FACADES), rnd.randint(8, 40)
+            for k in range(4):
+                key = frozenset((loop[k], loop[(k + 1) % 4]))
+                edge_tex[key] = tex
+                edge_light[key] = light
+    ground = clockwise(rect(-R + 48, -R + 48, X + 2 * R - 96, Y + 2 * R - 96))
+    sectors.append(([ground] + holes[1:] + [ring], dict(floor=z, ceil=sky, ftex="CWASPH", ctex="F_SKY1", light=120, tag=0)))
+    # the horizon: a sealed ring with a sky ceiling, so the sky shows where the world ends
+    sectors.append(([clockwise(rect(-R, -R, X + 2 * R, Y + 2 * R)), ground], dict(floor=z, ceil=z, ftex="CWASPH", ctex="F_SKY1", light=104, tag=0)))
+    return len(placed)
+
+
+def template(name, colw, rowh):
     nx, ny = len(colw), len(rowh)
     cx = [sum(colw[:i]) + WALL * i for i in range(nx)]
     cy = [sum(rowh[:j]) + WALL * j for j in range(ny)]
@@ -102,19 +190,23 @@ def template(colw, rowh):
         for i in range(nx - 1):
             sectors.append(([clockwise(rect(cx[i] + colw[i], cy[j] + rowh[j], WALL, WALL))], dict(floor=0, ceil=0, tag=11000 + j * (nx - 1) + i)))
 
-    # the view band: an outer box with the grid's outline as a hole
+    # the view band round the grid: plain, or the ring of a world of scenery
     X, Y = cx[-1] + colw[-1], cy[-1] + rowh[-1]
     xs = sorted({v for i in range(nx) for v in (cx[i], cx[i] + colw[i])})
     ys = sorted({v for j in range(ny) for v in (cy[j], cy[j] + rowh[j])})
     hole = [(x, 0) for x in xs] + [(X, y) for y in ys[1:]] + [(x, Y) for x in reversed(xs[:-1])] + [(0, y) for y in reversed(ys[1:-1])]
-    outer = clockwise(rect(-VIEW, -VIEW, X + 2 * VIEW, Y + 2 * VIEW))
-    sectors.append(([outer, hole], dict(floor=-768, ceil=1024, ftex="ADFCITY", ctex="F_SKY1", light=144, tag=12000)))
+    edge_tex, edge_light, towers = {}, {}, 0
+    if name in SCENERY:
+        towers = scenery(name, X, Y, hole, sectors, edge_tex, edge_light)
+    else:
+        outer = clockwise(rect(-VIEW, -VIEW, X + 2 * VIEW, Y + 2 * VIEW))
+        sectors.append(([outer, hole], dict(floor=-768, ceil=1024, ftex="ADFCITY", ctex="F_SKY1", light=144, tag=12000)))
     blocking = {frozenset((hole[k], hole[(k + 1) % len(hole)])) for k in range(len(hole))}
     start = (cx[0] + colw[0] // 2, cy[0] + rowh[0] // 2)
-    return sectors, blocking, start
+    return sectors, blocking, start, edge_tex, edge_light, towers
 
 
-def udmf(sectors, blocking, start):
+def udmf(sectors, blocking, start, edge_tex, edge_light):
     verts, vid = [], {}
 
     def v(p):
@@ -136,8 +228,12 @@ def udmf(sectors, blocking, start):
             sides.append(dict(sector=s, texturemiddle="CWCONCW"))
             lines.append(dict(v1=v(a), v2=v(b), sidefront=len(sides) - 1, blocking=True))
         else:
-            sides.append(dict(sector=s, texturetop="CWCONCW", texturebottom="CWCONCW"))
-            sides.append(dict(sector=uses[1][2], texturetop="CWCONCW", texturebottom="CWCONCW"))
+            tex = edge_tex.get(key, "CWCONCW")
+            sides.append(dict(sector=s, texturetop=tex, texturebottom=tex))
+            sides.append(dict(sector=uses[1][2], texturetop=tex, texturebottom=tex))
+            if key in edge_light:
+                sides[-2]["light"] = edge_light[key]
+                sides[-1]["light"] = edge_light[key]
             ln = dict(v1=v(a), v2=v(b), sidefront=len(sides) - 2, sideback=len(sides) - 1, twosided=True)
             if key in blocking:
                 ln.update(blocking=True, blockmonsters=True)
@@ -178,7 +274,7 @@ def write_wad(path, name, textmap):
 
 if __name__ == "__main__":
     for name, (colw, rowh) in GRIDS.items():
-        sectors, blocking, start = template(colw, rowh)
+        sectors, blocking, start, edge_tex, edge_light, towers = template(name, colw, rowh)
         path = os.path.join(OUT, name + ".wad")
-        write_wad(path, name, udmf(sectors, blocking, start))
-        print("%s: %d x %d cells, %d sectors -> %s" % (name, len(colw), len(rowh), len(sectors), os.path.relpath(path, ROOT)))
+        write_wad(path, name, udmf(sectors, blocking, start, edge_tex, edge_light))
+        print("%s: %d x %d cells, %d sectors, %d towers -> %s" % (name, len(colw), len(rowh), len(sectors), towers, os.path.relpath(path, ROOT)))

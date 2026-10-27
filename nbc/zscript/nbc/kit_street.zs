@@ -9,7 +9,8 @@
 //   row 1  the sidewalk (and down column 1)
 //   row 0  the road (and the cross street down column 0)
 //
-// Shops are one storey (108, 3.5 m); above them the facades show the flats upstairs. Variants: a tower entrance
+// Shops are one storey (108, 3.5 m); above them the facades show the flats upstairs. Past the road and the cross
+// street a canal runs; past the side passage a retaining wall; behind the Wall (8 m) and all round, tower blocks. Variants: a tower entrance
 // (a fenced courtyard, the tower's lobby, a playground), corner stores, a chop lot (a fenced car lot and the
 // garage), and under the el (the elevated rail line over the road, market stalls beneath it).
 class NBC_KitStreet : NBC_KitGen
@@ -27,7 +28,8 @@ class NBC_KitStreet : NBC_KitGen
 	const COL_PASS = 14;
 	const ROW_ALLEY = 6;
 	const ROW_WALL = 7;
-	const WALL_TEX = "ADSCONC";      // the Wall's floodlit concrete
+	const WALL_TEX = "CWWALLD";      // the Wall's concrete
+	const WALL_H = 256;              // and its height: 8 m, the towers beyond rise over it
 	static const String FRONTS[] = { "BRICK1", "BRICK12", "BIGBRIK1", "STUCCO1", "BRICK6", "BRICK11", "ADBRICK", "STONE2" };
 	static const String UPPER[] = { "CWNRESA", "CWNRESB", "CWNRESC" };
 
@@ -41,8 +43,8 @@ class NBC_KitStreet : NBC_KitGen
 		for (int j = 0; j < RW.Size(); j++) rowh.Push(RW[j]);
 		Grid(CW.Size(), RW.Size());
 		doorTex = "ADDOOR3"; jambTex = "SUPPORT3"; edgeTex = "ADBRICK";
-		// across the street: the pavement at kerb height, then the towers opposite, the night sky above them
-		bandFloor = 0; bandTex = "CWPAVE"; bandCeil = 640; bandLight = 136;
+		// past the kerb: the embankment and the canal, the towers beyond (the template's scenery, make_kit_maps.py)
+		bandFloor = 0; bandTex = "CWPAVE"; bandCeil = 640; bandLight = 128;
 		kerbTex = "CWCONCW";
 	}
 	override double SkyH() { return 640; }
@@ -54,8 +56,8 @@ class NBC_KitStreet : NBC_KitGen
 		if (ground == "CWVIADUC" || ground.Length() == 0) return ground.Length() ? ground : "ADBRICK";
 		return UPPER[(ground.Length() + ground.ByteAt(ground.Length() - 1)) % UPPER.Size()];
 	}
-	// beyond the road and the cross street: towers with lit windows
-	override String BandWall(Vector2 at) { return UPPER[Rand(0, UPPER.Size() - 1)]; }
+	// the Wall stands free, open to the sky above it
+	override double SolidTop(int i, int j) { return cellFac[j * NX + i] == WALL_TEX ? WALL_H : 0; }
 	override bool EdgeOpen(int r) { return IsOut(r); }
 	override int VariantCount() { return V_COUNT; }
 	override String VariantName()

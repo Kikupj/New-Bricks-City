@@ -1047,6 +1047,7 @@ In every kit:
 - **The way in and the exit** are two of the kit's entries (stairs, lift, alley, ramp, fire escape...); the exit is the one farthest from the way in, under a lit exit sign.
 - **Objectives** go in the rooms each kit scores highest for seizing, wrecking or reaching someone (`NBC_ObjectiveMarker`).
 - **Fences and rails:** where outdoor spaces meet without a doorway or gap, there's a fence; rails over a drop block.
+- **Past the map's edges** (street, tower and roof templates): a canal with embankments along the road side, a high retaining wall, a ground plane, and tower blocks as real geometry at three distances for parallax; the horizon is a sky-hack ring, never a wall. Never paint a city onto a flat wall at a map border.
 
 ---
 
