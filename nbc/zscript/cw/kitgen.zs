@@ -551,11 +551,40 @@ class NBC_KitGen play
 			{
 				int a = At(i, j), b = At(i + 1, j), c = At(i, j + 1), d = At(i + 1, j + 1);
 				if (a < 0 || b < 0 || c < 0 || d < 0) continue;
-				if (EdgeState(i, j, true) != 2 || EdgeState(i, j + 1, true) != 2 || EdgeState(i, j, false) != 2 || EdgeState(i + 1, j, false) != 2) continue;
+				int e0 = EdgeState(i, j, true), e1 = EdgeState(i, j + 1, true), e2 = EdgeState(i, j, false), e3 = EdgeState(i + 1, j, false);
 				double f = max(max(rF[a], rF[b]), max(rF[c], rF[d]));
 				double cc = min(min(CeilOf(a), CeilOf(b)), min(CeilOf(c), CeilOf(d)));
-				Planes(PTag(i, j), f, cc);
+				if (e0 == 2 && e1 == 2 && e2 == 2 && e3 == 2) { Planes(PTag(i, j), f, cc); continue; }
+				// NBC: outdoors, where fences (and gates) meet, the post is a fence post: fence height, sky above.
+				// Left sealed it would be raised as building facade: a thin column standing up out of the fence.
+				if (IsOut(a) && IsOut(b) && IsOut(c) && IsOut(d)
+					&& (e0 == 2 || e0 == -1) && (e1 == 2 || e1 == -1) && (e2 == 2 || e2 == -1) && (e3 == 2 || e3 == -1))
+				{
+					double top = f + max(max(FenceH(a, b), FenceH(c, d)), max(FenceH(a, c), FenceH(b, d)));
+					Planes(PTag(i, j), top, SkyH());
+				}
 			}
+	}
+
+	// NBC: two outdoor spaces that touch without a link would be split by a sealed strip, which rises as
+	// facade like a building wall. Give every such edge a fence instead.
+	void FenceOpenGround()
+	{
+		for (int j = 0; j < NY; j++)
+			for (int i = 0; i < NX; i++)
+			{
+				int a = At(i, j);
+				if (!IsOut(a)) continue;
+				int r = At(i + 1, j);
+				if (IsOut(r) && r != a && LinkKindAt(i, j, true) < 0) Link(i, j, i + 1, j, E_FENCE);
+				r = At(i, j + 1);
+				if (IsOut(r) && r != a && LinkKindAt(i, j, false) < 0) Link(i, j, i, j + 1, E_FENCE);
+			}
+	}
+	int LinkKindAt(int ei, int ej, bool vert)
+	{
+		for (int k = 0; k < lI.Size(); k++) if (lI[k] == ei && lJ[k] == ej && (lVert[k] == 1) == vert) return lKind[k];
+		return -1;
 	}
 
 	// sealed sectors next to an outdoor space rise to the ground-floor height (see GroundFloorH)
@@ -1225,6 +1254,7 @@ class NBC_KitGen play
 			for (int r = 0; r < rtype.Size(); r++)
 				if (depth[r] < 0 && CellCount(r) && !Has(r, RF_WATER)) Console.Printf("\cgKit: %s is unreachable", rName[r]);
 		}
+		FenceOpenGround();
 		Carve();
 		RaiseFacades();
 		Paint();
