@@ -18,24 +18,26 @@ engine="${UZDOOM:-}"
 if [ ! -x "$engine" ]; then echo "smoke_test: no UZDoom binary (set UZDOOM=...)"; exit 2; fi
 if [ ! -f freedoom-0.13.0/freedoom2.wad ]; then echo "smoke_test: freedoom-0.13.0/freedoom2.wad is missing"; exit 2; fi
 mkdir -p build
-secs="${SECONDS_PER_MAP:-12}"
+secs="${SECONDS_PER_MAP:-90}"   # software rendering under xvfb is slow to boot
 maps=("$@"); [ ${#maps[@]} -eq 0 ] && maps=(NBC_TEST)
 pattern=', line [0-9]+:|script error|error|unknown|not found|bad state|could not|missing|invalid|warning|failed|can.t|cannot'
+# the container has no sound devices: ALSA / PipeWire / OpenAL complain even with -nosound
+noise='ALSA lib|pw\.conf|\[ALSOFT\]|pipewire'
 failed=0
 
 for m in "${maps[@]}"; do
 	out="build/smoke_$m.txt"
 	rm -f "$out"
 	# shellcheck disable=SC2086
-	timeout -s KILL "$secs" xvfb-run -a -s "-screen 0 1024x768x24" \
+	timeout -s KILL "$secs" xvfb-run -a -s "-screen 0 640x480x24" stdbuf -oL -eL \
 		"$engine" -iwad freedoom-0.13.0/freedoom2.wad -file nbc -nosound -stdout -config build/smoke.ini \
-		+vid_fullscreen 0 +map "$m" ${EXTRA:-} > "$out" 2>&1
+		+vid_fullscreen 0 +vid_rendermode 0 +vid_preferbackend 0 +map "$m" ${EXTRA:-} > "$out" 2>&1
 	code=$?
 	reasons=()
 	[ "$code" -ne 137 ] && [ "$code" -ne 124 ] && reasons+=("engine exited by itself (code $code)")
 	grep -q '^Init complete\.' "$out" || reasons+=("never reached 'Init complete.'")
 	grep -q "^$m - " "$out" || reasons+=("map $m never loaded")
-	while IFS= read -r line; do reasons+=("log: $line"); done < <(grep -Ei "$pattern" "$out" | head -25)
+	while IFS= read -r line; do reasons+=("log: $line"); done < <(grep -Ei "$pattern" "$out" | grep -Eiv "$noise" | head -25)
 	if [ ${#reasons[@]} -eq 0 ]; then
 		echo "PASS  $m  ($(wc -l < "$out") log lines, $out)"
 	else
