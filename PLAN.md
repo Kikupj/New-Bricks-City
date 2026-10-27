@@ -652,7 +652,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 
 ---
 
-### M2c — The Bricks kit layouts, from scratch — 🔄 IN PROGRESS (2026-10-27, by Claude)
+### M2c — The Bricks kit layouts, from scratch — ✅ BUILT, NEEDS PLAYTEST (2026-10-27, by Claude)
 **Decision (owner, 2026-10-27):** the Corpo Wars kit layouts aren't up to standard and cover settings the Bricks doesn't need, so every layout is written new for New Bricks City. Only M2b's carving engine (`nbc/zscript/cw/kitgen.zs`) stays. The kits are `nbc/zscript/nbc/kit_*.zs` on new template grids (`tools/make_kit_maps.py`), at the measured scale in §4.4:
 - **Tower floor** (`NBC_KT`): stair cores at both ends, a corridor, flats on both sides (studios to four-bay flats: bathroom, hall and kitchen by the corridor, bedrooms either side of the living room at the windows), the lift lobby with the trash chute and laundry. Variants: occupied, gallery (an open-air deck along one face), gang floor (knocked-through flats, barricades, stash/cook/counting/lookout flats), burned-out, penthouse.
 - **Street** (`NBC_KS`): the foot of the towers: the tower entrance, a courtyard, a bodega and corner stores, a chain-link lot, the alley, the Wall.
@@ -1029,20 +1029,24 @@ Officers who bleed out are **killed** and leave the roster for good (§2.1).
 | **Hold the Block** (M7c) | Defend a reclaimed block against a counter-raid: fortify a building on the street kit, the gang attacks in 3–4 waves from the map edges (two edges in a two-front defense) | The last wave breaks (surrender applies) | Keep the block; +Backing, +Merit. Lose it if you retreat or go down |
 | **Foot Patrol** (side job, M9) | Walk a marked route through the turf to a far checkpoint; light resistance, residents on the street | You reach the checkpoint | Cash and officer XP; low risk |
 
-### 6.7 Kit variants used for the Bricks (ported from Corpo Wars, restyled)
+### 6.7 The Bricks kits (written for New Bricks City, M2c)
 
-| NBC kit | From | Variants we use | Becomes | Objectives |
+Each kit is a template grid (`tools/make_kit_maps.py`) plus a layout class in `nbc/zscript/nbc/kit_*.zs`, carved by the engine in `nbc/zscript/cw/kitgen.zs`. All at the measured scale in §4.4.
+
+| Kit (map) | Grid | Variants | Becomes | Objectives it suits |
 |---|---|---|---|---|
-| `NBC_K1` street | K01 | street market, pawn shop, gambling den, drug lab, chop shop, club | Approach blocks on every turf, Hold the Block defenses and Foot Patrols. Restyle: the foot of the towers on one side, burned cars (voxels), barricades, chain-link, corner stores, rubble, the Wall on one edge where a turf borders it, an elevated highway or the skyline over the other. | Sweep, Evidence, Warrant, Lab (drug lab), Pursuit, Hold the Block, Foot Patrol |
-| `NBC_K2` residential | K02 | **tenement** (the default Bricks floor), apartments, luxury apartments, hotel, den, **rooftops** | Mansion floors. Tenement uses boarded doors, graffiti and dark corridors; luxury and hotel become the Collectors' and the Crown's floors; rooftops is the top of a tower (fire escapes, roof huts, gaps). | All |
-| `NBC_K4` underground | K04 | parking garage, maintenance tunnels, underpass | The Iron Pit's fight club, the Rust Saints' garage, the Wall Watch's smuggling tunnels, and basement labs under any tower | Sweep, Lab, Evidence, Extraction |
+| **Tower floor** (`NBC_KT`) | 14 x 5: stair cores, 12 flat bays, two rows of rooms either side of the corridor | occupied floor, gallery floor, gang floor, burned-out floor, penthouse floor | Mansion floors. Flats (studio to four bays), the lift lobby, the trash chute and laundry. The gang floor has stash, cook, counting, trap and lookout flats, knocked-through walls, barricades. The penthouse is the Collectors' and the Crown's. | All; Lab Bust in the cook flat, Evidence in the stash and counting room |
+| **Street** (`NBC_KS`) | 15 x 8: road, sidewalk, 12 lots, alley, the Wall | tower entrance, corner stores, chop lot, under the el | Approach blocks, Hold the Block defenses, Foot Patrols. Shops with back rooms and flats above, walk-ups, closed buildings, the tower's courtyard and lobby, a playground, the chain-link car lot and garage, the elevated line over the road. | Sweep, Evidence, Warrant, Pursuit, Hold the Block, Foot Patrol |
+| **Basement** (`NBC_KB`) | 16 x 12 cells of 128 | service basement, cook lab, fight pit, parking garage, smugglers' tunnel | The Iron Pit's fight hall, the Rust Saints' garage, the Wall Watch's tunnel, labs under any tower. | Sweep, Lab, Evidence, Extraction |
+| **Roof** (`NBC_KR`) | 14 x 9 cells of 160 | tower roof, rooftop crossing, roof camp | The top of a tower: stair huts, the lift machine room, water tanks, the gap to the next tower on plank bridges, a squatters' and lookout camp. | Sweep, Rooftop Pursuit, Warrant |
 
 In every kit:
-- **Spawn spots** come from the kit's rooms: patrol and people rooms are ground spots, windows and fire escapes are perches, and the far stair core is for reinforcements.
-- **Rubble piles** go in derelict and outdoor rooms.
-- **Residents** (civilians) go in the kit's civilian rooms.
-- The **squad start and extraction** go at the chosen entry.
-- **Objectives** use the kit's objective planner: "destroy" becomes Lab Bust, "steal" becomes Evidence Run, and "turn in" becomes Informant Extraction.
+- **Spawn spots** come from every reachable cell (up to two per cell); outdoor cells are marked as perches for M4.
+- **Rubble piles** (against walls) and loose debris go in rooms flagged `RF_RUBBLE`: squats, burned flats, alleys, yards, roofs, tunnels.
+- **Residents** stand at `NBC_ResidentSpot` markers in civilian rooms (M9).
+- **The way in and the exit** are two of the kit's entries (stairs, lift, alley, ramp, fire escape...); the exit is the one farthest from the way in, under a lit exit sign.
+- **Objectives** go in the rooms each kit scores highest for seizing, wrecking or reaching someone (`NBC_ObjectiveMarker`).
+- **Fences and rails:** where outdoor spaces meet without a doorway or gap, there's a fence; rails over a drop block.
 
 ---
 

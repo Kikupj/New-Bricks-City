@@ -13,8 +13,11 @@
 //   painchance        multiplier on gang members' pain chance (stagger resistance < 1)
 //   trait             one line for the raid board dossier
 //   mansion           the kit floors the gang holds (PLAN.md §6.7, §6.9), "<kit>:<variant>"; a raid picks one with
-//                     the case RNG. Kits and variants: tower (occupied floor, gallery floor, gang floor,
-//                     burned-out floor, penthouse floor); street, basement and roof arrive with M2c
+//                     the case RNG. Kits and their variants (nbc/zscript/nbc/kit_*.zs):
+//                       tower     occupied floor, gallery floor, gang floor, burned-out floor, penthouse floor
+//                       street    tower entrance, corner stores, chop lot, under the el
+//                       basement  service basement, cook lab, fight pit, parking garage, smugglers' tunnel
+//                       roof      tower roof, rooftop crossing, roof camp
 
 gang stoop_kings
 {
@@ -32,7 +35,7 @@ gang stoop_kings
 	leaderhealth = 6
 	escorts = 3
 	trait = "Swarm: more of them on every stoop, but they drop fast."
-	mansion = "tower:gang floor" "tower:gallery floor" "tower:burned-out floor"
+	mansion = "tower:gang floor" "tower:gallery floor" "street:corner stores" "roof:roof camp"
 }
 
 gang rust_saints
@@ -52,7 +55,7 @@ gang rust_saints
 	escorts = 2
 	damage = Fire 0
 	trait = "Pyros: fire and explosives, and fire won't touch them."
-	mansion = "tower:gang floor" "tower:burned-out floor"
+	mansion = "street:chop lot" "basement:parking garage" "tower:burned-out floor" "basement:cook lab"
 }
 
 gang iron_pit
@@ -73,7 +76,7 @@ gang iron_pit
 	damage = Fire 1.5
 	painchance = 0.4
 	trait = "Roiders: they shrug off stagger. Fire hurts them half again."
-	mansion = "tower:gang floor"
+	mansion = "basement:fight pit" "basement:service basement"
 }
 
 gang collectors
@@ -93,5 +96,5 @@ gang collectors
 	escorts = 3
 	damage = NBC_Light 0.6
 	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles."
-	mansion = "tower:penthouse floor"
+	mansion = "tower:penthouse floor" "street:tower entrance"
 }
