@@ -1,0 +1,19 @@
+# Known, accepted problems for tools/check_lumps.py. One "check:key" per line (key as the checker prints it).
+# Every entry needs a reason. Remove an entry once the problem is fixed.
+
+# --- Pre-existing in DeePayback Enemies: SNDINFO names sounds the pack never shipped. The engine plays nothing.
+sndinfo:sndinfo:assurr1
+sndinfo:sndinfo:assurr2
+sndinfo:sndinfo:assurr3
+sndinfo:sndinfo:assurr4
+sndinfo:sndinfo:rastas8
+sndinfo:sndinfo:drsee13
+sndinfo:sndinfo:prsee13
+sndinfo:sndinfo:bikdie
+sndinfo:sndinfo:biksee2
+sndinfo:sndinfo:jap3pan
+
+# --- Pre-existing in the weapon packs: these sprites are only used on 0-tic frames, so they're never drawn.
+sprite:sprite:null   # CombatKnife Select/Deselect
+sprite:sprite:mgnf   # CombatKnife A_Recoil frames
+sprite:sprite:d9ra   # DualBeretta fire-swap frame

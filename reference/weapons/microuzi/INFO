@@ -1,0 +1,8 @@
+Name: Micro-Uzi
+Class: Level 2
+Type: Hitscan
+Palette: Doom
+Summon: MicroUzi
+Ammotype: UziAmmo
+AltFire: No
+Powered Mode: No

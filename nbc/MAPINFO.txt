@@ -1,0 +1,12 @@
+// New Bricks City — MAPINFO
+// NBC map things use DoomEdNums from 26000 (25013 is the imported Molotov's; 10600-10803 are the voxel cars).
+
+// Test room for smoke tests: a brick box with a pillar and a few vanilla monsters,
+// which the enemy pack replaces with human enemies. Rebuild with tools/make_test_map.py.
+map NBC_TEST "Test Room"
+{
+	levelnum = 900
+	sky1 = "SKY1", 0
+	nointermission
+	next = "NBC_TEST"
+}

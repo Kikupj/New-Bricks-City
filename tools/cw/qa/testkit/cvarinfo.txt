@@ -1,0 +1,6 @@
+server noarchive float tk_x = 0;
+server noarchive float tk_y = 0;
+server noarchive float tk_z = -1;
+server noarchive float tk_a = 0;
+server noarchive float tk_p = 0;
+server noarchive string tk_shots = "";

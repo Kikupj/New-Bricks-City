@@ -1,0 +1,23 @@
+Name: Dual Berettas
+Class: 2
+Type: Hitscan
+Palette: Doom
+Summon: Dual92
+Ammo Type: Bullets
+Altfire: No
+Powered Mode: No
+Brightmaps: No
+Actor modification: No
+Inspiration: The Dual Elites, from Counter-Strike.
+ACS: No
+
+Credits:
+Code: LossForWords
+Sounds: Hyperix, Valve
+Sprites: LossForWords, Joblez, Valve, iD Software.
+
+Description:
+The Beretta 92 is a symbol of excellence in italian arms manufacturing, with it's high capacity and sleek, elegant shape.
+While effective enough on it's own, nothing compares to the feeling of unloading two at once.
+It'll cost you in accuracy and reload speed, but the firerate and mag capacity will more than make up for it.
+If holding one of these makes you feel like Superman, you can only imagine how holding two would make you feel.

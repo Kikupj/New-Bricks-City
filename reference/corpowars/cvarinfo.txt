@@ -1,0 +1,34 @@
+server bool EAI_Debug = false;
+server bool EAI_Stealth = true;
+server float EAI_StealthFactor = 24;
+server bool cw_navdebug = false;
+server int cw_procseed = 0;
+server int cw_floorrole = -1;   // G02 floor role: -1 random, 0 ground, 1 typical, 2 top   // G01 seed when loaded directly (0 = random)
+server int cw_theme = -1;       // G02 interior theme: -1 contract/seed, 0 Meridian, 1 Walnut & Brass, 2 Clinical White, 3 Night Glass, 4 Brick & Steel
+user bool cw_floorreflect = true;  // G02: polished-floor reflections in lobbies (turn off if the renderer struggles)
+server noarchive int cw_floors = 0;        // test: floors in the G02 building when no mission is running (0/1 single, 2-3 multi-floor)
+server noarchive int cw_simverbose = 0;   // debug: print every headline during netevent cw_simdays
+server noarchive int cw_simplayer = 0;    // debug: 1-6 = during cw_simdays, a broker wins one strike a day for that corp
+server noarchive int cw_kitvariant = -1;   // test: site kit variant when a K01-K06 map is loaded without a job (-1 = from the seed)
+server bool cw_obsidian = true;
+server noarchive string cw_pool_industrial = "";   // set by the launcher: the current industrial map set (CWI or CWJ)           // city jobs use Obsidian-built maps from the pool (pool WADs from the launcher) where one exists
+server noarchive string cw_pool_underground = "";  // set by the launcher: the current underground map set (CWU or CWV)
+server int cw_undermood = -1;   // underground mood lighting: -1 = picked per site, 0 plain, 1 soft gold, 2 green, 3 crimson, 4 cool blue, 5 mixed
+server bool cw_newsites = true;           // city jobs and city-map visits use the After Hours site pack (CorpoWars_sites.wad) where it has the building type; off = the old kits
+server bool cw_kitsites = true;           // city jobs use the site kits (K01-K06) where one fits; off = every job on the G02 office floor
+
+user float cw_leanangle = 12;    // tactical lean: camera tilt in degrees
+user float cw_leandist = 22;     // tactical lean: how far the eye slides out to peek (map units)
+user bool cw_climb = true;       // hold Jump at a ledge or low furniture to climb onto it
+user bool cw_buildmove = true;   // grounded movement (extra ground friction, slower top speed); off = vanilla Doom
+user float cw_movespeed = 1.6;   // grounded movement push (friction 0.88 per tic): 1.6 runs ~12 u/tic, 1.9 = the original mod
+user bool cw_landflinch = true;  // view dips and you slow briefly after a real fall
+user bool cw_deathroll = true;   // view rolls over and flashes red when you die
+server noarchive bool cw_debughub = false;   // debug hub (Play_CorpoWars_DebugHub.bat): the terminal's OPERATIONS tab becomes the kit tester
+
+server int cw_cityseed = 0;                  // city districts C01-C05: seed (0 = random each visit; the seed in use is printed at load)
+server noarchive int cw_cityseedact = 0;     // the seed C01 is using (so returning from a kit rebuilds the same city)
+// (cw_citydoor removed: the door now travels in CW_CityLink)
+server bool cw_cityauto = true;              // after a city-launched kit ends in HUB01, go straight back to C01
+server bool cw_cityalldoors = false;         // test: every non-empty building is enterable (default: authored properties + 18 neutral sites per district)
+server bool cw_citydebug = false;            // print the roster placement decisions when a city district loads

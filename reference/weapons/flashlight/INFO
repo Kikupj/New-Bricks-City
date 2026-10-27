@@ -1,0 +1,15 @@
+Name: Flashlight
+Class: None
+Type: Harmless hitscan
+Palette: Doom
+Summon: FlashLightCentered, FlashLightAngled
+Ammo Type: None
+Altfire: No
+Powered Mode: No
+Brightmaps: No
+Actor modification: No
+ACS: No
+
+
+A simple toggleable flashlight, which comes in both centered and angled versions. It requires
+dynamic lights to be enabled in order to function properly.

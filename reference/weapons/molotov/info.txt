@@ -1,0 +1,14 @@
+Name: Molotov Cocktail
+Class: 5
+Type: Projectile
+Palette: Custom
+Summon: MolotovCocktail
+Ammo Type: MolotovAmmo (custom)
+Altfire: No
+Powered Mode: No
+Brightmaps: Yes
+Actor modification: No
+ACS: No
+
+Hold the fire button to charge your power meter. The more you hold it, the further you can throw a molotov cocktail. Don't hold it for too long or it will explode in your hands. Doesn't work underwater.
+Includes an alternate set of sprites with Doom hands inside the file. Check the "altsprites" folder if you want to use those instead.

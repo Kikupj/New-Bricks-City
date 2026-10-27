@@ -1,0 +1,6 @@
+Code: Scientist, Gothic
+GLDefs: Keksdose, Gothic
+Sounds: Blood & Clive Barker's Undying.
+Sprites: Scientist, Blood, Shadow Warrior, Dzierzan, Espi & Kristus, Doom 2, Scuba Steve, Per Kristian 
+Sprite Edit: Gothic
+Idea Base: The Molotov Cocktail from the WRW

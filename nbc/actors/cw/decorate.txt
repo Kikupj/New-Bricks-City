@@ -1,0 +1,6 @@
+// Corpo Wars imports that are safe to load now (M0b). Everything else from Corpo Wars is in
+// reference/corpowars/ until its milestone ports it; see docs/corpowars-port-map.md.
+
+// Voxel Vehicles Pack 1.0 by NerdKoopa (static parked cars, DoomEdNums 10600-10803), as used by Corpo Wars.
+// The voxel models are in voxels/ and replace the RCAR/BCAR/... sprite frames by name.
+#include "actors/cw/vehicles.txt"

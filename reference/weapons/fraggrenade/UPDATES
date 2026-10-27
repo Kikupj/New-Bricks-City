@@ -1,0 +1,38 @@
+20/03/17 //Update
+-Have had to make the Weapon's "GrenSpeed" (the speed increase factor for 
+Primary Fire) an Inventory Item* to stop giving the player unlimited Primary or 
+Secondary Grenades. Ammo was originally taken by scripted action but after 
+further testing, it has failed to stop you running out of ammo.
+*Because of this you can't see the charge level number. But it rises fast & 
+isn't a huge problem at the moment.
+-Reload Check on Raising Weapon removed (it raised, then deselected, slowing 
+down weapon scrolling time) it will still swap out when you try firing but you 
+have no Grenades.
+
+20/03/17 //Continued
+-Renamed to Frag Grenades (Originally Hand Grenades)
+-Decorate layout modified (looked a bit messy)
+-Auto-Aim is now enabled, for testing purposes & user feedback.
+-Grenades give +1 Ammo if a single Grenade is picked up.
+
+21/03/17
+-Auto-Aim is disabled. With notes about the restrictions it created added to INFO.
+-Fixed an issue with presentation & weapon selection after deselecting the 
+weapon with no grenades left. You should now not be raising the weapon until 
+more ammo is collected.
+-You should not be seeing the Player lowering any weapon when deselecting & 
+there is no Grenades left.
+-Weapon Flagged as an Explosive.
+-Grenades have an extra kickback added, knocking targets back slightly or 
+blasting weaker ememies aside (crowd control).
+
+10/12/24 - DeVloek
+* wad converted to pk3
+* renamed explosion sprites to match same sprites from other weapons
+* changed slotnumber to 9
+* slowed down roll animation
+* minor adjustments to bouncing behavior
+* removed redundant code
+* fixed pickups, now each grenade always gives 1 ammo regardless if the weapon or ammo was picked up
+* picking up a grenade box also gives the weapon
+* edited sounds (removed click noise, reduced file size)

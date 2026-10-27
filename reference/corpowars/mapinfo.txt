@@ -1,0 +1,1099 @@
+gameinfo
+{
+	AddEventHandlers = "EnhancedAIHandler", "CW_Handler", "CW_Lean", "CW_CityLink"
+	PlayerClasses = "CW_Player"
+}
+
+DoomEdNums
+{
+	20001 = CW_Guard
+	20002 = CW_PatrolPoint
+	20003 = CW_NavNode
+	20004 = CW_SecuritySupervisor
+	20010 = CW_ContractBoard
+	20012 = CW_GearLocker
+	20020 = CW_Prototype
+	20021 = CW_Server
+	20022 = CW_Scientist
+	20023 = CW_Extraction
+	20024 = CW_Civilian
+	20025 = CW_TransportAccess
+	20100 = CW_DeskCommand
+	20101 = CW_DeskRound
+	20102 = CW_DeskTarget
+	20103 = CW_ServerRack
+	20104 = CW_Chair
+	20105 = CW_FileCabinet
+	20106 = CW_Dresser
+	20107 = CW_RadioConsole
+	20108 = CW_CrateBig
+	20109 = CW_CrateStack
+	20110 = CW_CaseBlack
+	20111 = CW_Shelf
+	20112 = CW_Workbench
+	20113 = CW_CaseSmall
+	20114 = CW_MapTable
+	20115 = CW_CeilingLight
+	20116 = CW_Plant
+	20117 = CW_Vending
+	20118 = CW_Copier
+	20119 = CW_Sofa
+	20120 = CW_WaterCooler
+	20121 = CW_JanitorCart
+	20122 = CW_Bin
+	20123 = CW_ExitSign
+	// Obsidian site markers (obssite.zs)
+	30110 = CW_ObsSpot0
+	30111 = CW_ObsSpot1
+	30112 = CW_ObsSpot2
+	30113 = CW_ObsSpot3
+	30122 = CW_ObsEntry2
+	30123 = CW_ObsEntry3
+	30124 = CW_ObsEntry4
+	30125 = CW_ObsEntry5
+	30130 = CW_ObsLamp
+	30140 = CW_ObsWindow
+	30150 = CW_ObsDuct
+	30200 = CW_ObsRoom00
+	30201 = CW_ObsRoom01
+	30202 = CW_ObsRoom02
+	30203 = CW_ObsRoom03
+	30204 = CW_ObsRoom04
+	30205 = CW_ObsRoom05
+	30206 = CW_ObsRoom06
+	30207 = CW_ObsRoom07
+	30208 = CW_ObsRoom08
+	30209 = CW_ObsRoom09
+	30210 = CW_ObsRoom10
+	30211 = CW_ObsRoom11
+	30212 = CW_ObsRoom12
+	30213 = CW_ObsRoom13
+	30214 = CW_ObsRoom14
+	30215 = CW_ObsRoom15
+	30216 = CW_ObsRoom16
+	30217 = CW_ObsRoom17
+	30218 = CW_ObsRoom18
+	30219 = CW_ObsRoom19
+}
+
+map CWTEST "Corpo Wars: Stealth Test"
+{
+	next = "CWTEST"
+	sky1 = "SKY1"
+	music = "D_STALKS"
+}
+
+map HUB01 "The Broker's Office"
+{
+	next = "HUB01"
+	sky1 = "SKY1"
+	music = "D_DM2INT"
+}
+
+map M01 "Oriole Biotech: Helix Lab"
+{
+	next = "HUB01"
+	sky1 = "SKY1"
+	music = "D_STALKS"
+}
+
+map M02 "Castellan Systems: R&D Annex"
+{
+	next = "HUB01"
+	sky1 = "SKY1"
+	music = "D_STALKS"
+}
+
+map G02 "Office Floor"
+{
+	cluster = 20
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+// multi-floor missions: the other floors of the same building. One hub, so floors keep their state
+// (bodies, open doors, alert guards) while you move between them on the stairs.
+
+map G03 "Office Floor 2"
+{
+	cluster = 20
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map G04 "Office Floor 3"
+{
+	cluster = 20
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map G05 "Parking Garage (B1)"
+{
+	cluster = 20
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K01 "Street Block"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K02 "Residential Floor"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K03 "Industrial Lot"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K04 "Underground"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K05 "Civic Hall"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map K06 "Tech Interior"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+cluster 20
+{
+	hub
+}
+
+
+map G01 "Procedural Site"
+{
+	next = "HUB01"
+	sky1 = "SKY1"
+	music = "D_STALKS"
+}
+
+// The Obsidian map pool (built by the launcher with Obsidian + the CorpoWars addon; see Design Docs/obsidian-maps.md).
+// Only the maps present in the pool WAD are used.
+
+map CWI01 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI02 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI03 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI04 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI05 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI06 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI07 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI08 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI09 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI10 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI11 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI12 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI13 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI14 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI15 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI16 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI17 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI18 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI19 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI20 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI21 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI22 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI23 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI24 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI25 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI26 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI27 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI28 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI29 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI30 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI31 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWI32 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ01 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ02 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ03 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ04 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ05 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ06 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ07 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ08 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ09 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ10 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ11 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ12 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ13 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ14 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ15 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ16 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ17 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ18 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ19 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ20 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ21 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ22 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ23 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ24 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ25 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ26 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ27 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ28 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ29 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ30 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ31 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWJ32 "Industrial Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+// the underground pool (CWU / CWV)
+
+map CWU01 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU02 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU03 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU04 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU05 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU06 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU07 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU08 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU09 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU10 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU11 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU12 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU13 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU14 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU15 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU16 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU17 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU18 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU19 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU20 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU21 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU22 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU23 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU24 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU25 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU26 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU27 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU28 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU29 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU30 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU31 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWU32 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV01 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV02 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV03 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV04 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV05 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV06 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV07 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV08 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV09 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV10 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV11 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV12 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV13 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV14 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV15 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV16 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV17 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV18 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV19 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV20 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV21 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV22 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV23 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV24 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV25 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV26 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV27 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV28 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV29 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV30 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV31 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+map CWV32 "Underground Site"
+{
+	next = "HUB01"
+	sky1 = "ADSKYCT"
+	music = "D_STALKS"
+}
+
+// City districts C01..C05: ARCHIVED (walkable city shelved for the HUD city map, citymap.zs). The map lumps stay in maps/ but no
+// MAPINFO entry, handler or menu reaches them any more.

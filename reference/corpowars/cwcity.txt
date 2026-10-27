@@ -1,0 +1,234 @@
+# =============================================================================
+# Corpo Wars — city roster (read once, when a new campaign starts).
+# Source: Design Docs/city-roster.md, executives-and-insertion.md, factions-draft.md,
+#         campaign-and-city-population.md, contract-hierarchy.md.
+# One record per line, fields separated by |. Lines starting with # are comments.
+# Edit freely: names, stats and starting values here are data, not code.
+# =============================================================================
+
+# DISTRICT|code|name|tall (1 = towers: HQ/office jobs can insert from the garage)
+DISTRICT|MR|Meridian Row|1
+DISTRICT|EG|Eastgate Research Park|1
+DISTRICT|IS|Ironside Docks|0
+DISTRICT|OQ|Old Quarter|0
+DISTRICT|HL|Highline|1
+
+# CORP|code|name|short|wealth|security|tech|aggression|ethics|theme|steal|sabotage|recruit|special|motto
+#   stats 1-5; goal weights 0 none .. 3 high (sim-behavior-draft.md); theme = CW_Themes index
+#   special: BURY / EXPOSE / PATENTS / STRIKEBREAK / AUDIT (flavour for the op generator)
+CORP|ORI|Oriole Biosciences|Oriole|4|3|5|2|4|2|3|1|2|BURY|Better living, patented.
+CORP|CAS|Castellan Systems|Castellan|4|5|4|4|1|3|2|3|2|NONE|Peace through superior hardware.
+CORP|HAL|Halvorsen Logistics|Halvorsen|3|2|2|3|2|4|3|1|1|AUDIT|It gets there. Don't ask how.
+CORP|SAB|Sable Media Group|Sable|3|2|3|2|3|1|3|0|2|EXPOSE|We don't report the news. We schedule it.
+CORP|COR|Corvane Energy|Corvane|5|4|3|1|2|4|2|2|1|PATENTS|Keeping the lights on.
+CORP|LAT|Lattice Dynamics|Lattice|4|4|5|4|2|3|3|2|3|STRIKEBREAK|The future is already optimising you.
+
+# RELROW|corp|vs ORI|CAS|HAL|SAB|COR|LAT   (starting corp-to-corp relations; randomised +-10 per save)
+RELROW|ORI|0|-50|10|-20|0|-10
+RELROW|CAS|-50|0|10|-30|20|-20
+RELROW|HAL|10|10|0|10|0|10
+RELROW|SAB|-20|-30|10|0|-10|10
+RELROW|COR|0|20|0|-10|0|-30
+RELROW|LAT|-10|-20|10|10|-30|0
+
+# SUB|code|corp|name|niche|public or shell|service|guard force|tech level
+#   guard force 6-16 (capped by EarthGov), tech 1-4. service: fence intel blackout weapons crew medical or -
+SUB|HLX|ORI|Helix Labs|core R&D|public|-|11|4
+SUB|OCL|ORI|Oriole Clinical|clinics|public|medical|7|2
+SUB|VRD|ORI|Verdant Grow|pharma crops|public|-|7|2
+SUB|OPS|ORI|Oriole Pharma Supply|manufacture and distribution|public|-|8|3
+SUB|KES|ORI|Kestrel Trials|unlicensed trials|shell|-|9|3
+SUB|OBB|ORI|Oriole Biobank|specimen storage|public|-|10|4
+SUB|BAS|CAS|Bastion Arms|weapons R&D|public|weapons|12|4
+SUB|CSE|CAS|Castellan Secure|in-house security|public|-|14|4
+SUB|BFB|CAS|Bastion Fabrication|arms manufacturing|public|-|11|3
+SUB|IWP|CAS|Ironwall Proving Grounds|test ranges|public|-|12|4
+SUB|AEG|CAS|Aegis Contracting|deniable ops, procurement|shell|-|10|3
+SUB|HFR|HAL|Halvorsen Freight|trucking, storage|public|-|8|2
+SUB|HMA|HAL|Halvorsen Maritime|shipping|public|-|8|2
+SUB|GHS|HAL|Grey Harbor Salvage|salvage, fencing|shell|fence|6|1
+SUB|HCC|HAL|Halvorsen Cold Chain|refrigerated storage|public|-|7|2
+SUB|NGR|HAL|Northgate Rail|rail freight|public|-|7|2
+SUB|TWB|HAL|Tidewater Brokerage|customs, paperwork|shell|-|6|2
+SUB|SNN|SAB|Sable Newsnet|broadcast|public|-|8|3
+SUB|CAN|SAB|Candor Analytics|data brokerage|shell|intel|8|3
+SUB|SOD|SAB|Sable Outdoor|advertising, print|public|-|7|2
+SUB|RLB|SAB|Relay Broadcast|transmission|public|-|7|3
+SUB|GHL|SAB|Glasshouse Live|events, venues|public|-|9|2
+SUB|CGR|COR|Corvane Grid|power tech core|public|-|12|3
+SUB|CGN|COR|Corvane Generation|power plants|public|-|11|3
+SUB|CDS|COR|Corvane Distribution|substations|public|-|7|3
+SUB|CRS|COR|Corvane Research|power R&D|public|-|11|3
+SUB|VOL|COR|Voltaic Holdings|investments, deniable hires|shell|blackout|7|2
+SUB|LCP|LAT|Lattice Compute|core compute|public|-|9|4
+SUB|NST|LAT|Northstar Talent|headhunting|shell|crew|7|3
+SUB|LFB|LAT|Lattice Fabrication|chips, servers|public|-|8|4
+SUB|LED|LAT|Lattice Edge|small data centres|public|-|6|4
+SUB|HEL|LAT|Helion Power|Lattice's secret power project|shell|-|9|3
+
+# PROP|sub|type|district|label (optional; replaces the type name in the property's name)
+#   types: OFF HQ CLN STU TRN RND LAB DC FARM BNK WH DOCK FAB PLT SUB PARK SAL
+PROP|HLX|HQ|EG|
+PROP|HLX|LAB|EG|
+PROP|HLX|LAB|EG|east lab
+PROP|OCL|CLN|OQ|
+PROP|OCL|CLN|OQ|Canal Street clinic
+PROP|OCL|CLN|MR|
+PROP|VRD|FARM|OQ|
+PROP|VRD|FARM|IS|
+PROP|OPS|FAB|IS|
+PROP|OPS|WH|IS|
+PROP|KES|OFF|MR|
+PROP|KES|CLN|OQ|clinic (drug-lab wing)
+PROP|OBB|LAB|HL|cold vault
+PROP|BAS|HQ|HL|
+PROP|BAS|RND|EG|
+PROP|BAS|BNK|HL|
+PROP|CSE|TRN|HL|
+PROP|CSE|OFF|MR|dispatch office
+PROP|BFB|FAB|HL|
+PROP|BFB|WH|IS|armoury
+PROP|IWP|PARK|IS|range
+PROP|IWP|BNK|HL|
+PROP|AEG|OFF|OQ|
+PROP|HFR|HQ|IS|
+PROP|HFR|WH|IS|
+PROP|HFR|WH|HL|
+PROP|HMA|DOCK|IS|
+PROP|HMA|DOCK|IS|north dock
+PROP|HMA|OFF|IS|harbour office
+PROP|GHS|SAL|IS|
+PROP|GHS|SAL|OQ|
+PROP|HCC|WH|IS|cold store
+PROP|HCC|WH|EG|cold store
+PROP|NGR|PARK|IS|rail yard
+PROP|NGR|PARK|HL|rail yard
+PROP|TWB|OFF|MR|
+PROP|SNN|HQ|MR|
+PROP|SNN|STU|OQ|
+PROP|SNN|STU|HL|
+PROP|CAN|OFF|MR|
+PROP|CAN|OFF|EG|
+PROP|SOD|OFF|OQ|
+PROP|SOD|FAB|IS|print works
+PROP|RLB|PARK|IS|antenna farm
+PROP|RLB|DC|HL|
+PROP|GHL|STU|MR|arena
+PROP|GHL|OFF|OQ|
+PROP|CGR|HQ|HL|
+PROP|CGR|PLT|IS|
+PROP|CGR|SUB|HL|
+PROP|CGN|PLT|IS|
+PROP|CGN|PLT|IS|park plant
+PROP|CDS|SUB|EG|
+PROP|CDS|SUB|OQ|
+PROP|CRS|RND|HL|
+PROP|CRS|LAB|EG|
+PROP|VOL|OFF|MR|
+PROP|LCP|HQ|MR|
+PROP|LCP|DC|EG|
+PROP|LCP|DC|HL|
+PROP|NST|OFF|MR|
+PROP|NST|OFF|EG|
+PROP|LFB|FAB|HL|
+PROP|LFB|FAB|IS|
+PROP|LED|DC|OQ|
+PROP|LED|DC|IS|
+PROP|HEL|PLT|IS|park plant
+
+# EXEC|owner (corp code = CEO, sub code = head)|name|works at: type|district
+EXEC|ORI|Dr. Imelda Voss|HQ|EG
+EXEC|HLX|Dr. Aaron Vance|LAB|EG
+EXEC|OCL|Dr. Priya Okonjo|CLN|OQ
+EXEC|VRD|Marisol Ekwueme|FARM|OQ
+EXEC|OPS|Gregor Lindqvist|FAB|IS
+EXEC|KES|Dr. Silas Wren|CLN|OQ
+EXEC|OBB|Dr. Anouk Brandt|LAB|HL
+EXEC|CAS|Marcus Hale|HQ|HL
+EXEC|BAS|Ingrid Soler|RND|EG
+EXEC|CSE|Col. Dmitri Rusk|TRN|HL
+EXEC|BFB|Petra Kowalczyk|FAB|HL
+EXEC|IWP|Maj. Owen Tate|BNK|HL
+EXEC|AEG|Leon Graves ("Mr. Grey")|OFF|OQ
+EXEC|HAL|Elsa Halvorsen|HQ|IS
+EXEC|HFR|Tomas Bergqvist|WH|IS
+EXEC|HMA|Capt. Signe Aalto|OFF|IS
+EXEC|GHS|"Dutch" Maren|SAL|IS
+EXEC|HCC|Farid Haddad|WH|EG
+EXEC|NGR|Walter Brennan|PARK|IS
+EXEC|TWB|Celeste Duval|OFF|MR
+EXEC|SAB|Vivian Sable|HQ|MR
+EXEC|SNN|Julian Reyes|STU|OQ
+EXEC|CAN|Noor Castell|OFF|MR
+EXEC|SOD|Marco Bellini|OFF|OQ
+EXEC|RLB|Yusuf Adeyemi|DC|HL
+EXEC|GHL|Tamsin Rook|STU|MR
+EXEC|COR|Augustin Corvane|HQ|HL
+EXEC|CGR|Dr. Hana Ito|PLT|IS
+EXEC|CGN|Henrik Solberg|PLT|IS
+EXEC|CDS|Grace Mbeki|SUB|EG
+EXEC|CRS|Dr. Felix Okafor|RND|HL
+EXEC|VOL|Simon Pike|OFF|MR
+EXEC|LAT|Kai Mercer|HQ|MR
+EXEC|LCP|Dr. Lena Wirth|DC|EG
+EXEC|NST|Ruben Achebe|OFF|MR
+EXEC|LFB|Mei Tanaka|FAB|HL
+EXEC|LED|Daniel Cruz|DC|OQ
+EXEC|HEL|Soren Vale|PLT|IS
+
+# MINOR|code|name|short|kind|service|turf MR|EG|IS|OQ|HL|aggression|steal|sabotage|recruit|special
+MINOR|RUS|Rustline Crew|Rustline|street gang|blackmarket|0|0|50|60|0|4|3|2|1|EXTORT
+MINOR|L9|Local 9|Local 9|labor union|informants|0|20|60|0|30|3|1|2|2|STRIKE
+MINOR|NUL|NullSet|NullSet|hacker collective|cheapintel|30|40|0|0|0|3|3|1|1|LEAK
+MINOR|TEN|Old Quarter Tenants' Association|Tenants|tenants' group|safehouse|0|0|0|70|0|2|1|2|1|PROTEST
+
+# STRONGHOLD|minor|site name|district   (a stronghold exists while the group's turf there is 30+)
+STRONGHOLD|RUS|the Anchor bar|OQ
+STRONGHOLD|RUS|the drug lab|IS
+STRONGHOLD|L9|the union hall|IS
+STRONGHOLD|L9|the union office|HL
+STRONGHOLD|NUL|the hacker den|EG
+STRONGHOLD|NUL|the basement den|MR
+STRONGHOLD|TEN|the meeting hall|OQ
+STRONGHOLD|TEN|the church hall|OQ
+
+# LEADER|minor|name|role|district of their stronghold
+LEADER|RUS|Reyna "Knuckles" Ortiz|boss|OQ
+LEADER|RUS|Viktor Kane|dock lieutenant|IS
+LEADER|L9|Rosa Delgado|president|IS
+LEADER|L9|Tomasz Wolski|chief steward|HL
+LEADER|NUL|"Cipher"|founder|EG
+LEADER|NUL|"Moth"|operator|MR
+LEADER|TEN|Ada Nwosu|chair|OQ
+LEADER|TEN|Father Luis Moreno|organiser|OQ
+
+# MREL|minor|vs ORI|CAS|HAL|SAB|COR|LAT   (starting minor-to-corp relations)
+MREL|RUS|-10|-20|-40|0|-10|-10
+MREL|L9|-10|-20|-30|0|-10|-40
+MREL|NUL|-30|-20|0|-30|-10|-30
+MREL|TEN|-40|-10|-10|-10|-20|-10
+
+# AGENDA|owner|kind|target faction|focus subsidiary|text
+#   kinds: HURT (a rival corp), TECH (steal/recruit a rival's tech), SUPPRESS (a minor player),
+#          PROTECT (own assets), HIRE (poach executives anywhere), EXPOSE (uncover shells),
+#          TURF (minor players: push into a district; target = district code)
+AGENDA|ORI|HURT|CAS|BAS|Break Castellan's weapons edge
+AGENDA|ORI|PROTECT|-|KES|Bury the Kestrel trial data
+AGENDA|CAS|HURT|ORI|HLX|Cripple Oriole's R&D
+AGENDA|CAS|PROTECT|-|IWP|Guard the bunker programme
+AGENDA|HAL|SUPPRESS|RUS|-|Clear Rustline out of the docks
+AGENDA|HAL|PROTECT|-|TWB|Keep the auditors off
+AGENDA|SAB|EXPOSE|-|-|Expose a rival's shell
+AGENDA|SAB|SUPPRESS|NUL|-|Find the NullSet leakers
+AGENDA|COR|PROTECT|-|CRS|Protect the power patents
+AGENDA|COR|HURT|LAT|HEL|Find out who's building Helion
+AGENDA|LAT|TECH|COR|CGR|Get Corvane's power tech
+AGENDA|LAT|SUPPRESS|L9|-|Break Local 9 at the fabs
+AGENDA|RUS|TURF|OQ|-|Own the Old Quarter
+AGENDA|RUS|HURT|HAL|HMA|Tax the docks
+AGENDA|L9|HURT|LAT|LFB|Unionise the Lattice fabs
+AGENDA|L9|HURT|HAL|HFR|Win the Ironside strike
+AGENDA|NUL|HURT|ORI|KES|Leak Kestrel's trials
+AGENDA|NUL|EXPOSE|LAT|HEL|Expose Helion
+AGENDA|TEN|TURF|OQ|-|Stop the Old Quarter clearances
+AGENDA|TEN|HURT|ORI|VRD|Shut down the Verdant farm

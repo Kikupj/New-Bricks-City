@@ -1,0 +1,373 @@
+/*
+Weapon: Molotov Cocktail
+Original by: Scientist
+Remake by: Gothic
+Sprites:
+	Bottle: Scientist, edited by Gothic
+	Hands: Blood, edited by Dzierzan & Gothic
+	Empty Hand: Shadow Warrior, edited by Dzierzan & Gothic
+	Debris & Wooden Box: Blood, edited by Gothic
+	Explosion, Fire & Fireball: Espi & Kristus
+	Bottle Fire Trail: Espi & Kristus, edited by Gothic
+	Red Bar: Gothic
+	Doom Hands: Blood, id Software, Scuba Steve and Per Kristian, edited by Gothic
+Sounds: Blood & Clive Barker's Undying.
+*/
+
+Actor MolotovCocktail : Weapon 25013
+{
+//$Category Weapons
+//$Title "Molotov Cocktail"
+Weapon.AmmoType "MolotovAmmo"
+Weapon.AmmoGive 1
+Weapon.AmmoUse 1
+Weapon.SlotNumber 9
+Weapon.SelectionOrder 3000
+Inventory.PickupSound "Blood/AmmoPickup"
+Inventory.PickupMessage "Picked up a Molotov Cocktail."
++WEAPON.NOAUTOAIM
+Tag "Molotov Cocktail"
+Scale 0.7
+States
+	{
+	Spawn:
+		MOLP A -1
+		Stop
+	Ready:
+		MOLT A 1
+		{
+		if(waterlevel>2)
+			{ A_WeaponReady(WRF_NOPRIMARY); }
+		else { A_WeaponReady; }
+		A_Overlay(5,"");
+		if(CountInv("MolotovAmmo")==0)
+			{ return state("ReadyNoAmmo"); }
+		return state(""); 
+		}
+		Loop
+	ReadyNoAmmo:
+		NMOL A 1
+		{
+		A_WeaponReady;
+		if(CountInv("MolotovAmmo")>0)
+			{ return state("Ready"); }
+		return state(""); 
+		}
+		Loop
+	Deselect:
+		MOLT A 0
+		{
+		A_ClearOverlays(0,0);
+		A_StopSound(8);
+		A_TakeInventory("MolotovThrowSpeed",5);
+		if(CountInv("SelfDestructToken"))
+			{ return state("DeselectExplode"); }
+		else if(CountInv("MolotovAmmo")==0 && !CountInv("SelfDestructToken"))
+			{ return state("DeselectNoAmmo"); }
+		return state("");
+		}
+		MOLT A 1 A_Lower(16)
+		goto Deselect+1
+	DeselectExplode:
+		MHAN AAAA 1 A_WeaponOffset(26,14,WOF_ADD)
+		TNT1 A 0 A_WeaponOffset(0,32)
+		TNT1 A 1 { A_Lower(16); A_SelectWeapon("Fist",SWF_SELECTPRIORITY); }
+		goto DeselectExplode+5
+	DeselectNoAmmo:
+		NMOL A 1 A_Lower(16)
+		Loop
+	Select:
+		MOLT A 0 A_JumpIfNoAmmo("SelectNoAmmo")
+		MOLT A 1 { A_Raise(16); A_TakeInventory("SelfDestructToken"); }
+		goto Select+1
+	SelectNoAmmo:
+		NMOL A 1 { A_Raise(16); A_TakeInventory("SelfDestructToken"); }
+		Loop
+	Fire:
+		MOLT A 4 { A_Overlay(5,"WaterCheck"); A_Overlay(4,"ZippoLighter"); A_OverlayFlags(4,PSPF_ADDWEAPON,false); A_OverlayOffset(4,0,42); }
+		MOLT AAA 2 A_WeaponOffset(-16,6,WOF_ADD)
+		MOLT A 6
+		MOLT A 12 { A_Overlay(3,"MolotovFire"); A_StartSound("Weapons/Molotov/Light",7); A_StartSound("Weapons/Molotov/MidAir",8,CHANF_LOOPING,0.4); }
+		MOLT AAA 2 A_WeaponOffset(32,4,WOF_ADD)
+		MOLT A 0
+		{
+		A_Overlay(6,"Powerbar"); A_Overlay(7,"ExplodeCountdown");
+		A_OverlayFlags(6,PSPF_ADDWEAPON,false);
+		A_OverlayFlags(6,PSPF_FORCEALPHA|PSPF_RENDERSTYLE|PSPF_FORCESTYLE,true);
+		A_OverlayRenderstyle(6,STYLE_Normal);
+		}
+	Hold:
+		MOLT A 2
+		MOLT A 2 A_Refire
+		MOLT A 2 { A_WeaponOffset(-72,-48,WOF_ADD); A_ClearOverlays(6,7); }
+		MHAN A 2 { A_TakeInventory("SelfDestructToken"); A_Overlay(5,""); A_WeaponOffset(-72,-40,WOF_ADD); A_StartSound("Weapons/Molotov/Throw"); A_FireProjectile("MolotovBottle",0,1,0,5); A_Overlay(3,""); A_StopSound(8); }
+		MHAN B 2 { A_WeaponOffset(-60,6,WOF_ADD); A_TakeInventory("MolotovThrowSpeed",5); }
+		MHAN B 2 A_WeaponOffset(-56,22,WOF_ADD)
+		MHAN BB 2 A_WeaponOffset(-40,32,WOF_ADD)
+		TNT1 A 6 A_WeaponOffset(0,112)
+		TNT1 A 1 A_JumpIfNoAmmo("ReadyNoAmmo")
+		MOLT AAAA 1 A_WeaponOffset(0,-16,WOF_ADD)
+		Goto Ready
+	MolotovFire:
+		MOLF ABCDE 3 Bright
+		Loop
+	ZippoLighter:
+		ZIPO A 2 { A_OverlayOffset(4,8,-5,WOF_ADD); A_StartSound("Weapons/Zippo/Open",6); }
+		ZIPO ABB 2 A_OverlayOffset(4,8,-5,WOF_ADD)
+		ZIPO C 3 Bright A_StartSound("Weapons/Zippo/Light",6)
+		ZIPO DECDECDE 3 Bright
+		ZIPO BBAA 2 A_OverlayOffset(4,-14,10,WOF_ADD)
+		Stop
+	Powerbar:
+		TNT1 A 8
+		REDM ABCDZ 10 Bright A_GiveInventory("MolotovThrowSpeed",1)
+		Wait
+	WaterCheck:
+		TNT1 A 1
+		{
+		if(waterlevel>2)
+			{
+			A_Overlay(PSP_WEAPON,"Deselect");
+			A_SelectWeapon("Fist",SWF_SELECTPRIORITY);
+			}
+		}
+		Loop
+	ExplodeCountdown:
+		TNT1 AAAAAA 35
+		TNT1 A 35 A_SoundVolume(8,0.6)
+		TNT1 A 35 A_SoundVolume(8,0.8)
+		TNT1 A 35 A_SoundVolume(8,1.0)
+		TNT1 A 0
+		{
+		if (!CountInv("PowerInfiniteAmmo") && !GetCVar("sv_infiniteammo")) { A_TakeInventory("MolotovAmmo",1); }
+		A_SpawnItemEx("MolotovBottleDeath",8,8,32); A_StartSound("Weapons/Molotov/Explode",7);
+		A_TakeInventory("MolotovThrowSpeed",5); A_GiveInventory("SelfDestructToken");
+		}
+		TNT1 A 1 A_Overlay(PSP_WEAPON,"Deselect")
+		Stop
+	}
+}
+
+Actor MolotovThrowSpeed : Inventory { Inventory.MaxAmount 5 }
+Actor SelfDestructToken : Inventory { Inventory.MaxAmount 1 }
+
+Actor MolotovBottle
+{
+Projectile
+Radius 12
+Height 8
+Mass 2000
+Speed 14
+Scale 0.4
+Damage 4
+DamageType Fire
+-NOGRAVITY
+Gravity 0.6
+DeathSound "Weapons/Molotov/Explode"
+Obituary "%o couldn't handle %k's Cocktail."
+Decal Scorch
+var int user_fbangle;
+States
+	{
+	Spawn:
+		MOGT A 0 Bright NoDelay A_ScaleVelocity(1.0+(0.75*CountInv("MolotovThrowSpeed",AAPTR_TARGET)))
+		MOGT ABCDE 2 Bright { A_StartSound("Weapons/Molotov/MidAir",7,CHANF_LOOPING,0.7); A_SpawnItemEx("MltvBtTrail",0,0,28,0,random(-1,1),random(2,4)); }
+		goto Spawn+1
+	Death:
+		TNT1 AAAAAAAAAA 0 A_SpawnItemEx("MltvBottleDebris",0,0,2,random(4,8),0,random(-2,2),random(0,359))
+		COMT E 3 Bright
+		{
+		for(A_SetUserVar(user_fbangle,0); user_fbangle<271; A_SetUserVar(user_fbangle,user_fbangle+90))
+			{
+			if(z==floorz)
+				{
+				A_SpawnItemEx("MolotovFireball",0,0,8,12,0,4,user_fbangle);
+				}
+			else if(z==ceilingz)
+				{
+				A_SpawnItemEx("MolotovFireball",0,0,-8,8,0,0,user_fbangle);
+				}
+			else { A_SpawnItemEx("MolotovFireball",0,0,0,8,0,0,user_fbangle); }
+			}
+		A_Explode(88,148);
+		A_SetScale(1.1,1.7);
+		A_NoGravity;
+		A_SetRenderstyle(1,STYLE_Add);
+		A_StopSound(7);
+		}
+		COMT FGHI 3 Bright
+		Stop
+	}
+}
+
+Actor MolotovBottleDeath : MolotovBottle { States { Spawn: goto Super::Death } }
+
+Actor MltvBtTrail
+{
++NOINTERACTION
+Renderstyle Add
+States
+	{
+	Spawn:
+		MBFI ABCD 3 Bright
+		Stop
+	}
+}
+
+Actor MltvBottleDebris
+{
+Projectile
+Radius 4
+Height 4
+Damage 0
+Mass 600
+Scale 0.8
+Gravity 0.8
++THRUACTORS
++DONTSPLASH
+-ACTIVATEIMPACT
+-ACTIVATEPCROSS
+-NOGRAVITY
+States
+	{
+	Spawn:
+		TNT1 A 0 NoDelay A_Jump(220,1,2,3,4,5,6,7)
+		MDEB ABCDEFGH 3
+		goto Spawn+1
+	Death:
+		TNT1 A 1
+		Stop
+	}
+}
+
+Actor MolotovFireball
+{
+Projectile
+Radius 8
+Height 8
+Damage 5
+DamageType Fire
+Renderstyle Add
+-NOGRAVITY
++FORCERADIUSDMG
+States
+	{
+	Spawn:
+		FRTB A 1 Bright Nodelay
+		{
+		if(waterlevel>2)
+			{
+			return state("Null");
+			}
+		else { A_SpawnItemEx("MltvFTrail"); }
+		return state("");
+		}
+		Loop
+	Death:
+		TNT1 AAAAAA 3 A_CheckFloor("FireBurn")
+		Stop
+	FireBurn:
+		TNT1 A 0 A_StartSound("Weapons/Molotov/Fireball",5)
+		TNT1 BBCCDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD 4
+		{
+		A_StartSound("Weapons/Molotov/Fire",7,CHANF_LOOPING,0.5);
+		A_SpawnItemEx("MolotovFire",random(-52,52),random(0,52),2,0,0,-4,0,SXF_ORIGINATOR);
+		A_SpawnItemEx("MolotovFire",random(-52,52),random(-52,0),2,0,0,-4,0,SXF_ORIGINATOR);
+		A_Explode(4,112,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR);
+		}
+		TNT1 DD 4 { A_StartSound("Weapons/Molotov/Fire",7,CHANF_LOOPING,0.5); A_Explode(4,112,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR); }
+		TNT1 D 4 { A_SoundVolume(7,0.4); A_Explode(4,112,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR); }
+		TNT1 D 4 { A_SoundVolume(7,0.3); A_Explode(4,108,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR); }
+		TNT1 C 4 { A_SoundVolume(7,0.2); A_Explode(3,104,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR); }
+		TNT1 C 4 { A_SoundVolume(7,0.1); A_Explode(3,100,XF_HURTSOURCE|XF_NOSPLASH|XF_THRUSTLESS|XF_CIRCULAR); }
+		TNT1 B 4 A_StopSound(7)
+		TNT1 BE 4
+		Stop
+	}
+}
+
+Actor MltvFTrail
+{
++NOINTERACTION
+Renderstyle Add
+States
+	{
+	Spawn:
+		FRTB ABCDEFGHI 1 Bright
+		Stop
+	}
+}
+
+Actor MolotovFire
+{
+Projectile
+Radius 4
+Height 4
+Damage 0
+Renderstyle Add
+Alpha 0.67
+Scale 1.5
++THRUACTORS
++DONTSPLASH
+-ACTIVATEIMPACT
+-ACTIVATEPCROSS
+States
+	{
+	Spawn:
+		TNT1 AAA 2
+		{
+		if(waterlevel>2)
+			{ return state("Null"); }
+		return state("");
+		}
+	Death:
+		FRTB GHI 1 Bright
+		{
+		if(waterlevel>2)
+			{ return state("Null"); }
+		else if(z==floorz)
+			{ return A_JumpIfHigherOrLower("FireBurn","Null",-16,0); }
+		else { A_SetScale(1.0); }
+		return state("");
+		}
+		Stop
+	FireBurn:
+		FRTF ABCDEFGHIJKLMNO 3 Bright 
+		Stop
+	}
+}
+
+Actor MolotovAmmo : Ammo
+{
+Inventory.Amount 1
+Inventory.MaxAmount 25
+Ammo.BackpackAmount 1
+Ammo.BackpackMaxAmount 50
+Inventory.Icon MOLPA0
+Inventory.PickupMessage "you shouldn't ever see this message because this item will be replaced by the actual weapon"
+States
+	{
+	Spawn:
+		TNT1 A 0
+		TNT1 A 0 A_SpawnItemEx("MolotovCocktail")
+		Stop
+	}
+}
+
+Actor MolotovBox : CustomInventory
+{
+//$Category Ammunition
+//$Title "Box of Molotov Cocktails"
+Inventory.PickupSound "Blood/AmmoPickup"
+Inventory.PickupMessage "Picked up a box with Molotov Cocktails."
+States
+	{
+	Spawn:
+		MOLP B -1
+		Stop
+	Pickup:
+		TNT1 A 0 A_GiveInventory("MolotovCocktail")
+		TNT1 A 0 A_GiveInventory("MolotovAmmo",4)
+		Stop
+	}
+}

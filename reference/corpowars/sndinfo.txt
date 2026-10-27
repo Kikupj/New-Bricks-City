@@ -1,0 +1,129 @@
+// Corpo Wars — weapon sounds (from DeePayback Weapons 1.5E; see CREDITS.txt)
+cw/sd/fire      SPIFIR
+cw/sd/reload    M92R
+cw/sd/slide     M92B
+cw/tranq/fire   DSSPSHT
+cw/tranq/bolt   DSSPREL
+cw/tranq/open   BAIKOPN
+cw/taser/fire   TAZES
+cw/taser/hit    TAZEH
+cw/smg/fire     MP5KFIR
+cw/smg/mag      BERM12R
+cw/smg/bolt     AUGB
+
+// Weapon packs (see CREDITS.txt)
+cw/glock1 GLOCK1
+cw/glock2 GLOCK2
+cw/glock3 GLOCK3
+$random cw/pistol/fire { cw/glock1 cw/glock2 cw/glock3 }
+cw/sg1 DSSGBOO1
+cw/sg2 DSSGBOO2
+cw/sg3 DSSGBOO3
+$random cw/shotgun/fire { cw/sg1 cw/sg2 cw/sg3 }
+cw/shotgun/pump DSSGPUMP
+
+cw/smg/silenced SMGSIL
+cw/taser/zap    VTAZEATK
+cw/taser/spark  VTAZEHIT
+cw/flash/on     FSHLITE1
+cw/flash/off    FSHLITE2
+
+// Breaching charge (Spring Mine by Mor'ladim; see CREDITS.txt)
+cw/breach/arm   SMNSET1
+cw/breach/beep  SMNSET2
+cw/breach/boom  SPRNMNXP
+
+// Guard voices (DeePayback Enemies: PMC bud male / female, USA male; see CREDITS.txt)
+$random cw/guardm/see { cwg/buds1 cwg/buds10 cwg/buds11 cwg/buds12 cwg/buds13 cwg/buds14 cwg/buds15 cwg/buds16 cwg/buds2 cwg/buds3 cwg/buds4 cwg/buds5 cwg/buds6 cwg/buds7 cwg/buds8 cwg/buds9 }
+cwg/buds1 buds1
+cwg/buds10 buds10
+cwg/buds11 buds11
+cwg/buds12 buds12
+cwg/buds13 buds13
+cwg/buds14 buds14
+cwg/buds15 buds15
+cwg/buds16 buds16
+cwg/buds2 buds2
+cwg/buds3 buds3
+cwg/buds4 buds4
+cwg/buds5 buds5
+cwg/buds6 buds6
+cwg/buds7 buds7
+cwg/buds8 buds8
+cwg/buds9 buds9
+$random cw/guardm/pain { cwg/budh1 cwg/budh2 cwg/budh3 cwg/budh4 cwg/budh5 cwg/budh6 }
+cwg/budh1 budh1
+cwg/budh2 budh2
+cwg/budh3 budh3
+cwg/budh4 budh4
+cwg/budh5 budh5
+cwg/budh6 budh6
+$random cw/guardm/die { cwg/budd1 cwg/budd2 }
+cwg/budd1 budd1
+cwg/budd2 budd2
+$random cw/guardf/see { cwg/bufs1 cwg/bufs10 cwg/bufs11 cwg/bufs12 cwg/bufs2 cwg/bufs3 cwg/bufs4 cwg/bufs5 cwg/bufs6 cwg/bufs7 cwg/bufs8 cwg/bufs9 }
+cwg/bufs1 bufs1
+cwg/bufs10 bufs10
+cwg/bufs11 bufs11
+cwg/bufs12 bufs12
+cwg/bufs2 bufs2
+cwg/bufs3 bufs3
+cwg/bufs4 bufs4
+cwg/bufs5 bufs5
+cwg/bufs6 bufs6
+cwg/bufs7 bufs7
+cwg/bufs8 bufs8
+cwg/bufs9 bufs9
+$random cw/guardf/pain { cwg/bufh1 cwg/bufh2 cwg/bufh3 cwg/bufh4 cwg/bufh5 cwg/bufh6 cwg/bufh7 }
+cwg/bufh1 bufh1
+cwg/bufh2 bufh2
+cwg/bufh3 bufh3
+cwg/bufh4 bufh4
+cwg/bufh5 bufh5
+cwg/bufh6 bufh6
+cwg/bufh7 bufh7
+$random cw/guardf/die { cwg/bufd1 cwg/bufd2 cwg/bufd3 cwg/bufd4 cwg/bufd5 cwg/bufd6 }
+cwg/bufd1 bufd1
+cwg/bufd2 bufd2
+cwg/bufd3 bufd3
+cwg/bufd4 bufd4
+cwg/bufd5 bufd5
+cwg/bufd6 bufd6
+$random cw/guards/see { cwg/Ls1 cwg/Ls10 cwg/Ls11 cwg/Ls12 cwg/Ls13 cwg/Ls2 cwg/Ls3 cwg/Ls4 cwg/Ls5 cwg/Ls6 cwg/Ls7 cwg/Ls8 cwg/Ls9 }
+cwg/Ls1 Ls1
+cwg/Ls10 Ls10
+cwg/Ls11 Ls11
+cwg/Ls12 Ls12
+cwg/Ls13 Ls13
+cwg/Ls2 Ls2
+cwg/Ls3 Ls3
+cwg/Ls4 Ls4
+cwg/Ls5 Ls5
+cwg/Ls6 Ls6
+cwg/Ls7 Ls7
+cwg/Ls8 Ls8
+cwg/Ls9 Ls9
+$random cw/guards/pain { cwg/Lp1 cwg/Lp2 cwg/Lp3 cwg/Lp4 cwg/Lp5 }
+cwg/Lp1 Lp1
+cwg/Lp2 Lp2
+cwg/Lp3 Lp3
+cwg/Lp4 Lp4
+cwg/Lp5 Lp5
+$random cw/guards/die { cwg/Ld1 cwg/Ld2 cwg/Ld3 cwg/Ld4 cwg/Ld5 }
+cwg/Ld1 Ld1
+cwg/Ld2 Ld2
+cwg/Ld3 Ld3
+cwg/Ld4 Ld4
+cwg/Ld5 Ld5
+$random cw/guards/alert { cwg/Lsur1 cwg/Lsur2 cwg/Lsur3 cwg/Lsur4 cwg/Lsur5 }
+cwg/Lsur1 Lsur1
+cwg/Lsur2 Lsur2
+cwg/Lsur3 Lsur3
+cwg/Lsur4 Lsur4
+cwg/Lsur5 Lsur5
+cw/guard/fire eG17fire
+
+// ledge climbing grunt (CW_Player)
+$playersound	player	male	*climb		dsoof
+$playersound	player	female	*climb		dsoof
+$playersound	player	other	*climb		dsoof

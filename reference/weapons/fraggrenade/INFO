@@ -1,0 +1,40 @@
+Name: Frag Grenade
+Class: 5
+Type: Projectile, Explosive
+Palette: Doom
+Summon: FragGrenade
+Ammo Type: FragGrenadeAmmo (custom)
+AltFire: Yes
+Powered Mode: No
+Brightmaps: No
+Added States: No
+ACS: No
+
+//Frag Grenades
+Standard issue UAC infantry frag grenades. Dealing high damage for crowd control, wiping out weaker
+enemies quickly and packing a punch to tougher enemies. You can take advantage of various throwing
+distances bouncing off walls or the floor, as well as using full speed attack, throwing the grenade
+with little bounce intended, adding a faster attack.
+
+//Firing Modes
+Primary Fire has a better offence at enemies at long distance, you can "cook"
+the grenades increasing Speed & distance the longer the Primary Fire is held.
+Cooking the Grenades will also help with accuracy.
+
+Secondary Fire instantly throws a Grenade at full speed that doesn't bounce as
+much as the Primary Firing Mode. It is an effective, fast attack & acts as a
+timed mine.
+
+//Auto-Aim Flags
+Tested under GZDoom's free look settings switched on with Auto Aim flags on & off.
+
+Changing -NoAutoAim to +AutoAim on drastically restricts the weapon's distance &
+ability to hit targets above the player on high platforms & is almost impossible
+to hit flying enemies without closing in on them which usually results in
+damaging yourself in the process & when the grenade explodes.
+
+"Smart Auto-Aiming" won't change the behaviour of the thrown Grenade, so they
+can be thrown in all directions freely, the distance thrown depends on the
+Player's Angle (tilt upward it will travel farther) & if using Primary how long
+you cook the grenade (although it charges to full speed quickly & is added
+mainly for aim assistance.

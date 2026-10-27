@@ -1,0 +1,41 @@
+// Corpo Wars weapon slots (next/prev weapon cycles through these in order)
+weaponsection CorpoWars
+setslot 1 Fist CW_Taser
+setslot 2 CW_ServicePistol Pistol
+setslot 3 CW_TranqGun CW_Shotgun
+setslot 4 CW_SMG
+
+addkeysection "Corpo Wars" corpowars_keys
+addmenukey "Nyx: blackout" "netevent cw_ability 1"
+addmenukey "Vox: noise lure" "netevent cw_ability 2"
+defaultbind b "netevent cw_ability 1"
+defaultbind n "netevent cw_ability 2"
+addmenukey "Throw noisemaker" "netevent cw_gadget 1"
+addmenukey "Throw flashbang" "netevent cw_gadget 2"
+defaultbind g "netevent cw_gadget 1"
+defaultbind h "netevent cw_gadget 2"
+defaultbind r "+reload"
+addmenukey "Use medkit" "netevent cw_medkit"
+defaultbind j "netevent cw_medkit"
+addmenukey "Fit / remove suppressor" "netevent cw_suppressor"
+defaultbind v "netevent cw_suppressor"
+addmenukey "Toggle flashlight" "netevent cw_flashlight"
+defaultbind l "netevent cw_flashlight"
+
+addmenukey "Plant breaching charge" "netevent cw_breach"
+defaultbind k "netevent cw_breach"
+
+addmenukey "Lean left (hold)" +cw_leanl
+addmenukey "Lean right (hold)" +cw_leanr
+alias +cw_leanl "netevent cw_lean_l"
+alias -cw_leanl "netevent cw_unlean_l"
+alias +cw_leanr "netevent cw_lean_r"
+alias -cw_leanr "netevent cw_unlean_r"
+defaultbind q +cw_leanl
+defaultbind e +cw_leanr
+
+addmenukey "Debug hub: return to hub" "netevent cw_dbgreturn"
+defaultbind home "netevent cw_dbgreturn"
+
+addmenukey "City map" "netevent cw_citymap"
+defaultbind m "netevent cw_citymap"

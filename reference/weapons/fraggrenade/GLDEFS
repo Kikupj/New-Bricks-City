@@ -1,0 +1,400 @@
+flickerlight HGrn_X1
+{
+    color 1.0 0.7 0.0
+    size 64
+    secondarySize 72
+    chance 0.3
+}
+flickerlight HGrn_X2
+{
+    color 0.5 0.1 0.0
+    size 80
+    secondarySize 88
+    chance 0.3
+}
+flickerlight HGrn_X3
+{
+    color 0.3 0.0 0.0
+    size 96
+    secondarySize 104
+    chance 0.3
+}
+
+object D3GrenadeCooked01
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked02
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked03
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked04
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked05
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked06
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked07
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked08
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked09
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked10
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked11
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+object D3GrenadeCooked12
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}
+
+	object D3Grenade2
+{
+    frame EXP3A { light HGrn_X1 }
+    frame EXP3B { light HGrn_X1 }
+    frame EXP3C { light HGrn_X1 }
+    frame EXP3D { light HGrn_X1 }
+	frame EXP3E { light HGrn_X1 }
+    frame EXP3F { light HGrn_X1 }
+    frame EXP3G { light HGrn_X1 }
+    frame EXP3H { light HGrn_X2 }
+	frame EXP3I { light HGrn_X2 }
+    frame EXP3J { light HGrn_X2 }
+    frame EXP3K { light HGrn_X2 }
+    frame EXP3L { light HGrn_X2 }
+	frame EXP3M { light HGrn_X2 }
+    frame EXP3N { light HGrn_X2 }
+    frame EXP3O { light HGrn_X2 }
+    frame EXP3P { light HGrn_X2 }
+	frame EXP3Q { light HGrn_X2 }
+    frame EXP3R { light HGrn_X2 }
+    frame EXP3S { light HGrn_X2 }
+    frame EXP3T { light HGrn_X3 }
+	frame EXP3U { light HGrn_X3 }
+    frame EXP3V { light HGrn_X3 }
+    frame EXP3W { light HGrn_X3 }
+    frame EXP3X { light HGrn_X3 }
+	frame EXP3Y { light HGrn_X3 }
+    frame EXP3Z { light HGrn_X3 }
+	}

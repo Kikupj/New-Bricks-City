@@ -1,0 +1,34 @@
+# --- UZDoom engine (installed next to the mod, not part of it) ---
+/uzdoom.exe
+/uzdoom.pk3
+/updater.exe
+/*.dll
+/brightmaps.pk3
+/game_support.pk3
+/game_widescreen_gfx.pk3
+/lights.pk3
+/licenses.zip
+/soundfonts/
+/fm_banks/
+/freedoom-0.13.0/
+
+# --- UZDoom per-user files if it runs in portable mode ---
+/*.ini
+/*.zds
+/save/
+/screenshots/
+
+# --- SLADE (the owner's lump editor) ---
+/SLADE.exe
+/SLADE.pdb
+/slade.pk3
+/slade3.cfg
+/slade*.log
+/temp/
+
+# --- Build and tool output ---
+/dist/
+/build/
+/art/**/out/
+__pycache__/
+*.pyc

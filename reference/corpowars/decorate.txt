@@ -1,0 +1,2 @@
+// Voxel Vehicles Pack 1.0 by NerdKoopa (static vehicles, DoomEdNums 10600-10803): see CREDITS.txt
+#include "decorate.vehicles.txt"

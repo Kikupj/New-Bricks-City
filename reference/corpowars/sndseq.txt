@@ -1,0 +1,4 @@
+// Corpo Wars: generated office doors move silently; CW_Door plays its own open/close sounds (varied pitch).
+:CWDoorSilent
+	delay 1
+end

@@ -1,0 +1,307 @@
+version "4.10"
+class TK_Handler : EventHandler
+{
+	int idx;
+	Actor cg, c1, c2, c3;
+	override void WorldTick()
+	{
+		if (cg && level.maptime % 35 == 0)
+			Console.Printf("TKCOVER crouched-behind-desk %d standing-behind-desk %d crouched-in-open %d",
+				CW_Cover.Behind(cg, c1), CW_Cover.Behind(cg, c2), CW_Cover.Behind(cg, c3));
+	}
+	void Move(Actor pm, double x, double y, double a, double p, double z)
+	{
+		Vector3 pos = (x, y, 0);
+		double fz = level.PointInSector(pos.xy).floorplane.ZAtPoint(pos.xy);
+		pos.z = z < 0 ? fz : z;
+		pm.SetOrigin(pos, false);
+		pm.angle = a; pm.pitch = p; pm.vel = (0, 0, 0);
+		pm.bNOGRAVITY = z >= 0;
+		pm.player.viewz = pos.z + 41;
+	}
+	override void NetworkProcess(ConsoleEvent e)
+	{
+		let pm = players[e.Player].mo;
+		if (!pm) return;
+		if (e.Name ~== "tkstair")
+		{
+			// use the first fire door that leads to another mission floor (multi-floor test)
+			let it = ThinkerIterator.Create("CW_StairDoor");
+			CW_StairDoor d;
+			while (d = CW_StairDoor(it.Next()))
+				if (d.targetMap.Length() && (e.Args[1] == 0 || d.elevator) && (e.Args[0] == 0 || d.targetMap ~== (e.Args[0] == 3 ? "G03" : e.Args[0] == 4 ? "G04" : "G02")))
+				{ Console.Printf("TKSTAIR %s -> %s (tower %d)", d.label, d.targetMap, d.tower); d.Interact(pm); return; }
+			Console.Printf("TKSTAIR none");
+			return;
+		}
+		if (e.Name ~== "tkgo")
+		{
+			static const String mp[] = { "HUB01", "G02", "G03", "G04", "G05" };
+			level.ChangeLevel(mp[clamp(e.Args[0], 0, 4)], 0, CHANGELEVEL_NOINTERMISSION);
+			return;
+		}
+		if (e.Name ~== "tkterm")
+		{
+			// open the terminal on contract Args[0]; Args[1] = 1 fakes a worst-case debrief first
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (!l || !h) return;
+			l.selected = e.Args[0];
+			if (e.Args[1])
+			{
+				l.activeContract = e.Args[0]; l.missionActive = true; l.objDone = 14; l.alarms = 3; l.kills = 4; l.takedowns = 6;
+				l.civKills = 2; l.doorsForced = 2; l.opCost = 700; l.loadoutSpent = 2400; l.startBudget = l.budget;
+				l.approachNotes.Clear();
+				l.approachNotes.Push("executive suite\tside door (private office)");
+				l.approachNotes.Push("server room\tair duct");
+				l.approachNotes.Push("lab\tfront door with security pass");
+				l.AddFine("Unauthorized sabotage (Wipe the finance servers)", 1500);
+				l.AddFine("Guard killed", 500); l.AddFine("Civilian killed", 1500);
+				l.FinishMission(true);
+				return;
+			}
+			h.terminalRequests++;
+			return;
+		}
+		if (e.Name ~== "tkmission")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			if (!l) return;
+			l.activeContract = e.Args[0]; l.missionActive = true; l.crewMask = 5; l.hackerUses = 1; l.voxUses = 3; l.alarms = 1; l.passMask = 1;
+			return;
+		}
+		if (e.Name ~== "tkdone")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			if (l) { l.objDone |= 1 << 1; l.passMask = 1; }
+			pm.SetOrigin((1300, 300, 0), false);
+			return;
+		}
+		if (e.Name ~== "tkhack" || e.Name ~== "tkbreach")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (!h || !h.floorGen || !h.floorGen.secDoors.Size()) { Console.Printf("TKDOOR none"); return; }
+			let d = h.floorGen.secDoors[0];
+			if (e.Name ~== "tkhack") { h.RequestHack(d); Console.Printf("TKHACK door %d", d.doorIdx); return; }
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			l.missionActive = true;
+			int it = l.AddItem(CW_Items.IT_BREACH, 2); l.AutoPlace(it, 2);
+			pm.SetOrigin((d.pos.xy + (40, 0), d.floorz), false);
+			h.PlantBreach(l, pm);
+			Console.Printf("TKBREACH door %d secured %d", d.doorIdx, d.secured);
+			return;
+		}
+		if (e.Name ~== "tkhackwin")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			let d = h.floorGen.secDoors[0];
+			d.HackResult(1, pm);
+			Console.Printf("TKHACKWIN door %d", d.doorIdx);
+			return;
+		}
+		if (e.Name ~== "tkdstate")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			let d = h.floorGen.secDoors[0];
+			Console.Printf("TKDSTATE secured %d open %d jammed %d by %d", d.secured, d.isOpen, d.jammed, d.openedBy);
+			return;
+		}
+		if (e.Name ~== "tkgarage")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			l.activeContract = 0; l.missionActive = true; l.garageRun = true; l.objDone = 1 << 1; l.alarms = e.Args[0];
+			l.scenarioRolled = false;
+			Console.Printf("TKGARAGE heat %d", l.Heat());
+			l.arriveTower = 9;
+			level.ChangeLevel("G05", 0, CHANGELEVEL_NOINTERMISSION);
+			return;
+		}
+		if (e.Name ~== "tkcar")
+		{
+			let a = Actor.Spawn("ModernCarRed", pm.pos + (Actor.AngleToVector(pm.angle) * 220, 0)); if (a) a.angle = e.Args[0];
+			return;
+		}
+		if (e.Name ~== "tkginsert")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			l.activeContract = 0; l.missionActive = true; l.garageRun = true; l.objDone = 0; l.missionSeed = 4242;
+			l.scenarioRolled = false; l.scenario = -1; l.rerouted = false;
+			level.ChangeLevel("G05", 0, CHANGELEVEL_NOINTERMISSION);
+			return;
+		}
+		if (e.Name ~== "tkexit")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			l.objDone |= 1 << 1; l.alarms = e.Args[0];
+			let it = ThinkerIterator.Create("CW_Extraction"); let x = Actor(it.Next());
+			if (x) { pm.SetOrigin(x.pos, false); Console.Printf("TKEXIT at %.0f %.0f heat %d map %s", x.pos.x, x.pos.y, l.Heat(), level.MapName); }
+			return;
+		}
+		if (e.Name ~== "tkwhere2")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			Console.Printf("TKWHERE %s %.0f %.0f active %d scen %d garage %d", level.MapName, pm.pos.x, pm.pos.y, l.missionActive, l.scenario, l.garageRun);
+			return;
+		}
+		if (e.Name ~== "tkpass")
+		{
+			let l = CW_Ledger(pm.FindInventory("CW_Ledger"));
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			Console.Printf("TKPASS mask %d has %d pos %.0f %.0f %.0f", l ? l.passMask : -1, CW_SecurityPass.Has(pm), pm.pos.x, pm.pos.y, pm.pos.z);
+			return;
+		}
+		if (e.Name ~== "tknext")
+		{
+			Array<String> shots; CVar.FindCVar("tk_shots").GetString().Split(shots, "|");
+			if (idx == 0) idx = 1;   // entry 0 is the "S" guard (a leading '-' would read as a command-line switch)
+			if (idx >= shots.Size()) { Console.Printf("TKEND"); return; }
+			Array<String> v; shots[idx].Split(v, ",");
+			idx++;
+			Move(pm, v[0].ToDouble(), v[1].ToDouble(), v[2].ToDouble(), v.Size() > 3 ? v[3].ToDouble() : 0, v.Size() > 4 ? v[4].ToDouble() : -1);
+			Console.Printf("TKSHOT %d [%s]", idx, shots[idx-1]);
+		}
+		else if (e.Name ~== "tktest")
+		{
+			let t = Actor.Spawn("TK_Test", (269, 900, 0));
+			t.angle = 0;
+		}
+		else if (e.Name ~== "tkshow")
+		{
+			int k = 0;
+			for (int c = 0; c < AllActorClasses.Size(); c++)
+			{
+				let cls = AllActorClasses[c];
+				if (!(cls is "CW_Furniture") || cls == "CW_Furniture") continue;
+				let a = Actor.Spawn(cls, (-300 + k * 110, -150, -1024));
+				if (a) { a.angle = 270; Console.Printf("SHOW %d %s", k, cls.GetClassName()); }
+				k++;
+			}
+		}
+		else if (e.Name ~== "tkcover")
+		{
+			// synthetic: guard at street level x=0, a desk and a tall shelf between it and two dummies
+			Vector3 base = (-200, -200, -1024);
+			let g = Actor.Spawn("CW_Guard", base); g.bDORMANT = true;
+			let desk = Actor.Spawn("CW_FDeskWork", base + (100, 0, 0)); desk.angle = 180;
+			let crouch = Actor.Spawn("TK_Dummy", base + (130, 0, 0)); crouch.A_SetSize(16, 28);
+			let stand = Actor.Spawn("TK_Dummy", base + (130, 0, 0)); stand.A_SetSize(16, 56);
+			let far = Actor.Spawn("TK_Dummy", base + (400, 0, 0)); far.A_SetSize(16, 28);
+			idx = 1000;
+			cg = g; c1 = crouch; c2 = stand; c3 = far;
+		}
+		else if (e.Name ~== "tksec")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (!h || !h.floorGen || !h.floorGen.secDoors.Size()) { Console.Printf("TKSEC none"); return; }
+			let fg = h.floorGen;
+			let dr = fg.secDoors[e.Args[0] % fg.secDoors.Size()];
+			int d = dr.doorIdx;
+			Vector2 n = fg.dVert[d] ? (1, 0) : (0, 1);
+			Vector2 p = dr.pos.xy + n * 44;
+			int i = fg.CellIdx(p.x), j = fg.CellIdx(p.y);
+			if (i < 0 || j < 0 || fg.IsObjRoom(fg.RoomAt(i, j))) p = dr.pos.xy - n * 44;
+			if (e.Args[1]) { Vector2 side = (-n.y, n.x); p = p + (p - dr.pos.xy).Unit() * 30 + side * 30; } Move(pm, p.x, p.y, VectorAngle(dr.pos.x - p.x, dr.pos.y - p.y), 0, -1);
+			Console.Printf("TKSEC at %.0f %.0f door %.0f %.0f", p.x, p.y, dr.pos.x, dr.pos.y);
+		}
+		else if (e.Name ~== "tkdoorinfo")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (!h || !h.floorGen) return;
+			for (int k = 0; k < h.floorGen.secDoors.Size(); k++)
+			{
+				let dr = h.floorGen.secDoors[k];
+				Console.Printf("TKDOOR %d secured %d open %d shut %d openedBy %d hacklock %d", k, dr.secured, dr.isOpen, dr.IsShut(), dr.openedBy, dr.hackLock);
+			}
+			let l = CW_Ledger.Of(pm);
+			Console.Printf("TKPASS %d", pm.FindInventory("CW_SecurityPass") != null);
+		}
+		else if (e.Name ~== "tkentered")
+		{
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (h && h.floorGen) for (int k = 1; k <= 3; k++) Console.Printf("TKENTER %d %d %s", k, h.floorGen.entered[k], h.floorGen.entered[k] ? h.floorGen.DescribeEntry(pm, h.floorGen.objRoom[k]) : "-");
+		}
+		else if (e.Name ~== "tkgivepass") pm.GiveInventory("CW_SecurityPass", 1);
+		else if (e.Name ~== "tkstair")
+		{
+			// stand in front of stairwell t's plate fire door (Args[1] = 1: the tower's own-floor landing door), facing it
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (!h || !h.floorGen) return;
+			let fg = h.floorGen;
+			int t = e.Args[0] & 1;
+			Actor dr = fg.vestDoor[t];
+			if (e.Args[1])
+			{
+				ThinkerIterator it = ThinkerIterator.Create("CW_StairDoor");
+				CW_StairDoor sd; double best = 1e9;
+				Vector3 c1 = fg.LandingPos(t, e.Args[1] - 1);
+				while (sd = CW_StairDoor(it.Next())) { double dd = (sd.pos.xy - c1.xy).Length(); if (dd < best) { best = dd; dr = sd; } }
+			}
+			if (!dr) { Console.Printf("TKSTAIR none"); return; }
+			Vector2 back = (dr.pos.xy - (fg.CellCenter(fg.stairI[t], fg.stairJ[t]))).Unit();
+			if (e.Args[1]) { Vector3 lp = fg.LandingPos(t, e.Args[1] - 1); back = (dr.pos.xy - lp.xy).Unit(); }
+			Vector2 p = dr.pos.xy - back * 34;
+			pm.SetOrigin((p, dr.pos.z), false);
+			pm.angle = VectorAngle(back.x, back.y); pm.pitch = 0;
+			Console.Printf("TKSTAIR at %.0f %.0f %.0f door %.0f %.0f label %s lock %s", pm.pos.x, pm.pos.y, pm.pos.z, dr.pos.x, dr.pos.y, CW_StairDoor(dr).label, CW_StairDoor(dr).lockText);
+		}
+		else if (e.Name ~== "tkwhere") Console.Printf("TKWHERE %.0f %.0f %.0f", pm.pos.x, pm.pos.y, pm.pos.z);
+		else if (e.Name ~== "tkdoors")
+		{
+			ThinkerIterator it = ThinkerIterator.Create("CW_Door");
+			CW_Door d;
+			Array<CW_Door> all;
+			while (d = CW_Door(it.Next())) all.Push(d);
+			for (int k = 0; k < all.Size(); k++) { all[k].SetDoor(true); all[k].Destroy(); }
+			Console.Printf("TKDOORS %d", all.Size());
+		}
+		else if (e.Name ~== "tkdump")
+		{
+			// sector dump for the python heightmap renderer
+			for (int s = 0; s < level.sectors.Size(); s++)
+			{
+				Sector sec = level.sectors[s];
+				Console.Printf("SEC %d %.1f %.1f %s %s %d", s, sec.floorplane.ZAtPoint(sec.centerspot), sec.ceilingplane.ZAtPoint(sec.centerspot),
+					TexMan.GetName(sec.GetTexture(Sector.floor)), TexMan.GetName(sec.GetTexture(Sector.ceiling)), sec.lightlevel);
+			}
+			for (int l = 0; l < level.lines.Size(); l++)
+			{
+				Line ln = level.lines[l];
+				int f = ln.sidedef[0] ? ln.sidedef[0].sector.Index() : -1;
+				int b = ln.sidedef[1] ? ln.sidedef[1].sector.Index() : -1;
+				String mt = ln.sidedef[0] ? TexMan.GetName(ln.sidedef[0].GetTexture(Side.mid)) : "-";
+				Console.Printf("LIN %.0f %.0f %.0f %.0f %d %d %s", ln.v1.p.x, ln.v1.p.y, ln.v2.p.x, ln.v2.p.y, f, b, mt);
+			}
+			ThinkerIterator it = ThinkerIterator.Create("Actor");
+			Actor a;
+			while (a = Actor(it.Next()))
+				if (a.bSOLID || a is "CW_CeilingLight" || a is "CW_Door" || a is "CW_Furniture" || a is "CW_SecurityPass") Console.Printf("THG %s %.0f %.0f %.0f %.0f %.0f", a.GetClassName(), a.pos.x, a.pos.y, a.pos.z, a.radius, a.height);
+			let h = CW_Handler(EventHandler.Find("CW_Handler"));
+			if (h && h.floorGen)
+				for (int j = 0; j < 11; j++) for (int i = 0; i < 11; i++)
+				{
+					Vector2 c = h.floorGen.CellCenter(i, j);
+					Console.Printf("CEL %d %d %d %d %.0f %.0f", i, j, h.floorGen.RoomAt(i, j), h.floorGen.rtype[h.floorGen.RoomAt(i, j)], c.x, c.y);
+				}
+			if (h && h.floorGen)
+			{
+				for (int k = 0; k < h.floorGen.secDoors.Size(); k++)
+					if (h.floorGen.secDoors[k].secured) Console.Printf("SDOOR %.0f %.0f", h.floorGen.secDoors[k].pos.x, h.floorGen.secDoors[k].pos.y);
+				for (int k = 1; k <= 3; k++) Console.Printf("OBJROOM %d %d", k, h.floorGen.objRoom[k]);
+			}
+			let pit = ThinkerIterator.Create("CW_PatrolPoint");
+			Actor pp;
+			while (pp = Actor(pit.Next())) Console.Printf("PP %d %d %.0f %.0f", pp.tid, pp.args[0], pp.pos.x, pp.pos.y);
+			ThinkerIterator git = ThinkerIterator.Create("CW_Guard");
+			CW_Guard gd;
+			while (gd = CW_Guard(git.Next())) if (gd.hasPass) Console.Printf("PASSGUARD %.0f %.0f", gd.pos.x, gd.pos.y);
+			Console.Printf("DUMPEND");
+		}
+	}
+}
+class TK_Test : Actor
+{
+	Default { +NOGRAVITY; Radius 8; Height 8; }
+	States { Spawn: TKTS A -1; Stop; }
+}
+
+class TK_Dummy : Actor { Default { +NOGRAVITY; +SOLID; Radius 16; Height 56; } States { Spawn: TNT1 A -1; Stop; } }

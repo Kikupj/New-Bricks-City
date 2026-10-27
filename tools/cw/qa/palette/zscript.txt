@@ -1,0 +1,69 @@
+version "4.10"
+class CW_PaletteCheck : EventHandler
+{
+	Array<CW_Guard> guards;
+	bool done;
+	static const Name TONES[] = { 'CWGuardLight', 'CWGuardTan', 'CWGuardBrown', 'CWGuardDeep' };
+	static const Name MILITIA_TONES[] = { 'CWGuardMilitiaLight', 'CWGuardMilitiaTan', 'CWGuardMilitiaBrown', 'CWGuardMilitiaDeep' };
+	static const Name LIVE[] = { 'CWMA', 'CWFA', 'CWGA' };
+	static const Name DOWN[] = { 'CWMB', 'CWFB', 'CWGB' };
+	static const String ANIM_STATES[] = { "See", "Missile", "Pain", "Stunned", "Death", "Death.Takedown", "Raise", "Spawn" };
+	override void WorldLoaded(WorldEvent e)
+	{
+		for (int i = 0; i < 64; i++)
+			guards.Push(CW_Guard(Actor.Spawn("CW_Guard", (0, 0, 0))));
+		for (int i = 0; i < 16; i++)
+			guards.Push(CW_Guard(Actor.Spawn("CW_SecuritySupervisor", (0, 0, 0))));
+	}
+	override void WorldTick()
+	{
+		if (done || level.maptime < 4) return;
+		done = true;
+		int counts[4];
+		int maleTones[4], femaleTones[4];
+		int invalid = 0;
+		int looks[3];
+		int stateErrors = 0;
+		for (int i = 0; i < guards.Size(); i++)
+		{
+			bool matched = false;
+			if (guards[i])
+			{
+				let g = guards[i];
+				int look = g.appearance;
+				if (look < 0 || look > 2) { invalid++; continue; }
+				looks[look]++;
+				if (g.sightRange != (i >= 64 ? 1280 : 1024) || (i >= 64) != (look == 2)) invalid++;
+				for (int k = 0; k < 4; k++)
+					if (g.Translation == Translation.GetID(look == 2 ? TONES[k] : MILITIA_TONES[k]))
+					{
+						counts[k]++;
+						if (look == 0) maleTones[k]++;
+						else if (look == 1) femaleTones[k]++;
+						matched = true;
+					}
+				let originalTone = g.Translation;
+				for (int s = 0; s < ANIM_STATES.Size(); s++)
+				{
+					g.stunTics = 35;
+					g.SetState(g.FindStateByString(ANIM_STATES[s]));
+					int expected = Actor.GetSpriteIndex(s == 5 ? DOWN[look] : LIVE[look]);
+					if (g.sprite != expected || g.Translation != originalTone) stateErrors++;
+				}
+				guards[i].Destroy();
+			}
+			if (!matched) invalid++;
+		}
+		Console.Printf("CW_PALETTE_CHECK light=%d tan=%d brown=%d deep=%d invalid=%d", counts[0], counts[1], counts[2], counts[3], invalid);
+		Console.Printf("CW_CAST_CHECK male=%d female=%d supervisors=%d stateErrors=%d", looks[0], looks[1], looks[2], stateErrors);
+		Console.Printf("CW_MALE_TONES original=%d tan=%d brown=%d deep=%d", maleTones[0], maleTones[1], maleTones[2], maleTones[3]);
+		Console.Printf("CW_FEMALE_TONES original=%d tan=%d brown=%d deep=%d", femaleTones[0], femaleTones[1], femaleTones[2], femaleTones[3]);
+		if (level.MapName ~== "G02" || level.MapName ~== "G01")
+		{
+			int floorSupervisors = 0;
+			let it = ThinkerIterator.Create("CW_SecuritySupervisor");
+			while (it.Next()) floorSupervisors++;
+			Console.Printf("CW_FLOOR_CHECK supervisors=%d (expected 1)", floorSupervisors);
+		}
+	}
+}

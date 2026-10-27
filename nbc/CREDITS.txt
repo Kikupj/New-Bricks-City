@@ -1,0 +1,476 @@
+NEW BRICKS CITY — CREDITS
+=========================
+
+Rule for this file: never delete an entry. Every asset added to nbc/ gets a line here.
+Sections below the "Imported packs" line are each pack's own credits, copied unchanged.
+
+-------------------------------------------------------------------------------
+Original work for New Bricks City
+-------------------------------------------------------------------------------
+Design, code and maps: the New Bricks City project.
+Debris sprites (bricks, half-bricks, concrete chunk, rubble piles, tumble frames, shards; nbc/sprites/debris/):
+  drawn for this project with the pxl pixel-art tool (source art/debris/debris.px.js).
+  The brick-in-hand frames (BRKHA0/BRKHB0) are the FragGrenade pack's hand frame (see its credits below)
+  with the grenade recoloured into a brick.
+
+-------------------------------------------------------------------------------
+Required game data (not shipped)
+-------------------------------------------------------------------------------
+Freedoom 2 (freedoom2.wad), the Freedoom project, modified BSD licence. https://freedoom.github.io/
+  Some imported actors also use Freedoom's sounds and sprites (e.g. the gadgets' bounce and blast sounds).
+
+-------------------------------------------------------------------------------
+Imported packs
+-------------------------------------------------------------------------------
+// ===== DeePayback Enemies by DeeDeeOZ (credits.txt, unchanged) =====
+//SPRITES
+RIFLE REDNECK
+-buil.t on the civilian by osjclatchford, w/credits to Bjecinst, Xim, DeeDeeOZ, Craneo, dnf2013 team, id and Monolith
+-cap from strife
+-carbine from carbine marine. The_Funktasm and Ghastly_dragon
+
+//male goon/hoodlum/mook/thug/roider/triggerman
+these are built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+shotgun flash is from Project Brutality.
+
+//male tshirt Damon/hoody goon
+these are built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+
+//suit girl/dress girl	
+built of female zombie base. Credits DavidRaven,Mryayayify
+MARS 3D bits
+
+//punk
+-sprites Mark Quinn, Skelegant, MARS3d bits, mohawk from punk marine by Crazdoom
+
+//girl punk
+-sprites sprites edited from Revy skin by Mike 12, mohawk from punk marine by Crazdoom
+
+MILTIA MALE/SMG/spec ops/chav smg
+-these are built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+-the Smg is from the Twilight Warrior TC
+
+MILTIA FEMALE/SMG/spec ops girl
+-sprites DavidRaven,Mryayayify,Illucia by Skulltag Team
+-the Smg is from the Twilight Warrior TC
+
+MILTIA SHOTGUN
+-these are built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+-shotgun flash is from Project Brutality.
+-shotguns are Doom2, Id software
+
+MILTIA MUSCLE/ROIDERs/Topless Thug
+-these are built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+
+//mobster 1/2/ moustache suit/yakuza uzi/suit ak
+Credits Captain J,Scalliano,Skelegant
+Revolver from DirtyHarry skin by Mike12
+
+//waistcoat guy
+built on the male base. Credits Mark Quinn,Skelegant,Skulltag head
+Revolver from DirtyHarry skin by Mike12
+MARS 3D bits
+
+//bandit gunman
+this is built on the female base. Credits to DavidRaven,Mryayayify
+Ak47 from James Bond skulltag skin by d00ds from Goldeneye TC
+
+//gnome
+this is built on the female base. Credits to DavidRaven,Mryayayify
+SSG from doom 2
+
+//Hand Ninja
+doomjedi/strife peasant
+
+//Drone
+Matt,Treyarch
+
+//Jetpack hazmat
+Mark Quinn, Captain Toenail, Id Software, Rogue Entertainment, 3d Realms
+
+//Big Jacki/Rose
+sprites these are Skelegants Typhoon edited. Revolver from dirty harry skin by Mike12
+
+//hardin 2 pistols
+-sprites Mark Quinn, Skelegant, MARS3d bits
+
+//udo merc
+-sprites Mark Quinn, Doom2, TommyGalano5
+
+CHUBBY SSG/PYRO
+-skulltag, ThrashFanBert94, ItsNatureToDie, Enjay
+-flamethrower bits from kickattack
+
+BASIC SOLDIERS/mercs/terrorist/tovket guy (pretty much most guys built on this)
+-this is good old doomguy,with skulltag head
+-Credits to Id Software,Matt,Solo_Spaghetti and TommyGalano5
+-Ak47 from James Bond skulltag skin by d00ds from Goldeneye TC
+-rocket launcher is TommyGalano5
+-shotguns are Doom2, Id software
+-Knife is from Knife Marine by Xim
+-beret is by TommyGalano5
+-Crouching sprites by LossForWords
+-mounted gun from Captain J Wolfers for Wolfers/Tormentor667/WSJ
+-unsure who did the headscarfs
+
+ELITE MERCS/BADASS MERCS
+this is good old doomguy,with skulltag head
+Credits to Id Software,Matt,Solo_Spaghetti and TommyGalano5
+-gasmask head is TommyGalano5
+-sniper sunhat is from Orka's shotgun mobster
+
+FEMALE merc
+-this is built on Alice Jamesons old doom girl sprites,with bits by TommyGalano5
+-Head is from Illucia
+-credits to David G (ItsNatureToDie),JoeyTD and TommyGalano5
+
+FEMALE RUSSIAN
+-this is good old doomguy. uses Skelegant awesome Rosie head.
+-Credits to Id Software,Matt,Solo_Spaghetti and TommyGalano5
+-Crouching sprites by LossForWords
+
+BIG MERC/COMMANDER/LMG GUY/DOORMAN/ big tec9 guy
+-this is built on the doom2 commando specifically the unamred version/rifle version
+-credits to David G (ItsNatureToDie),JoeyTD and TommyGalano5
+-helmet by TommyGalano5
+-smg from strife
+
+BRUTE BOSSES
+-Doom2 Idsoftware, David G (ItsNatureToDie), JoeyTD and TommyGalano5. 
+-Project Brutality/Skulltag minigun.
+-ballistic mask is by Mike12
+-hood gasmask by Mortarian
+
+BIKER
+-bike is resized from Redneck rampage,3dRealms
+
+KAPPA cyborgs male/female
+-built on Doomimp, HorrormovieReis female imp
+deaths by David G (ItsNatureToDie),Mike12
+masks by Mike12
+
+JEEPS
+-Jeep is originally the Batman Doom/Ghostbusters Doom car
+-Jeep was edited originally by doomUACS then by DeeDeeOZ
+-mounted gun from Captain J Wolfers for Wolfers/Tormentor667/WSJ
+-rocket launcher is TommyGalano5
+-The crew are all Mark Quinn, Skelegant, Doom2 marines and caps from Strife
+
+TANKS
+-base sprites were made by Pixel Noob who created them from model tank in brutal doom v21 by Sgt_Mark_IV
+-heavily edited by DeeDeeOZ
+-Project Brutality/Skulltag minigun.
+
+//SOUNDS
+//BULLET/TRACER SOUNDS 
+- from Medal of Honor: Allied Assault and No One Lives Forever 2.(from WW_Nazis)
+
+//WEAPON SOUNDS
+KNIFE
+-sounds from 99weaps.wad
+PISTOL/SMG
+-Deltaforce,Nova logic
+MEDIUM PISTOL
+-Deltaforce,Nova logic
+DESERT EAGLE
+-sounds from Rainbow 6 Raven shield, Ubisoft
+MAC MACHINE PISTOL
+-Punisher 2004.THQ
+SHOTGUN
+-Call of Duty 2 by Infinity Ward and Freesound Project (author unknown).
+AK47
+-Deltaforce,Nova logic
+M4 CARBINE
+-Deltaforce,Nova logic
+RIFLE/SNIPER RIFLE
+-Call of Duty 2
+FAL/SILENCED PISTOL/SILENCED SMG
+-These all come from RastaManGames Stalker Weapons which uses a bunch of Stalker Mods unsure of some but mostly from these.
+- E.Nigma42 [Arsenal Overhaul] (Weapon/misc. sounds)
+- Gaz1k & Mortan [STCoP] (Weapon/misc. sounds)
+- mp5lng [The Armed Zone] (Weapon/misc. sounds)
+- STRIFER [GUNSLINGER Mod] (Weapon/misc. sounds)
+RPD
+-Deltaforce,Nova logic (RPK)
+M60
+-Realm 667 m60 sounds by Valve
+M79
+-realm 667 gl,sounds by Valve Software, FreeDoom
+MGL ROCKETS
+-Unknown source and Powerslave. (nebelwefer stuff from WW_Nazis)
+MINIGUN
+-from Call of Duty 2, Return to Castle Wolfenstein by Grey Matter, and sound recording by The_Funktasm. (WW_Nazis umg43)
+30 CAL BROWNING
+-Delta Force Land Warrior or Addon
+
+//ENEMY SOUNDS
+ENEMY BURNING/NECK SHOT SOUNDS
+-these are all from soldier of forutne 1/2
+LATINO THUGS
+-Manhunt Innocents, Rockstar
+THUGS MALES
+-prisoner voices from the Punisher 2004,THQ
+AFRICAN THUGS
+-Grand theft auto San Andreas Grove street and ballas, Rockstar
+FEMALE THUGS
+-Sof 1 female thugs,Raven
+TRAMP FEMALE
+-Asian female player sounds from GTA4
+MALE GOONS
+-The Punisher 2004 Druggies,THQ
+HOODS ROBBERS 1/2
+-Manhunt, Rockstar
+BRUISERS SKINS 1/2/REDNECK RIFLE
+-Manhunt Skins, Rockstar
+JAMAICAN YARDIE
+-Urban Chaos thugs
+JAMACIAN RASTA
+-Gta 3 yardies, Rockstar
+JAMICAN GIRL
+-Ganstas new orleans
+PERV STRAPS/GIMP
+-Manhunt 2 Pervs, Rockstar
+PERV FIST
+-Manhunt 2 Pervs,Rockstar
+PERV CANIBAL
+-Manhunt 2 Pervs,Rockstar
+GNOMES
+-these are gnomes from Lego Dimensions
+MOBSTERS/HITMEN
+-The Punisher 2004 Gnuccis,THQ
+YAKUZA
+-The Punisher 2004 yakuza,THQ
+FEMALE ROBBER
+-Daisy from Redneck Rampage, 3D Realms
+-Timeslitters 2 cowgirl,Free Radical Design,Edios interactive
+COWBOY GUY
+-The Punisher 2004 one of the prisoners,THQ
+BRUISERS
+-Sof 1 Male thugs,Raven
+WARDOG
+-Manhunt Wardogs, Manhunt, Rockstar
+-pains are from SOF1
+MALE ENGLISH RUSSIANS
+-THe Punisher 2004,THQ
+MALE FULL RUSSIAN
+Darkest days ww1 russians. 8monkey Labs,Phantom EFX
+FEMALE RUSSIAN
+-Call of Duty 2 Russian girl. Spiderman Friend or Foe Silver Sable
+HISPANIC CHUBB
+-hispanic thugs from Gangsters Las Vegas,Gameloft 
+JUNIOR/GIMP BIG REDNECKS
+-Both from Redneck Rampage Biker, 3D Realms, Sin thugs, Ritual
+SOLDIER BIG
+-just cause 1.	Eidos Interactive,Avalanche Studios
+SPAINISH MALE
+-Mexican cartel, 25 to Life, Avalanche ,Ritual, Eidos
+SPAINISH FEMALE
+-25 to Life,bad cop girl, Avalanche, Ritual, Eidos
+-some Postal 2, Running with Scissors
+MALE SOLDIER
+-Sof 2 professional male,Raven
+-alt is Fisks Guards from Punisher 2004,THQ
+FEMALE SOLDIER/HITMAN
+-sof 2 professional female,Raven
+PMC MALE/PMC FEMALE/TERRORIST
+-unreal tournament 3 reaper and lauren, Epic Games (UT3X),Midway Games. from TSR ripped by Cooper B. Chance, Ziella
+JAPANESE MERC full
+-voice 1 from Japanese version of Postal 
+-voice 2 from Battlefield 1942
+JAPANESE MERC BIG
+-voice from battlefield 5
+JAPANESE MERC FEMALE full
+-voices are from battlefield 5
+JAPANESE MERC female english
+-is Kairi from Teenage mutant ninja turtles SMASH UP.
+MERC NO HELMET
+-Fallout 3 enclave male,Bethesda
+MERC FEMALE
+-Fallout 3 enclave female,Bethesda
+MERC GASMASK1
+-mirrors edge cops/swat. Electronic Arts,DICE. from TSR ripped by Cooper B. Chance
+MERC GASMAKS2
+-Sof 2 professional MP Radio chatter,Raven
+MERC POMMY
+-older officer from Battlefield 2
+-younger from Battlefield 1942
+MERC BIG
+-take no prisoners soldiers, Raven Software,Red Orb Entertainment. ripped by Diodeus
+BRUTE BOSSES
+-unreal tournament 3 male mercenary.Epic Games (UT3X),Midway Games. from TSR ripped by Cooper B. Chance, Ziella
+BIKES
+-riders from Carmageddon TDR
+-bike sounds from Redneck Rampage, 3dRealms
+KAPPA CYBORGS MALE/FEMALE
+-male is Stark Guard from Punisher 2004,THQ
+-female is Portal turret,Valve
+JETPACK/PROBE NOISES
+Unknown Source
+
+//FINAL NOTE
+I have tried to keep this up to date and as in depth as possible, that said I have been known to make mistakes so if
+something is wrong/miscredited/not listed please tell me and I will change it as soon as possible.
+Have no intention of claiming I made anything that was someone else's hard work.
+Pretty much everything I use is originally made by some one else with or without lots of editing so full credit to them.
+If I have used anything of yours that your not happy with and want me to change it please just contact me, not trying
+to make anyone mad so happy to change things if this is what is required.
+
+// ===== AK47 (weapon pack, Weapons/AK47.zip) =====
+Submitted: JoeyTD
+Decorate: JoeyTD
+Sounds: ???
+Sprites: Terminator Rampage
+Sprites Edit: JoeyTD, WildWeasel
+
+// ===== Colt45 (weapon pack, Weapons/Colt45.zip) =====
+Submitted: JoeyTD
+Code: JoeyTD, SuperSonix07
+Sounds: Wolfenstein 2009
+Sprites: Doom, Rise of the Triad
+Sprite Edit: JoeyTD
+Idea Base: Doom's pistol
+
+// ===== CombatKnife (weapon pack, Weapons/CombatKnife.zip) =====
+Name: Combat Knife
+Class: 1
+Type: Melee
+Palette: Doom
+Summon: CombatKnife
+Ammo Type: No
+Altfire: Stab
+Powered Mode: No
+Brightmaps: No
+Actor modification: No
+ACS: No
+
+Credits:
+Code: LossForWords
+Sounds: Valve, Dennaton
+Sprites: LossForWords, sonik.o.fan, Amuscaria, CaptainJ, iD Software.
+
+Description:
+A standard issue combat knife, with notching ridges along the base of the blade.
+Low damage, but very fast swing speed.
+Affected by Berserk.
+While the strength multiplier is cut to a measly 2x, the swing speed is doubled.
+Secondary fire does a stab. Also affected by Berserk, under the same principle as above.
+Tap Altfire for a quick jab, hold altfire to "cook" a stronger thrust.
+
+// ===== DualBerettas (weapon pack, Weapons/DualBerettas.zip) =====
+Name: Dual Berettas
+Class: 2
+Type: Hitscan
+Palette: Doom
+Summon: Dual92
+Ammo Type: Bullets
+Altfire: No
+Powered Mode: No
+Brightmaps: No
+Actor modification: No
+Inspiration: The Dual Elites, from Counter-Strike.
+ACS: No
+
+Credits:
+Code: LossForWords
+Sounds: Hyperix, Valve
+Sprites: LossForWords, Joblez, Valve, iD Software.
+
+Description:
+The Beretta 92 is a symbol of excellence in italian arms manufacturing, with it's high capacity and sleek, elegant shape.
+While effective enough on it's own, nothing compares to the feeling of unloading two at once.
+It'll cost you in accuracy and reload speed, but the firerate and mag capacity will more than make up for it.
+If holding one of these makes you feel like Superman, you can only imagine how holding two would make you feel.
+
+// ===== FistsOfFury (weapon pack, Weapons/FistsOfFury.zip) =====
+Code: Gothic
+Sounds: id Software (Doom 3 & D3 alpha), 3DRealms (Shadow Warrior)
+Sprites: 3DRealms (Shadow Warrior & SW prototype), id Software (Doom)
+Sprite Edit: Gothic
+Idea Base: Fists from Shadow Warrior
+
+How's that for kung-fu fighting you chicken shit?!
+
+// ===== Flashlight (weapon pack, Weapons/Flashlight.zip) =====
+Code: Alando1, idGamer, Ghastly (ZScript conversion), Agent_Ash (New ZScript), RichardDS90 (Minor modifications)
+GLDefs: Alando1
+Sounds: Unreal Tournament
+Sprites: Alando1, osjclatchford, Amuscaria, id Software, 3D Realms
+Sprite Edit: MagicWazard (angled), RichardDS90 (angled pickup)
+
+// ===== MicroUzi (weapon pack, Weapons/MicroUzi.zip) =====
+Submitted: Captain Toenail
+Code: Captain Toenail, RichardDS90 (ZScript Conversion)
+Sprites: Captain Toenail
+SpriteEdit: Captain Toenail
+Sounds: Freedoom
+GLDEFs: RichardDS90 (Brightmaps)
+
+// ===== Molotov (weapon pack, Weapons/Molotov.zip) =====
+Code: Scientist, Gothic
+GLDefs: Keksdose, Gothic
+Sounds: Blood & Clive Barker's Undying.
+Sprites: Scientist, Blood, Shadow Warrior, Dzierzan, Espi & Kristus, Doom 2, Scuba Steve, Per Kristian 
+Sprite Edit: Gothic
+Idea Base: The Molotov Cocktail from the WRW
+
+// ===== PumpActionShotgun (weapon pack, Weapons/PumpActionShotgun.zip) =====
+Submitted: Xim
+Decorate: Xim
+Sprites: 3D Realms, Eurocom
+Sprite Edit: Xim, Dzierzan, Fox, Gothic
+Sounds: Unknown
+Idea Base: Shotgun from Doom, Shotgun from Duke Nukem 64
+
+// ===== FragGrenade (weapon pack, Weapons/FragGrenade.zip) =====
+Submitted: DBJ87
+Code: DBJ87, DeVloek (Update)
+Sounds: id Software (Doom 3), Froon
+Sprites: Kronos (Doom 2.5), BloodyAcid (ClipBox Variant used for GrenadeBox)
+Sprite Edit: Kronos, DBJ87
+Idea Base: Doom 3; extra grenades or mines thrown by hand instead of fired from a gun.
+
+I only take credit for:
+-Weapon's Decorate
+-Additional Ammo created & Dropped Weapon as Ammo set up.
+
+Thank you to Skelegant for Additional Sprite Resources.
+Thank you to Wild Weasel for helping me find the right people to credit for
+Sprites.
+Thank you to Blue Shadow, DreadOpp, MagicWazard & NourPrince for Feedback.
+
+Cooking Grenade set-up based off of the Hand Grenades submitted to Realm667
+Decorate created by Froon & submitted by Xim.
+
+// ===== Corpo Wars (the owner's earlier mod) and the packs it used — assets in nbc/ since M0b =====
+Full source credits: reference/corpowars/CREDITS.txt. Lines for assets now in nbc/:
+
+Textures (nbc/textures/cw/):
+  AD*.png and city skyline art — from "A.D Cop" / "A.D Cop: Overseas Missions" (1996) by Electronic Music and
+  Animated Graphics Co., Ltd.; Doom conversion by PGE. AX*.png interior theme sets: further textures from the same
+  pack, renamed to 8 characters. CW*.png and the textures/props set: Corpo Wars' own (CorpoWars_tools/make_textures.py).
+  NOTE: the A.D. Cop textures are not formally licensed; New Bricks City must stay free.
+City skyline sprites (nbc/sprites/cw/cityskyline/, CSKY*): from the A.D. Cop skyline art above.
+Decor sprites (nbc/sprites/cw/decor/) and sign sprites (nbc/sprites/cw/signs/): Corpo Wars' own
+  (CorpoWars_tools/sprite_gen, make_models.py).
+Prop models (nbc/models/props/*.obj): Corpo Wars' own (CorpoWars_tools/make_models.py).
+Flashbang and noisemaker sprites (nbc/sprites/cw/gadgets/CWC3A0, CWC4A0): Corpo Wars' own.
+Breaching charge (nbc/sprites/cw/breach/ SPMN*/SPMIA0; nbc/sounds/cw/breach/ SMNSET1, SMNSET2, SPRNMNXP):
+  from "Spring Mine" by Mor'ladim (sounds: Mor'ladim, Phantasy Star Online, Fate; sprites: Mor'ladim,
+  Legend of the Monster Hunter, Dark Forces mine sprite as base).
+Parked cars (nbc/voxels/, nbc/actors/cw/vehicles.txt): Voxel Vehicles Pack 1.0 by NerdKoopa (2013).
+Kit template maps (nbc/maps/NBC_K1/K2/K4.wad): Corpo Wars' own (CorpoWars_tools/genmap.py).
+
+// ===== Machete (weapon pack, Weapons/Machete.zip) =====
+Machete.wad ships no CREDITS or INFO lump.
+TODO (owner): add the author and source of this pack.
+
+// ===== Civilians2 (pedestrian sprites, nbc/sprites/civilians/) =====
+Source pack as found in C:\Games\Corpo Wars\Civilians2. It ships no credits file.
+TODO (owner): add the author and source of this pack.
+
+// ===== To add when the code is ported (reference/corpowars/ until then) =====
+Universal Enhanced AI 1.1.1 by Joshua Hard (MIT; keep LICENSE-UEAI.txt), stealth module adapted from Caligari87.
+Ledge climbing: "Ledge Climbing" by Dodopod (2018, "use or modify, attribute me"), with Corpo Wars changes.
+Tactical lean: reworked from "Tactical Lean" (lean.pk3, author uncredited), with Corpo Wars changes.
+Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash Muhandes' NashMove, with code
+  from Can't Sleep and BROS_ETT_311.

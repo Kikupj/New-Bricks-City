@@ -1,0 +1,1098 @@
+actor PedSpawner1 : RandomSpawner replaces ZombieMan
+{
+dropitem PedestrianFod1
+dropitem PedestrianFod2
+dropitem PedestrianFod3
+dropitem PedestrianFod4
+dropitem PedestrianFod5
+dropitem PedestrianFod6
+dropitem PedestrianFod7
+dropitem PedestrianFod1f
+dropitem PedestrianFod1f2
+dropitem PedestrianFod1f3
+dropitem PedestrianFod1f4
+dropitem PedestrianFod1f5
+dropitem PedestrianFod1f6
+dropitem PedestrianDoc1
+dropitem PedestrianDoc2f
+}
+
+actor PedestrianFod1
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM1 R 10 A_Look
+    loop
+  See:
+    PEM1 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM1 EE 5 A_FaceTarget
+    PEM1 E 8
+    goto See
+  Pain:
+    PEM1 H 3
+    PEM1 H 3 A_Pain
+    goto See
+  Death:
+    PEM1 I 5
+    PEM1 J 5 A_Scream
+    PEM1 K 5 A_NoBlocking
+    PEM1 L 5
+    PEM1 M -1
+    stop
+  Death.WEAK:
+    PEM1 I 5
+    PEM1 J 5 A_Scream
+    PEM1 K 5 A_NoBlocking
+    PEM1 L 5
+    PEM1 N -1
+    stop
+  XDeath:
+    PEM1 O 5
+    PEM1 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM1 AA 4 A_Wander
+    PEM1 A 0 A_Look
+    PEM1 BB 4 A_Wander
+    PEM1 A 0 A_Look
+    PEM1 CC 4 A_Wander
+    PEM1 A 0 A_Look
+    PEM1 DD 4 A_Wander
+    PEM1 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod2
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM2 R 10 A_Look
+    loop
+  See:
+    PEM2 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM2 EE 5 A_FaceTarget
+    PEM2 E 8
+    goto See
+  Pain:
+    PEM2 H 3
+    PEM2 H 3 A_Pain
+    goto See
+  Death:
+    PEM2 I 5
+    PEM2 J 5 A_Scream
+    PEM2 K 5 A_NoBlocking
+    PEM2 L 5
+    PEM2 M -1
+    stop
+  Death.WEAK:
+    PEM2 I 5
+    PEM2 J 5 A_Scream
+    PEM2 K 5 A_NoBlocking
+    PEM2 L 5
+    PEM2 N -1
+    stop
+  XDeath:
+    PEM2 O 5
+    PEM2 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM2 AA 4 A_Wander
+    PEM2 A 0 A_Look
+    PEM2 BB 4 A_Wander
+    PEM2 A 0 A_Look
+    PEM2 CC 4 A_Wander
+    PEM2 A 0 A_Look
+    PEM2 DD 4 A_Wander
+    PEM2 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod3
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM3 R 10 A_Look
+    loop
+  See:
+    PEM3 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM3 EE 5 A_FaceTarget
+    PEM3 E 8
+    goto See
+  Pain:
+    PEM3 H 3
+    PEM3 H 3 A_Pain
+    goto See
+  Death:
+    PEM3 I 5
+    PEM3 J 5 A_Scream
+    PEM3 K 5 A_NoBlocking
+    PEM3 L 5
+    PEM3 M -1
+    stop
+  Death.WEAK:
+    PEM3 I 5
+    PEM3 J 5 A_Scream
+    PEM3 K 5 A_NoBlocking
+    PEM3 L 5
+    PEM3 N -1
+    stop
+  XDeath:
+    PEM3 O 5
+    PEM3 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM3 AA 4 A_Wander
+    PEM3 A 0 A_Look
+    PEM3 BB 4 A_Wander
+    PEM3 A 0 A_Look
+    PEM3 CC 4 A_Wander
+    PEM3 A 0 A_Look
+    PEM3 DD 4 A_Wander
+    PEM3 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod4
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM4 R 10 A_Look
+    loop
+  See:
+    PEM4 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM4 EE 5 A_FaceTarget
+    PEM4 E 8
+    goto See
+  Pain:
+    PEM4 H 3
+    PEM4 H 3 A_Pain
+    goto See
+  Death:
+    PEM4 I 5
+    PEM4 J 5 A_Scream
+    PEM4 K 5 A_NoBlocking
+    PEM4 L 5
+    PEM4 M -1
+    stop
+  Death.WEAK:
+    PEM4 I 5
+    PEM4 J 5 A_Scream
+    PEM4 K 5 A_NoBlocking
+    PEM4 L 5
+    PEM4 N -1
+    stop
+  XDeath:
+    PEM4 O 5
+    PEM4 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM4 AA 4 A_Wander
+    PEM4 A 0 A_Look
+    PEM4 BB 4 A_Wander
+    PEM4 A 0 A_Look
+    PEM4 CC 4 A_Wander
+    PEM4 A 0 A_Look
+    PEM4 DD 4 A_Wander
+    PEM4 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod5
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM5 R 10 A_Look
+    loop
+  See:
+    PEM5 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM5 EE 5 A_FaceTarget
+    PEM5 E 8
+    goto See
+  Pain:
+    PEM5 H 3
+    PEM5 H 3 A_Pain
+    goto See
+  Death:
+    PEM5 I 5
+    PEM5 J 5 A_Scream
+    PEM5 K 5 A_NoBlocking
+    PEM5 L 5
+    PEM5 M -1
+    stop
+  Death.WEAK:
+    PEM5 I 5
+    PEM5 J 5 A_Scream
+    PEM5 K 5 A_NoBlocking
+    PEM5 L 5
+    PEM5 N -1
+    stop
+  XDeath:
+    PEM5 O 5
+    PEM5 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM5 AA 4 A_Wander
+    PEM5 A 0 A_Look
+    PEM5 BB 4 A_Wander
+    PEM5 A 0 A_Look
+    PEM5 CC 4 A_Wander
+    PEM5 A 0 A_Look
+    PEM5 DD 4 A_Wander
+    PEM5 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod6
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM6 R 10 A_Look
+    loop
+  See:
+    PEM6 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM6 EE 5 A_FaceTarget
+    PEM6 E 8
+    goto See
+  Pain:
+    PEM6 H 3
+    PEM6 H 3 A_Pain
+    goto See
+  Death:
+    PEM6 I 5
+    PEM6 J 5 A_Scream
+    PEM6 K 5 A_NoBlocking
+    PEM6 L 5
+    PEM6 M -1
+    stop
+  Death.WEAK:
+    PEM6 I 5
+    PEM6 J 5 A_Scream
+    PEM6 K 5 A_NoBlocking
+    PEM6 L 5
+    PEM6 N -1
+    stop
+  XDeath:
+    PEM6 O 5
+    PEM6 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM6 AA 4 A_Wander
+    PEM6 A 0 A_Look
+    PEM6 BB 4 A_Wander
+    PEM6 A 0 A_Look
+    PEM6 CC 4 A_Wander
+    PEM6 A 0 A_Look
+    PEM6 DD 4 A_Wander
+    PEM6 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod7
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEM7 R 10 A_Look
+    loop
+  See:
+    PEM7 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEM7 EE 5 A_FaceTarget
+    PEM7 E 8
+    goto See
+  Pain:
+    PEM7 H 3
+    PEM7 H 3 A_Pain
+    goto See
+  Death:
+    PEM7 I 5
+    PEM7 J 5 A_Scream
+    PEM7 K 5 A_NoBlocking
+    PEM7 L 5
+    PEM7 M -1
+    stop
+  Death.WEAK:
+    PEM7 I 5
+    PEM7 J 5 A_Scream
+    PEM7 K 5 A_NoBlocking
+    PEM7 L 5
+    PEM7 N -1
+    stop
+  XDeath:
+    PEM7 O 5
+    PEM7 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEM7 AA 4 A_Wander
+    PEM7 A 0 A_Look
+    PEM7 BB 4 A_Wander
+    PEM7 A 0 A_Look
+    PEM7 CC 4 A_Wander
+    PEM7 A 0 A_Look
+    PEM7 DD 4 A_Wander
+    PEM7 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF1 R 10 A_Look
+    loop
+  See:
+    PEF1 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF1 EE 5 A_FaceTarget
+    PEF1 E 8
+    goto See
+  Pain:
+    PEF1 H 3
+    PEF1 H 3 A_Pain
+    goto See
+  Death:
+    PEF1 I 5
+    PEF1 J 5 A_Scream
+    PEF1 K 5 A_NoBlocking
+    PEF1 L 5
+    PEF1 M -1
+    stop
+  Death.WEAK:
+    PEF1 I 5
+    PEF1 J 5 A_Scream
+    PEF1 K 5 A_NoBlocking
+    PEF1 L 5
+    PEF1 N -1
+    stop
+  XDeath:
+    PEF1 O 5
+    PEF1 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF1 AA 4 A_Wander
+    PEF1 A 0 A_Look
+    PEF1 BB 4 A_Wander
+    PEF1 A 0 A_Look
+    PEF1 CC 4 A_Wander
+    PEF1 A 0 A_Look
+    PEF1 DD 4 A_Wander
+    PEF1 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f2
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF2 R 10 A_Look
+    loop
+  See:
+    PEF2 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF2 EE 5 A_FaceTarget
+    PEF2 E 8
+    goto See
+  Pain:
+    PEF2 H 3
+    PEF2 H 3 A_Pain
+    goto See
+  Death:
+    PEF2 I 5
+    PEF2 J 5 A_Scream
+    PEF2 K 5 A_NoBlocking
+    PEF2 L 5
+    PEF2 M -1
+    stop
+  Death.WEAK:
+    PEF2 I 5
+    PEF2 J 5 A_Scream
+    PEF2 K 5 A_NoBlocking
+    PEF2 L 5
+    PEF2 N -1
+    stop
+  XDeath:
+    PEF2 O 5
+    PEF2 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF2 AA 4 A_Wander
+    PEF2 A 0 A_Look
+    PEF2 BB 4 A_Wander
+    PEF2 A 0 A_Look
+    PEF2 CC 4 A_Wander
+    PEF2 A 0 A_Look
+    PEF2 DD 4 A_Wander
+    PEF2 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f3
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF3 R 10 A_Look
+    loop
+  See:
+    PEF3 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF3 EE 5 A_FaceTarget
+    PEF3 E 8
+    goto See
+  Pain:
+    PEF3 H 3
+    PEF3 H 3 A_Pain
+    goto See
+  Death:
+    PEF3 I 5
+    PEF3 J 5 A_Scream
+    PEF3 K 5 A_NoBlocking
+    PEF3 L 5
+    PEF3 M -1
+    stop
+  Death.WEAK:
+    PEF3 I 5
+    PEF3 J 5 A_Scream
+    PEF3 K 5 A_NoBlocking
+    PEF3 L 5
+    PEF3 N -1
+    stop
+  XDeath:
+    PEF3 O 5
+    PEF3 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF3 AA 4 A_Wander
+    PEF3 A 0 A_Look
+    PEF3 BB 4 A_Wander
+    PEF3 A 0 A_Look
+    PEF3 CC 4 A_Wander
+    PEF3 A 0 A_Look
+    PEF3 DD 4 A_Wander
+    PEF3 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f4
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF4 R 10 A_Look
+    loop
+  See:
+    PEF4 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF4 EE 5 A_FaceTarget
+    PEF4 E 8
+    goto See
+  Pain:
+    PEF4 H 3
+    PEF4 H 3 A_Pain
+    goto See
+  Death:
+    PEF4 I 5
+    PEF4 J 5 A_Scream
+    PEF4 K 5 A_NoBlocking
+    PEF4 L 5
+    PEF4 M -1
+    stop
+  Death.WEAK:
+    PEF4 I 5
+    PEF4 J 5 A_Scream
+    PEF4 K 5 A_NoBlocking
+    PEF4 L 5
+    PEF4 N -1
+    stop
+  XDeath:
+    PEF4 O 5
+    PEF4 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF4 AA 4 A_Wander
+    PEF4 A 0 A_Look
+    PEF4 BB 4 A_Wander
+    PEF4 A 0 A_Look
+    PEF4 CC 4 A_Wander
+    PEF4 A 0 A_Look
+    PEF4 DD 4 A_Wander
+    PEF4 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f5
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF5 R 10 A_Look
+    loop
+  See:
+    PEF5 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF5 EE 5 A_FaceTarget
+    PEF5 E 8
+    goto See
+  Pain:
+    PEF5 H 3
+    PEF5 H 3 A_Pain
+    goto See
+  Death:
+    PEF5 I 5
+    PEF5 J 5 A_Scream
+    PEF5 K 5 A_NoBlocking
+    PEF5 L 5
+    PEF5 M -1
+    stop
+  Death.WEAK:
+    PEF5 I 5
+    PEF5 J 5 A_Scream
+    PEF5 K 5 A_NoBlocking
+    PEF5 L 5
+    PEF5 N -1
+    stop
+  XDeath:
+    PEF5 O 5
+    PEF5 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF5 AA 4 A_Wander
+    PEF5 A 0 A_Look
+    PEF5 BB 4 A_Wander
+    PEF5 A 0 A_Look
+    PEF5 CC 4 A_Wander
+    PEF5 A 0 A_Look
+    PEF5 DD 4 A_Wander
+    PEF5 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianFod1f6
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    PEF6 R 10 A_Look
+    loop
+  See:
+    PEF6 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    PEF6 EE 5 A_FaceTarget
+    PEF6 E 8
+    goto See
+  Pain:
+    PEF6 H 3
+    PEF6 H 3 A_Pain
+    goto See
+  Death:
+    PEF6 I 5
+    PEF6 J 5 A_Scream
+    PEF6 K 5 A_NoBlocking
+    PEF6 L 5
+    PEF6 M -1
+    stop
+  Death.WEAK:
+    PEF6 I 5
+    PEF6 J 5 A_Scream
+    PEF6 K 5 A_NoBlocking
+    PEF6 L 5
+    PEF6 N -1
+    stop
+  XDeath:
+    PEF6 O 5
+    PEF6 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    PEF6 AA 4 A_Wander
+    PEF6 A 0 A_Look
+    PEF6 BB 4 A_Wander
+    PEF6 A 0 A_Look
+    PEF6 CC 4 A_Wander
+    PEF6 A 0 A_Look
+    PEF6 DD 4 A_Wander
+    PEF6 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianDoc1
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    DOC1 R 10 A_Look
+    loop
+  See:
+    DOC1 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    DOC1 EE 5 A_FaceTarget
+    DOC1 E 8
+    goto See
+  Pain:
+    DOC1 H 3
+    DOC1 H 3 A_Pain
+    goto See
+  Death:
+    DOC1 I 5
+    DOC1 J 5 A_Scream
+    DOC1 K 5 A_NoBlocking
+    DOC1 L 5
+    DOC1 M -1
+    stop
+  Death.WEAK:
+    DOC1 I 5
+    DOC1 J 5 A_Scream
+    DOC1 K 5 A_NoBlocking
+    DOC1 L 5
+    DOC1 N -1
+    stop
+  XDeath:
+    DOC1 O 5
+    DOC1 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    DOC1 AA 4 A_Wander
+    DOC1 A 0 A_Look
+    DOC1 BB 4 A_Wander
+    DOC1 A 0 A_Look
+    DOC1 CC 4 A_Wander
+    DOC1 A 0 A_Look
+    DOC1 DD 4 A_Wander
+    DOC1 A 0 A_Look
+    loop
+  }
+}
+
+actor PedestrianDoc2f
+{
+  scale 1.0
+  obituary "%o was somehow killed by a scared civillian???"
+  health 20
+  radius 15
+  height 54
+  mass 100
+  speed 11
+  painchance 200
+  seesound ""
+  painsound ""
+  deathsound ""
+  activesound ""
+  Tag "Civillian"
+  MONSTER
+  +FLOORCLIP
+  -COUNTKILL
+  +MISSILEEVENMORE
+  +FRIENDLY
+  +AMBUSH
+  +FRIGHTENED
+  states
+  {
+  Spawn:
+    DOC2 R 10 A_Look
+    loop
+  See:
+    DOC2 AABBCCDD 3 A_Chase
+    loop
+  Missile:
+    DOC2 EE 5 A_FaceTarget
+    DOC2 E 8
+    goto See
+  Pain:
+    DOC2 H 3
+    DOC2 H 3 A_Pain
+    goto See
+  Death:
+    DOC2 I 5
+    DOC2 J 5 A_Scream
+    DOC2 K 5 A_NoBlocking
+    DOC2 L 5
+    DOC2 M -1
+    stop
+  Death.WEAK:
+    DOC2 I 5
+    DOC2 J 5 A_Scream
+    DOC2 K 5 A_NoBlocking
+    DOC2 L 5
+    DOC2 N -1
+    stop
+  XDeath:
+    DOC2 O 5
+    DOC2 P 5 A_XScream
+    PGIB A 5 A_NoBlocking
+    PGIB BCD 5
+    PGIB E -1
+    Stop
+  Idle:
+    DOC2 AA 4 A_Wander
+    DOC2 A 0 A_Look
+    DOC2 BB 4 A_Wander
+    DOC2 A 0 A_Look
+    DOC2 CC 4 A_Wander
+    DOC2 A 0 A_Look
+    DOC2 DD 4 A_Wander
+    DOC2 A 0 A_Look
+    loop
+  }
+}
