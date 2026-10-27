@@ -1,6 +1,6 @@
 # New Bricks City — Build Plan
 
-A roguelite FPS mod for UZDoom (a GZDoom fork, so it runs ZScript), inspired by the walled-off housing projects of *Brick Mansions*. You play an undercover cop leading raids into the district, with allied officers following you in. The plan is built to be handed to GPT Codex one milestone at a time.
+A roguelite FPS mod for UZDoom (a GZDoom fork, so it runs ZScript). The police are losing a megacity to its gangs, and you're an undercover cop leading what's left of a gutted department on raids into a walled-off district of brick housing towers, with allied officers following you in. It's guerrilla police work: seized guns, unmarked vans, paid informants, and a department you rebuild one room at a time. The setting draws on the walled-off projects of *Brick Mansions*; the tone draws on cop thrillers like *Dirty Harry*, *Bad Boys II* and *Den of Thieves*. The campaign layer (deploy screen, squad kits, counter-raids, permanent losses) borrows mechanics from the indie FPS *Hamburger Hill* (`docs/hamburger-hill-analysis.md`). The plan is built to be handed to GPT Codex one milestone at a time.
 
 - **Engine:** `uzdoom.exe` (in this folder)
 - **Base game (IWAD):** `freedoom-0.13.0/freedoom2.wad`. It's free, so the mod can be shared without needing commercial Doom.
@@ -88,7 +88,7 @@ If something is missing, the original `C:\Games\Corpo Wars\CorpoWars\` (newer th
 | **Civilians**: `CW_Civilian` (sees you → screams → alerts → flees; knock-out from behind) plus the `Civilians2` pedestrian sprites (male, female and doctor sets) | CorpoWars + Civilians2 | Bricks residents in flats and on streets, the escort informant, and **civilian-casualty Merit fines** (a cop's rules of engagement, modeled on Corpo Wars' contracts) | M9 |
 | **Reload code pattern** (code only): `gear.zs` has a magazine + reserve pattern, an interruptible shell-tube reload loop, and in-engine dip reloads (the weapon sprite is offset down and back up, with sounds). It also has `CW_Thrown`, with the noisemaker and **flashbang** gadgets. | CorpoWars (none of its weapons or weapon art) | The template for `NBC_ReloadWeapon`; the flashbang as a shop gadget | M1b, M7 |
 | **Movement**: `player.zs` ledge climbing (Dodopod, "use or modify, attribute me"), `lean.zs` tactical lean, grounded movement | CorpoWars | The M11 **mantle** (don't write it from scratch); lean as an optional extra | M11 |
-| **Menu framework**: `CW_UiMenu` / `terminal.zs` (tabbed terminal UI with mouse and keyboard), plus `gear.zs`'s locker menu | CorpoWars | Squad Room, Informant shop, Captain's Board, Armory locker | M6–M8 |
+| **Menu framework**: `CW_UiMenu` / `terminal.zs` (tabbed terminal UI with mouse and keyboard), plus `gear.zs`'s locker menu | CorpoWars | Squad Room, deploy screen, Informant shop, Captain's Office, Armory locker, results screen | M3–M8 |
 | **Props and dressing**: 71 OBJ models plus `modeldef.props.txt` (dumpsters, AC units, crates, beds, armchairs, bar counter, barriers, generators…); 460 decor sprites; signs; **voxel parked cars** (NerdKoopa); city skyline sprites (`CSKY`); breaching charge | CorpoWars + vvpck1.0 | Furnishing kits, burned-out cars on D1 streets, the skyline outside tower windows | M2, M12 |
 | **Textures**: 438, including the AD* set (brick, concrete, doors, blinds), the AX* interior themes and Corpo Wars' own CW* textures | CorpoWars | The urban texture set (the kits already reference them) | M2 |
 
@@ -96,7 +96,7 @@ If something is missing, the original `C:\Games\Corpo Wars\CorpoWars\` (newer th
 
 **Don't take any weapons.** That means nothing from DeePayback Weapons 1.5E, and none of Corpo Wars' own guns (Glock, MP5, Duke shotgun, tranq, taser) or their sprites, sounds or item icons. **The weapon roster is only the packs in `Weapons/`.** Reloads for guns without reload frames use the in-engine dip.
 
-**Don't take:** the corp economy itself (corps, subsidiaries, property market, Meridian, contracts), the terminal job board, grid inventory, the Obsidian/Oblige pipeline and pool maps, the office-floor generator `floorgen.zs` (maybe later for the Crown's floors), or the CW guard sprites (they're DeePayback militia, which we already have).
+**Don't take:** the corp economy itself (corps, subsidiaries, property market, Meridian, contracts), the terminal job board, grid inventory, the office-floor generator `floorgen.zs` (maybe later for the Crown's floors), or the CW guard sprites (they're DeePayback militia, which we already have). The Obsidian pipeline was tried for M2 and is now frozen (§4.4).
 
 **Licensing.**
 - **Fine to reuse:** Corpo Wars' own code (yours), and UEAI (MIT; keep `LICENSE-UEAI.txt`).
@@ -104,52 +104,68 @@ If something is missing, the original `C:\Games\Corpo Wars\CorpoWars\` (newer th
 - **Credit lines to copy over:** Corpo Wars' `CREDITS.txt` lists every source. Copy across the lines for everything you import.
 - **Not formally licensed:** the A.D. Cop textures come from a 1996 commercial game. That's common in Doom modding and fine for a **free** mod, but never sell New Bricks City or bundle it with anything paid.
 
-**How far to take the film.** It's fine to draw on the setting: a walled-off district of brick housing towers, police checkpoints at the wall, a kingpin running the towers, rooftop parkour, a cop working with locals, and a corrupt plan to raze the place. Keep all names, characters, dialogue, logos, footage and audio original. Film stills are fine as **your own private mood board** for mapping, but never ship them in the mod.
+**How far to take the films and games.** It's fine to draw on the setting: a walled-off district of brick housing towers, police checkpoints at the wall, a kingpin running the towers, rooftop parkour, a cop working with locals, and a corrupt plan to raze the place. From the cop thrillers, take only the **tone**: a department that's outgunned and underfunded, cops who bend the rules to get results, crews that fight like soldiers, big loud raids. From *Hamburger Hill*, take only **mechanics and screen layouts**. Keep all names, characters, dialogue, logos, footage, art and audio original. Film stills and screenshots are fine as **your own private mood board** for mapping, but never ship them in the mod.
 
 ---
 
 ## 1. The pitch
 
-> **New Bricks City.** Fifteen years ago the city poured a concrete wall around its poorest district and pulled everything out: the schools, the hospital, and finally the police. The brick housing towers inside now belong to **the Landlord**, a kingpin who runs the district's drugs, guns and rent from the top of the tallest tower, **the Crown**.
+> **New Bricks City.** Twenty million people, and the police are losing them. Budgets were cut year after year, precincts closed, and whole districts were handed to the gangs. The crews have rifles, armor and lawyers. The department has paperwork.
+>
+> The worst of it is **the Bricks**. Fifteen years ago the city poured a concrete wall around its poorest district and pulled everything out: the schools, the hospital, and finally the police. The brick housing towers inside now belong to **the Landlord**, a kingpin who runs the district's drugs, guns and rent from the top of the tallest tower, **the Crown**.
 >
 > City Hall has signed a demolition order. In thirty days the Bricks gets leveled, along with everyone still living there. Rumor says someone downtown is paying the Landlord to empty the towers first.
 >
-> You're **Detective Jordan Vance**, an undercover narcotics cop. You grew up two blocks from the wall. Every night you run raids out of **Checkpoint 9** with whatever officers will follow you over. You go block by block, tower by tower, building the case against the Landlord and against whoever at City Hall is paying him, before demolition day.
+> All that's left of the department on this side of the city is **Checkpoint 9**: a half-shut police post built into the Wall. The switchboard is dead, the cells are flooded, and the armory is a cage of guns taken off dead gangsters. No backup is coming. You're **Detective Jordan Vance**, an undercover narcotics cop who grew up two blocks from the wall, and you run raids with whatever you can scrape together: seized guns, an unmarked van, paid informants, and the few officers who still show up. It's guerrilla police work, and it works. Every raid that pays off brings back cash, guns and recruits, and Checkpoint 9 comes back to life one room at a time.
 >
-> If you go down, the squad drags you back to the checkpoint. The case file stays open. Go again.
+> If you go down, the squad drags you back to the checkpoint. The case file stays open. Go again. But the officers who bleed out in the Bricks don't come back.
 
 (These names are placeholders. Change them freely.)
+
+**What the lore means for play:**
+- **You start with almost nothing.** The first cases run on a cage of seized guns, two officers and a dead precinct. The meta progression (§2.6) is the department being rebuilt, and you can see it in the hub.
+- **Guerrilla methods are the toolset.** Unmarked vans, rooftop entries, informants, stakeouts and seized weapons, not SWAT trucks and air support.
+- **Every officer matters.** There aren't many, and losses are permanent (§2.1).
+- **Backing is fragile** (§2.5). City Hall and the street are watching. Clean raids earn trust; dead officers and dead residents burn it.
 
 ---
 
 ## 2. Core loop
 
 ```
-CHECKPOINT 9 (hub — a police post built into the Wall)
-  ├─ Captain's Board: spend Merit on permanent unlocks
-  ├─ Squad Room: pick which officers ride with you (roster, classes, ranks)
-  ├─ Armory: pick a loadout (unlocks + weapons seized earlier this case)
-  └─ THE CITY MAP (wall terminal): the Bricks, its turfs, the gangs, your case file
+CHECKPOINT 9 (hub — a half-shut police post built into the Wall; it rebuilds as you unlock rooms, §2.6)
+  ├─ Captain's Office: spend Merit to reopen precinct rooms (permanent unlocks)
+  ├─ Squad Room: roster, recruiting, ranks, the memorial wall for the fallen
+  ├─ Armory cage + Evidence Locker: your loadout and the weapons seized this case
+  └─ THE CITY MAP (wall terminal): the Bricks, its turfs, the gangs, your case file,
+     today's side jobs, districts under attack, Backing
 
 CASE = one roguelite run: a freshly seeded Bricks, 30 days to demolition, 3 strikes
   Each day, pick ONE:
     RAID a gang's mansion (takes the day)
+      DEPLOY SCREEN: time of day, how you go in, which officers, their kits (§2.7)
       Approach block (the street outside, on their turf)
       → STAGING FLAT across the street: pick 1 of 3 perks ("Intel"),
-        buy from the Informant, patch up officers, pick your entry
+        buy from the Informant, patch up officers, pick your entry into the mansion
       → 2 mansion floors (each floor is one block; the stair core is the exit up)
-      → the LEADER'S FLOOR: arrest or kill the gang leader → gang TOPPLED
+      → the LEADER'S FLOOR: arrest or kill the gang leader → gang TOPPLED,
+        its turf becomes a RECLAIMED BLOCK (pays turf income every day)
+    DEFEND a reclaimed block that a gang is counter-raiding: HOLD THE BLOCK (§2.4)
+    TAKE A SIDE JOB (takes the day): a short block with its reward posted up front
     STAKE OUT a gang's turf (takes the day): a short undercover recon block (M9)
     CLOSE THE DAY: rest; officers in the hospital recover a day
   Any time, free: buy tips from informants with Cash; read the gang dossiers
-  Every day ends with the GANG TICK: gangs react, fortify, expand, retaliate (§2.4)
+  Every day ends with the GANG TICK: gangs react, fortify, counter-raid, retaliate (§2.4),
+  and reclaimed blocks pay their turf income
 
   Topple 3 gangs → the CROWN opens: the Landlord's tower (final raid)
 
 GO DOWN in a raid → "OFFICER DOWN" → extracted, raid failed, 1 STRIKE,
                     what you carried that raid is lost, the gang is on alert
+BACKING HITS ZERO → 1 STRIKE (§2.5)
 CASE ENDS → win (the Landlord taken), 3 strikes (Internal Affairs pulls you), or day 30 (demolition)
-          → Merit banked → next case is a NEW seeded city
+          → Merit banked → next case is a NEW seeded city; the precinct and the
+            surviving roster carry over
 WIN       → big Merit payout → unlocks "Demolition Day" hard mode
 ```
 
@@ -157,13 +173,14 @@ Within a block, nothing changes. Enemies spawn in waves from a threat budget, yo
 
 **Two currencies:**
 - **Seized Cash.** Dropped by enemies and kept through the case. You lose half when you go down, and all of it when the case ends. Spent with the Informant and on tips.
-- **Merit** (commendation points). Earned for blocks cleared, arrests, elites, gangs toppled and officers brought home alive. It's banked after every raid and kept forever. Spent on the Captain's Board.
+- **Merit** (commendation points). Earned for blocks cleared, arrests, elites, gangs toppled and officers brought home alive. It's banked after every raid and kept forever. Spent in the Captain's Office to reopen precinct rooms, and in the Squad Room to recruit.
 
-**What carries through a case:** Intel perks, Seized Cash, and **seized weapons** (every weapon you pick up in a raid goes into the case's evidence locker and can be drawn at the Armory for later raids). All of these are lost when the case ends. The roster, ranks and Board unlocks are permanent.
+**What carries through a case:** Intel perks, Seized Cash, Backing, reclaimed blocks, and **seized weapons** (every weapon you pick up in a raid goes into the case's evidence locker; you draw from it at the Armory, and your officers carry it in their kits). All of these are lost when the case ends. The roster (minus the fallen), ranks and reopened rooms are permanent.
 
 **What makes you a cop, not just a gunman:**
 - **The squad.** Up to 3 allied officers follow you on raids (see §2.1).
 - **Arrests.** A badly wounded enemy can be cuffed instead of killed (use on them, with the handcuff sound). That earns Merit and a bigger drop.
+- **Surrender.** Once the leader of a block is down (or the objective is done) and about 75% of the crew is out, the rest **break**: they drop their guns and kneel for 20 seconds. Cuff as many as you can for Merit; the rest run for the map edges. "BLOCK SECURE: head for the exit" appears, so there's no slow cleanup of the last few stragglers.
 - **Undercover openers** (M9). Some blocks start with your cover intact: enemies aren't hostile yet, and you can line up your squad and make silent takedowns. Firing, being seen holding a gun, or a squadmate getting spotted blows your cover, and the whole block goes loud.
 - **Scouting before you hit a door.** Every gang fights differently, and you only learn how by working the case: informants, stakeouts and interrogating the people you arrest (§2.4).
 - **Curfew Heat.** Each block has a soft timer. When it runs out, the gangs call in reinforcements. Clearing quickly earns bonus Cash.
@@ -171,24 +188,31 @@ Within a block, nothing changes. Enemies spawn in waves from a threat budget, yo
 ### 2.1 The squad (allied cops)
 
 **Roster (permanent).**
-- Officers are recruited in the Squad Room with Merit.
-- Each officer has a generated name, a class, and a rank that improves over raids: Officer → Corporal → Sergeant.
+- Officers are recruited in the Squad Room with Merit, by class, each with a price. An **AUTO** button fills the roster's gaps with the cheapest useful mix.
+- Each officer has a generated name, a class, and a rank that improves over raids: Officer → Corporal → Sergeant. **Rank adds kit slots** (§2.7), so veterans carry more.
+- The roster header counts officers by class, so gaps are easy to see.
 - Squad size starts at 1 slot and unlocks up to 3.
+- **Losses are permanent.** An officer who bleeds out on a raid is **killed in the line of duty**: removed from the roster for good, with their name, rank and raids added to the **memorial wall** in the Squad Room. Keeping your Sergeants alive is half the game.
 
 **In a raid:**
 - **Following.** Officers follow you in formation, fight on their own, and travel with you from map to map. Their health carries between blocks.
-- **Orders** on three keys:
+- **Orders** on five keys:
   - **Regroup / Follow**
-  - **Hold Position**
-  - **Move There** (to the spot you're aiming at)
+  - **Hold Position**: officers take the nearest spot near you that's out of the enemy's sightline, not the exact point
+  - **Move There** (to the spot you're aiming at, again preferring cover)
+  - **Hold Fire**: they don't shoot unless shot at (for undercover openers, M9)
+  - **Weapons Free**: back to normal
+- **A squad log** on the HUD shows orders and callouts ("Holding!", "Reloading!", "Officer down!", "We've been spotted!", "They're running!").
 - **No friendly fire.** Your shots and explosions never hurt them, and theirs never hurt you.
-- **Officer Down.** At 0 HP an officer drops and bleeds out over 20 seconds. You or a Paramedic can revive them (stand next to them and press Use for 2 seconds), and they come back at 40% HP. If no one gets to them in time, they're **out for the rest of the raid**.
+- **Officer Down.** At 0 HP an officer drops and bleeds out over 20 seconds. You or a Paramedic can revive them (stand next to them and press Use for 2 seconds), and they come back at 40% HP. A downed officer you carry out (they're near the exit when you leave) survives. **If no one gets to them in time, they die**, permanently (see Roster above).
 - **Catch-up.** If an officer falls more than 1,024 units behind and you can't see them for 3 seconds, they quietly teleport to a free spot behind you. This also covers rooftop jumps they can't make.
 
 **After a raid:**
 - Officers who survived gain XP.
-- Officers who were knocked out of the raid spend **2 days in the hospital** (CLOSE DAY counts), so you'll bring someone else.
-- Bringing your whole squad home earns bonus Merit.
+- Officers who went down at any point (revived or carried out) spend **2 days in the hospital** (CLOSE DAY counts), so you'll bring someone else. The Infirmary (§2.6) cuts that to 1 day.
+- Officers who bled out are gone. Each one costs Backing (§2.5).
+- Bringing your whole squad home earns bonus Merit and Backing.
+- **Taking over an officer when you go down** (as *Hamburger Hill* does) is **not** in the standard game: you play one detective. It may come back as a Demolition Day rule (M10).
 
 **Classes** (see §6.5 for stats): Patrol Officer (SMG, all-rounder), Breacher (shotgun, tanky, kicks open doors ahead of you), Marksman (rifle, holds overwatch from range), Paramedic (light SMG, heals you and revives faster).
 
@@ -229,6 +253,10 @@ The wall terminal at Checkpoint 9 opens a **top-down map of the Bricks**, built 
 - The district inside the Wall is split into **turfs**, each held by a gang, with the **Crown** tower in the middle.
 - Each turf shows its gang's **mansion** (their stronghold building), plus a few side sites: stash houses, a lab, a lookout roof.
 - You select a site and read its **dossier** in the inspector panel, then press **RAID** or **STAKE OUT**. You can also open the case file: days left, strikes, toppled gangs, and the evidence on the Landlord.
+- **Every turf shows its estimated crew size** on the map: a range (±40%) with no intel, exact from intel level 1. You can judge a raid before you commit.
+- **The top bar** shows the day, Cash with **tomorrow's turf income** next to it, Backing, strikes, and the weather.
+- **Under-attack cards** list the reclaimed blocks a gang is counter-raiding today.
+- **Side jobs** (0–2 a day) sit on the map as their own markers. Selecting one opens a **briefing card**: a picture, two lines of orders from the Captain, the reward, and **Accept** or **Decline**. Types: Foot Patrol (walk a route to a far checkpoint; easy; Cash and officer XP), Evidence Run, Informant Pickup (an escort), Warrant (arrest a named lieutenant). Accepting takes the day.
 
 **Each case seeds a new Bricks.**
 - **4 of the 6 gangs** appear on the map, in random turfs.
@@ -262,30 +290,84 @@ The wall terminal at Checkpoint 9 opens a **top-down map of the Bricks**, built 
 **The gang tick (end of every day).** This is a much smaller version of Corpo Wars' daily sim (`citysim.zs`):
 1. **Alert decays** by 1 (from 0 to 3), unless you hit that gang today.
 2. **Fortifying.** A gang you raided or got spotted by goes **+1 alert**: bigger budget, more elites, cover blows faster, and higher informant prices.
-3. **Expansion.** A toppled gang's turf is absorbed by its strongest neighbor. Their roster starts showing up in its blocks, and the neighbor gets stronger.
+3. **Reclaimed blocks and counter-raids.** A toppled gang's turf becomes a **reclaimed block**: the department holds it, and it pays **turf income** every day (§6.10). A gang at alert 2 or higher that borders a reclaimed block may **counter-raid** it. The next day it shows as UNDER ATTACK. If you defend it that day (the **Hold the Block** objective, §6.6), you keep it and gain Backing. If you don't, or you lose, the attacker absorbs the turf: its roster starts showing up there, it gets stronger, and you lose the income and Backing. At most one counter-raid at a time, two after day 20. Sometimes two gangs hit the same block at once: a two-front defense.
 4. **Retaliation.** A gang at alert 3 may hit back: an officer is hospitalized, an informant goes quiet for 2 days, or your next approach block is an ambush.
 5. **The Crown grows.** Every 5 days the Crown gains a defense. Each gang you topple **removes** a matching one: no more lookouts after the Stoop Kings fall, no alarm after the Collectors, no rooftop snipers after the Wall Watch.
-6. **News.** One line of street news per day hints at what moved.
+6. **Turf income** from every reclaimed block is paid, and new side jobs are rolled.
+7. **News.** One line of street news per day hints at what moved.
+
+### 2.5 Backing
+
+How much City Hall, the brass and the street still back the department, from 0 to 100. Shown on the city map and the results screen. It starts each case at 60.
+- **It falls** when officers die, when residents die by your hand or the squad's, when you retreat from a raid, when you go down, and when a reclaimed block is lost.
+- **It rises** with clean raids (no officers lost, no residents hurt), arrests, toppled gangs and defended blocks.
+- **High Backing (75+)** makes informant tips 20% cheaper and adds a side job each day.
+- **Low Backing (25 or less)** adds a day to hospital stays and takes Radio for Backup out of the shop.
+- **At 0** you take a **strike** (Internal Affairs opens a file) and Backing resets to 40. Strikes stay the only way to lose a case.
+
+The numbers are in §6.10.
+
+### 2.6 Rebuilding the precinct (the meta)
+
+Checkpoint 9 starts as a ruin: most of it is boarded up, dark and flooded. The only rooms working are the Squad Room, the Armory cage and the wall terminal. **Merit reopens rooms**, in the Captain's Office, and each room is a group of permanent unlocks (§6.4). A reopened room is visibly back in the hub: lights on, furniture in, someone at the desk.
+
+| Room | What it gives |
+|---|---|
+| **Squad Room** (open) | The roster, recruiting, the memorial wall |
+| **Armory cage** (open) | Your loadout; the Evidence Locker of seized weapons |
+| **Captain's Office** | Squad slots 2 and 3, Long Case, Case Files |
+| **Motor Pool** | The **unmarked van** way in (§2.7); Radio for Backup in the shop |
+| **Radio Room** | Cheaper informant tips; a third side job each day; Backing shown as a trend |
+| **Infirmary** | Hospital stays 2 → 1 day; Precinct Doc (+max health); Trauma training |
+| **Range** | Range Qualification (faster reloads); Field Training (recruits start as Corporals) |
+| **Crime Lab** | Case Detective (intel 1 on every gang); interrogations more likely |
+| **Holding Cells** | Arrests are worth more Merit; interrogations reveal more |
+| **Roof Access** | The **rooftop** way in (§2.7); the second dash (M11) |
+
+### 2.7 The deploy screen (before every raid)
+
+Raids, defenses and side jobs start on one screen, laid out like *Hamburger Hill*'s: **roster on the left, squad slots in the middle, the selected officer's kit on the right**, and a strip along the bottom that totals the squad's Molotovs, medkits, debris and flashbangs.
+
+- **When:** Day, Dusk or Night.
+  - **Day:** the crew is awake and posted; more residents on the streets (more civilian risk).
+  - **Dusk:** in between.
+  - **Night:** genuinely dark (the flashlight matters); a third of the crew is asleep or off post, so undercover openers are likelier; ambush gangs (the Quiet) are stronger. The enemy count doesn't change.
+  - **Weather** is rolled each day from the case seed and shown here: clear, rain or fog. Fog shortens enemy sight (M9); rain is cosmetic.
+- **How you go in** (where the approach block starts):
+  - **On foot** from the checkpoint (always)
+  - **Unmarked van** (Motor Pool): start deeper in the block with your cover intact
+  - **Over the roofs** (Roof Access): start on a perch above the street
+  - **Through the tunnels** (intel level 2 on a gang whose turf has tunnels): start in a basement
+- **Squad:** drag officers into the slots, or press **AUTO** (best available mix, healthiest first). Officers in the hospital are greyed out with their days left.
+- **Kits** (one panel per officer):
+  - **Primary:** the class's issue weapon, or a matching **seized weapon** from the Evidence Locker (Patrol: Uzi, AK; Breacher: shotgun; Marksman: AK; Paramedic: Uzi, Colt). A seized weapon changes the officer's damage type and fire pattern. Only weapons from `Weapons/` exist.
+  - **Pouches** for consumables: Molotov, medkit, debris, flashbang. Officer 1 pouch, Corporal 2, Sergeant 3.
+  - **Vest** (if one is in the locker): armor for that officer.
+  - Kits come out of the Evidence Locker and go back after the raid. Whatever a fallen officer carried is lost.
+- **ASSAULT** (or **DEFEND**) starts the raid.
+
+The **staging flat** stays: it's where you pick a perk, shop and choose your entry into the mansion itself (§4.3 NBC_SafeApartment).
 
 ---
 
 ## 3. Feature scope
 
 **MVP, to build first (M0–M8):**
-1. The case and raid loop: 30 days, 3 strikes, Officer Down extraction, raids of approach + staging flat + 2 floors + leader
-2. Seeded, freshly generated blocks (Corpo Wars site kits) from the case seed
-2b. **The city map**: turfs, 4 of 6 gangs per case, dossiers with intel levels, informant tips, interrogations, and the daily gang tick (§2.4)
-3. A spawn director that spends a threat budget, enemy tiers by depth, and waves
+1. The case and raid loop: 30 days, 3 strikes, Officer Down extraction, raids of approach + staging flat + 2 floors + leader, and a graded results screen
+2. Seeded, freshly generated blocks from **our own level kits** (the Corpo Wars site kits, ported and rebuilt for the Bricks; §4.4), generated from the case seed
+2b. **The city map**: turfs, 4 of 6 gangs per case, dossiers with intel levels, crew estimates, informant tips, interrogations, and the daily gang tick (§2.4)
+2c. **The deploy screen and the turf war**: time of day, how you go in, squad kits from the Evidence Locker, reclaimed blocks with turf income, counter-raids and Hold the Block, Backing (§2.4, §2.5, §2.7)
+3. A spawn director that spends a threat budget, enemy tiers by depth, waves, and surrender
 4. Elite enemies (random modifiers)
-5. **The allied cop squad**: following, fighting, orders, downing and reviving, carrying over between maps, classes, a roster with ranks, and a hospital for officers knocked out of a raid
+5. **The allied cop squad**: following, fighting, orders, downing and reviving, carrying over between maps, classes, a roster with ranks, a hospital, and permanent deaths
 6. Seized Cash and the Informant shop
 7. A choice of 1 of 3 perks between blocks, including squad perks
-8. Permanent meta progression (Merit → Captain's Board, Squad Room)
-9. A custom HUD (player stats, magazine and reserve, debris count, squad status strip, gang and floor, day and strikes, objective)
+8. Permanent meta progression: **rebuilding the precinct** room by room with Merit (§2.6)
+9. A custom HUD (player stats, magazine and reserve, debris count, squad status strip and log, gang and floor, day and strikes, objective)
 10. **Reloading for every firearm** (§2.2)
 11. **Quick-throw bricks and debris** from the level (§2.3)
 
-**After the MVP (M9–M12):** raid objectives, undercover openers and arrests (M9); Curfew Heat, boss blocks and a win state (M10); a parkour movement kit (M11); and content and polish (M12).
+**After the MVP (M9–M12):** raid objectives, side jobs, undercover openers and arrests (M9); Curfew Heat, boss blocks and a win state (M10); a parkour movement kit (M11); and content and polish (M12).
 
 ---
 
@@ -306,6 +388,7 @@ New Bricks City/
 ├─ PLAN.md                            (this file)
 ├─ docs/STATUS.md                     (current state; Codex updates it after each milestone)
 ├─ docs/corpowars-port-map.md         (what each Corpo Wars system needs when ported)
+├─ docs/hamburger-hill-analysis.md    (what the campaign layer borrows from Hamburger Hill)
 ├─ reference/                         (READ-ONLY source to port from, never loaded)
 │  ├─ corpowars/                      (Corpo Wars' full ZScript, definition lumps, Design Docs, credits)
 │  └─ weapons/<pack>/                 (each weapon pack's INFO, OLDCODE, KEYCONF; FragGrenade's code)
@@ -353,11 +436,14 @@ How the smoke test works:
 
 | System | Where | How it works |
 |---|---|---|
-| **NBC_RunData** | `run_data.zs` | A `Thinker` set to `STAT_STATIC`, so it survives map changes and is stored in savegames. It holds the **case**: the seed and RNG step, the day, strikes, Cash, perks, the evidence locker of seized weapons, and the **gang states** (for each gang: turf, alert, intel level, revealed traits, toppled). It also holds the **current raid**: the gang, the floor index, Heat, the chosen entry, and the **squad snapshot** (for each officer: roster ID, health, downed or out state). There's a single instance, found with `NBC_RunData.Get()`. |
+| **NBC_RunData** | `run_data.zs` | A `Thinker` set to `STAT_STATIC`, so it survives map changes and is stored in savegames. It holds the **case**: the seed and RNG step, the day, strikes, Cash, perks, the evidence locker of seized weapons, and the **gang states** (for each gang: turf, alert, intel level, revealed traits, toppled). It also holds **Backing**, the **reclaimed blocks** and any counter-raids, today's **side jobs** and **weather**, and the **current raid**: the gang, the floor index, Heat, the time of day, the way in, the chosen entry, and the **squad snapshot** (for each officer: roster ID, health, downed, carried-out or killed state, and their kit). There's a single instance, found with `NBC_RunData.Get()`. |
 | **NBC_RunManager** | `run_manager.zs` | An `EventHandler`. It starts cases (seeding the city and the gangs), runs the day (raid, stakeout or close), and sequences a raid: approach → staging flat → floors → leader. It sets the kit, variant, seed and objective for each block and calls `Level.ChangeLevel(map, 0, CHANGELEVEL_NOINTERMISSION)`. On Officer Down it records a strike and on a raid's end it banks Merit; both return to the hub with `ChangeLevel("NBC_HUB", 0, CHANGELEVEL_RESETINVENTORY \| CHANGELEVEL_RESETHEALTH \| CHANGELEVEL_NOINTERMISSION)`. |
 | **NBC_Gangs** | `gangs.zs` + `nbc/gangs.txt` | Gang definitions read from the data file (§6.9): roster per tier, damage-factor profile, signature-tactic flags, morale, mansion kit variants, leader, Crown defense, and the random-trait pool. It applies the profile to every enemy the Director spawns, and runs the **daily gang tick** (§2.4). |
 | **NBC_CityMap** | `city/citymap.zs`, `city/citymapui.zs` | Ported from Corpo Wars' city map (data plus a full-screen ZScript menu). It draws the Bricks from `nbc/bricksmap.txt` (the Wall, 6 turfs, the Crown, Checkpoint 9, mansions and side sites), colors turfs by gang, and shows the inspector dossier with intel-gated fields (`???`), the case file and the news line. **RAID**, **STAKE OUT**, **BUY TIP** and **CLOSE DAY** send netevents that are checked in play scope. |
-| **NBC_Meta** | `meta.zs` + `CVARINFO` | Permanent progress, stored in archived `server` CVars: `nbc_merit`, `nbc_unlocks` (a bitfield), `nbc_best_toppled` (most gangs toppled in one case), `nbc_cases`, `nbc_wins`, and `nbc_roster`. The roster is a string holding each officer's ID, name, class, XP and hospital flag. Changing it goes through a parser and writer in `meta.zs`. |
+| **NBC_Meta** | `meta.zs` + `CVARINFO` | Permanent progress, stored in archived `server` CVars: `nbc_merit`, `nbc_unlocks` (a bitfield, grouped by precinct room, §6.4), `nbc_best_toppled` (most gangs toppled in one case), `nbc_cases`, `nbc_wins`, `nbc_roster` and `nbc_memorial`. The roster is a string holding each officer's ID, name, class, XP and hospital days. The memorial holds the fallen (name, rank, raids, the case and day they died). Changing either goes through a parser and writer in `meta.zs`. |
+| **NBC_Precinct** | `precinct.zs` | Runs on NBC_HUB. On `WorldLoaded` it reads `nbc_unlocks` and brings each reopened room to life: unbars its door, raises its lights, spawns its furniture and its NPC from map things tagged by room (`NBC_RoomMarker`, DoomEdNum 26000+, arg0 = room ID). Closed rooms stay boarded and dark. |
+| **NBC_Deploy** | `deploy.zs`, `ui/deploy_menu.zs` | The deploy screen (§2.7): time of day, way in, squad slots with AUTO, and per-officer kits drawn from the Evidence Locker. The menu reads RunData and the roster, and sends one `nbc_deploy` netevent that play scope validates before the raid starts. |
+| **NBC_Morale** | `morale.zs` | Tracks the crew still standing in a block. When the leader or objective is done and about 75% of the crew is out, the rest surrender (kneel, unarmed, cuffable for 20 seconds), then flee to the map edge and despawn. Prints "BLOCK SECURE". |
 | **NBC_Player** | `player.zs` | A custom `PlayerPawn` and the only player class. It defines weapon slots with `Player.WeaponSlot`, the start inventory, and the Officer Down intercept: an override of `DamageMobj` stops death during a raid and hands off to the RunManager. In the hub, damage is ignored. |
 | **NBC_SpawnSpot** | `spawn_spot.zs` | An invisible map thing (DoomEdNum 26000+). Its args set the role: 0 is ground, 1 is a sniper perch or balcony, 2 is reinforcements only, 3 is an undercover idle spot. |
 | **NBC_Director** | `director.zs` | A per-level `EventHandler`. It computes the threat budget from depth, Heat and objective, then spawns waves from the tier tables at spots the player can't see. It tracks living enemies and tells the objective when they're cleared. |
@@ -367,18 +453,33 @@ How the smoke test works:
 | **NBC_Objectives** | `objectives/*.zs` | One class per raid objective (§6.6). The objective owns the exit's lock state and the HUD objective text. |
 | **NBC_Exit** | `exit.zs` | The extraction point (a squad car or an open stairwell door). It stays locked until the objective completes, then touching it calls `RunManager.AdvanceBlock()`. Downed allies nearby get carried out; officers who are already out stay out. |
 | **NBC_Ally** (base) | `squad/ally.zs` | A ZScript actor class with one subclass per officer class, each inheriting the sprites and states of the pack actor listed in §0. It has `+FRIENDLY`, removes `+NOTARGET` and `+NOINFIGHTING`, and fires `AllyTracer` (or our own NBC tracers, never with the `"Enemy"` damage type). It runs its own state machine (follow, combat, hold, move-to, downed, reviving), uses **custom target-finding** (the nearest visible hostile within 1,536 units, preferring enemies that are attacking the player), avoids standing in the player's line of fire, and catches up by teleporting. Its `DamageMobj` override ignores damage from the player and other allies. It has `DamageFactor "Fire", 0`, so it's immune to the player's Molotov fire. At 0 HP sends the officer to the downed state instead of dying. Its `Used()` override handles reviving. |
-| **NBC_SquadManager** | `squad/squad_manager.zs` | An `EventHandler`. On `WorldLoaded` it spawns the officers in RunData's squad snapshot near the player start, in formation. Before the level changes it writes their health and state back. It handles order netevents (`nbc_order 0/1/2`), retargets enemies onto allies (each second, an enemy targeting the player has a 35% chance to switch to a closer ally it can see), and gives XP after the raid. |
-| **NBC_Roster** | `squad/roster.zs` | Recruiting, ranks (applies stat bonuses), hospital rotation, and name generation (first-name and last-name lists in LANGUAGE). |
+| **NBC_SquadManager** | `squad/squad_manager.zs` | An `EventHandler`. On `WorldLoaded` it spawns the officers in RunData's squad snapshot near the player start, in formation. Before the level changes it writes their health and state back. It handles order netevents (`nbc_order 0–4`: follow, hold, move, hold fire, weapons free) and the squad log, retargets enemies onto allies (each second, an enemy targeting the player has a 35% chance to switch to a closer ally it can see), and gives XP after the raid. |
+| **NBC_Roster** | `squad/roster.zs` | Recruiting by class (with AUTO), ranks (stat bonuses and kit slots), hospital rotation, deaths in the line of duty (to `nbc_memorial`), and name generation (first-name and last-name lists in LANGUAGE). |
 | **NBC_ReloadWeapon** | `weapons/reload_weapon.zs` | A ZScript `Weapon` base class that all firearms inherit from. Settings per weapon: magazine class and size, reserve class, reload style (whole magazine or shell by shell), reload time, extra time when empty, the commit point, the sounds (magazine out, magazine in, rack), and either the weapon's own reload frames or the generic dip. It handles auto-reload, the dry click, cancelling and the perk modifiers. Each imported firearm gets **ported to a ZScript subclass** (`NBC_Colt45`, `NBC_Dual92`, `NBC_PumpShotgun`, `NBC_MicroUzi`, `NBC_AK47`) that keeps its original sprites, sounds, damage and fire timing. |
 | **NBC_QuickThrow** | `weapons/quick_throw.zs` | A hidden inventory item on the player. `KEYCONF` defines `+nbc_throw` / `-nbc_throw` aliases → netevents. Pressing G starts a throw on an overlay layer (the finished `BRKH` hold frames, then the frag's `HGT2` throw frames), lowers the current weapon's sprite and blocks it from firing; holding builds the wind-up; releasing throws the next debris type. **Fallback** if overlays misbehave: a slot-0 "Debris" weapon built straight from the frag grenade code. |
 | **NBC_Debris** | `weapons/debris.zs` | The carried debris items (counts and limit), the thrown projectiles (bounce settings adapted from `D3Grenade1`, no explosion, `+FORCEPAIN`), the impact results (a reusable brick, fragments, or a noise event for M9), the loose pickups, and `NBC_RubblePile` (map thing 26000+; Use gives pieces until it runs out). |
 | **NBC_Arrest** | `arrest.zs` | Below 20% HP, an enemy has a chance to stagger for 3 seconds. Using it during the stagger cuffs it: the HCUFF sound plays, it's removed with no corpse, and it gives Merit and a drop. |
 | **NBC_SafeApartment** | `safe_apartment.zs` | Runs on the **staging flat** (map NBC_SAFE), once per raid between the approach and the mansion: 3 Intel perk pedestals, the Informant NPC who opens the shop, a first-aid station where you pay to heal officers, and an **entry board**. With intel level 3 the entry board lets you pick front, back, service or roof; otherwise the entry is random. |
-| **UI** | `ui/hud.zs`, `ui/shop_menu.zs`, `ui/board_menu.zs`, `ui/squad_menu.zs` | A `BaseStatusBar` HUD (player stats, the squad strip with name, class, health, order and bleed-out timer, the objective, Heat, and the day and strikes) plus ZScript menus built on Corpo Wars' `CW_UiMenu` framework. The UI only reads game state. Changes go through `SendNetworkEvent` and are checked in play scope. |
+| **NBC_Results** | `ui/results_menu.zs` | The after-action screen at the end of every raid, defense and side job: the title ("<Turf> Taken", "<Block> Held", "Raid Failed"), kills out of total, arrests, accuracy, health lost, time and a **letter grade** (§6.11); every officer's portrait with kills and a DOWN, KILLED or promotion stamp; seized weapons with counts; Cash, turf income, Merit and the Backing change. |
+| **UI** | `ui/hud.zs`, `ui/shop_menu.zs`, `ui/board_menu.zs`, `ui/squad_menu.zs` | A `BaseStatusBar` HUD (player stats, the squad strip with name, class, rank, health, order and bleed-out timer, the squad log, the objective, Heat, and the day and strikes) plus ZScript menus built on Corpo Wars' `CW_UiMenu` framework. The UI only reads game state. Changes go through `SendNetworkEvent` and are checked in play scope. |
 
 **Scope rules Codex must follow.** Game state changes happen in play scope. The HUD and menus are ui scope and only *read* state; they send changes as network events. Don't use ACS unless a map truly needs it.
 
 ### 4.4 Levels: "the Bricks"
+
+**Decision (owner, 2026-10-27): levels go back to our own architecture.** The goal is levels that look as true to the setting as possible, and Obsidian can't get there:
+- **Obsidian builds Doom levels.** It joins abstract rooms with lifts, odd-shaped halls and arenas. A city theme can re-skin that, but it can't produce an apartment block's logic: stacked identical floors, a corridor with flats on both sides, two stair cores, an elevator, fire escapes, real room sizes.
+- **Its maps are built outside the game** into a fixed pool, so the case seed can't shape them, and every rebuild is a manual step.
+- **Our own kits do what Obsidian can't.** Corpo Wars' site kits carve real building plans from the case seed inside the game, and they're the owner's own tested code. They're boxier, so the look comes from scale, facades, props and lighting (below).
+
+**Obsidian is frozen.** NBC_CT01–04 stay in the game as the M2 slice's districts until M2b replaces them, then they're dropped from the district pool. `tools/Obsidian/` stays in the repo as a record; don't extend it. Its Corpo Wars furniture classes (`nbc/zscript/cw/`) are reused by the kits' `Dress()`.
+
+**Scale (every kit and hand-built map uses it).** About 32 map units to a metre, bent where Doom's actors need room:
+- floor to floor 160, flat ceilings 120–128, lobby and shop ceilings 160–192
+- doors 64 wide and 96 high; double doors 128
+- corridors 96–128 wide (the squad has to pass you); stairs 16 high and 32 deep per step, stairwells 128 wide
+- windows start 40 above the floor; rows of identical windows on every facade
+- streets: a 256–384 roadway between 96–128 sidewalks
 
 Doom engines can't create new geometry at runtime, but they can **move** it. Corpo Wars' site kits (§0.1) use that: each kit map is a fixed grid of closed-off sectors, and when the map loads the kit code picks a layout from the seed and raises or lowers floors and ceilings to carve out rooms, doors, windows and fire escapes. It then furnishes and lights them, and marks entries and objective rooms. So **every block in every case is a new layout**, with no map files to author per block. On top of that come randomized objectives, spawns, loot and elite modifiers.
 
@@ -390,21 +491,23 @@ Doom engines can't create new geometry at runtime, but they can **move** it. Cor
 - Clotheslines, rooftops connected by planks and short jumps
 - Basement drug labs
 - The concrete Wall itself, with floodlights and checkpoint booths
+- **The megacity beyond the Wall:** the skyline in every window and over every street (the Corpo Wars `CSKY` sprites and sky), an elevated highway across one edge of some street blocks, neon and shop signs (Corpo Wars sign sprites), subway entrances (the K4 transit variant), police barricades and dead squad cars
 
-Use the Corpo Wars textures (brick, concrete, the AD and AX sets) that the kits already reference, plus Freedoom's bricks. Add graffiti and boarded-window textures in M12. The look matters a lot here.
+Use the Corpo Wars textures (brick, concrete, the AD and AX sets) that the kits already reference, plus Freedoom's bricks. Add graffiti and boarded-window textures in M12. The look matters a lot here: keep a mood board of real housing projects and city blocks (private, never shipped) and compare screenshots against it at every level milestone.
 
 **Climbing the towers, a floor per block.** Doom maps are 2.5D, so floors can't sit on top of each other. Instead of faking a whole tower in one map, **each block in the Stacks and the Crown is one floor**, and the far stair core is the exit to the next floor up. Climbing the tower *is* the raid's progress. Windows look out on the Corpo Wars city-skyline sprites so the height reads. The rooftop variant is the top of a tower.
 
 **Three sources of maps:**
-1. **Generated blocks: Corpo Wars site kits, ported and restyled for the Bricks (M2).** These are `NBC_K1` (street, from K01), `NBC_K2` (residential floor and rooftops, from K02) and `NBC_K4` (basement, garage and tunnels, from K04). Each is a template map from `genmap.py` plus a kit class. The variant and layout come from the case seed. The kit's own pipeline places the rooms, doors, furniture, lights and entries. **The NBC layer adds:**
+1. **Generated blocks: Corpo Wars site kits, ported and rebuilt for the Bricks (M2b).** These are `NBC_K1` (street, from K01), `NBC_K2` (residential floor and rooftops, from K02) and `NBC_K4` (basement, garage and tunnels, from K04). Each is a template map from `genmap.py` plus a kit class. The variant and layout come from the case seed. The kit's own pipeline places the rooms, doors, furniture, lights and entries. **The NBC layer adds:**
    - spawn spots: from patrol and people rooms; windows and balconies become perches
    - the squad start and the extraction point: at the kit's entries
    - objective markers: from the kit's objective-room picker
    - rubble piles
    - residents: in civilian rooms
+   - defense spots for Hold the Block: a fortifiable building on the street kit, with the enemy's approach from the map edges
 
-   Kit layouts already keep doors and corridors walkable for Doom monsters. Check that they fit the squad too, and widen them if not.
-2. **Hand-built hero maps (you build these in Ultimate Doom Builder).** These are Checkpoint 9, the Safe Apartment and the three boss arenas. Use UDMF format with the "GZDoom: Doom 2 (UDMF)" config, and drop the NBC things into place.
+   Kit layouts already keep doors and corridors walkable for Doom monsters. Check that they fit the squad too, and widen them to the scale above if not.
+2. **Hand-built hero maps (you build these in Ultimate Doom Builder).** These are Checkpoint 9 (with every precinct room built in, boarded up until it's reopened, §2.6), the Safe Apartment and the three boss arenas. Use UDMF format with the "GZDoom: Doom 2 (UDMF)" config, and drop the NBC things into place.
 3. **Pools.** `map_pools.zs` lists, per gang, which kit and variant their approach block, mansion floors and leader floor can be, with weights and the objectives each variant supports (§6.7, §6.9).
 
 **Turfs and mansions.** The Bricks map has **6 turfs** around the Crown. Each case puts 4 gangs on them; two gangs hold a second turf each and are stronger for it.
@@ -419,7 +522,7 @@ Which tiers and turfs feel hardest comes from the gang (§6.9), not from a fixed
 ## 5. Milestones and Codex prompts
 
 **How to work with Codex:**
-- **M0 and M0b are done. Start Codex at M1.** Read `docs/STATUS.md` first.
+- **M0 through M2 are done. Start Codex at M2b.** Read `docs/STATUS.md` first.
 - Use **Codex CLI or the IDE extension running locally on Windows**, not Codex Cloud. It has to run `uzdoom.exe` for smoke tests.
 - Give it **one milestone per task**. Each prompt below can be pasted as-is. Codex reads `AGENTS.md` automatically.
 - After each milestone, **you** play through the checklist (Codex can't play), commit, and paste any bugs back as a follow-up, with the exact console output.
@@ -517,14 +620,38 @@ Obsidian can't run inside UZDoom, so districts are built ahead of time into a **
 3. Take down the leader, then exit → gang **toppled**. Exit early → retreat (day lost, gang on alert). Lethal damage → **OFFICER DOWN** → strike, back to the hub.
 4. Back at the hub: a results card, the day advances. Topple all 4 → case closed. 3 strikes or day 30 → case over.
 
-The full city map, staging flat, intel and gang tick stay in M7b and later. The ported kits (old M2) are dropped; their props survive as the Obsidian room sets.
+The full city map, staging flat, intel and gang tick stay in M7b and later.
+
+*Superseded in part (owner, 2026-10-27): levels go back to our own kits (§4.4, M2b). The hub, raid board, gangs, RunData, squad, leader and Officer Down code all stay; only the Obsidian districts are replaced.*
 
 **Done when:** you can start a case at the hub, raid every district, topple a gang, go down and take a strike, and close or lose the case.
 
 ---
 
+### M2b — Our own level architecture: the Bricks kits
+**Prompt:**
+> Do PLAN.md milestone M2b (§4.4, §6.7, the "Runtime level generator" row of §0.1). Read `reference/corpowars/Design Docs/site-kits.md` and the "Site kits" section of `docs/corpowars-port-map.md` first. Port the kit base (`kitgen.zs`) and three kits into `nbc/zscript/cw/`: `kit_street.zs` (K01), `kit_residential.zs` (K02) and `kit_underground.zs` (K04), plus `procgen.zs`, `stairs.zs` and `themes.zs`. **Reuse** the furniture, kitprops and decor classes already ported in `nbc/zscript/cw/`; don't port them again. Cut every tie to Corpo Wars' mission layer listed in the port map (contracts, ledger, city, CW guards, bystanders, the drop crate): replace guard placement with NBC_SpawnSpot output, bystanders with resident spots (empty until M9), and extraction with NBC_Exit. Rename a class to `NBC_` once you change what it does.
+>
+> **Rebuild the kits for the Bricks, true to the setting:** apply the scale in §4.4 (widen corridors and doors where the squad needs it), the textures and dressing in §6.7, the city skyline outside every window and over every street, and lighting per room. K02 tenement is the default tower floor: a corridor between two stair cores, flats on both sides with real rooms (living room, kitchen, bedroom, bathroom), an elevator lobby, fire escapes. K02 rooftops is the top of a tower. K01 becomes the street block at the foot of the towers. K04 is basements, garages, tunnels and the subway (transit variant).
+>
+> **The NBC layer:** spawn spots from patrol and people rooms (perches from windows and fire escapes), the squad start and NBC_Exit at the kit's entries, rubble piles in derelict and outdoor rooms, resident spots in civilian rooms, objective markers from the kit's planner, and a defense spot on K01 (for M7c). The kit variant and layout come from the case RNG in `NBC_RunData`, never bare `random()`.
+>
+> **Switch the M2 slice onto the kits:** replace `nbc/districts.txt` with `map_pools.zs`, which lists per gang the kit and variant for their approach block and mansion floors (§6.9). For now a raid is **one block**: the gang's first mansion floor, with the leader placed in its deepest objective room (M3 adds the full approach → staging flat → floors sequence). Drop NBC_CT01–04 from the district pool, but leave the maps loadable. Remove placed monsters from kit maps as the slice already does.
+>
+> **Debug:** `nbc_kittest <kit> <variant> <seed>` loads a kit directly; `nbc_debug_kit` prints the rooms, entries, spawn spots and objective rooms. Run every variant × 3 seeds and fix any `Kit: <room> is unreachable` message.
+
+**Done when:** every raid in the slice runs on a seeded kit floor that reads as a real building, and the same seed gives the same floor.
+
+**You check:**
+- `nbc_kittest` every K02 and K01 variant with 3 seeds. Walk them: do they look like a housing tower and a city street? Compare screenshots with your mood board.
+- Can two officers follow you through every corridor, door and stairwell without blocking you?
+- Raid every gang in a case and confirm their floors use the right kit variants.
+- Look out of the windows: skyline, rows of windows on the facades opposite.
+
+---
+
 ### M3 — The case and raid loop (the heart of the roguelite)
-*Note (2026-10-27): M2's vertical slice already delivers the core of this on Obsidian districts. What remains: the multi-block raid (approach, staging flat, floors) is replaced by one district per raid; Cash, debug commands and save/load checks still to do.*
+*Note (2026-10-27): M2's vertical slice already delivers the core of this (RunData, the RunManager, gangs.txt, Officer Down, the case ending), and M2b moves it onto the kits. What remains: the full multi-block raid on the kits (approach → staging flat → 2 floors → leader's floor), Cash, the results screen, Backing's strike, debug commands and save/load checks. Reuse the slice's code rather than rewriting it.*
 
 **Prompt:**
 > Do PLAN.md milestone M3 (§2, §4.3 NBC_RunData, NBC_RunManager and NBC_Gangs). Implement `NBC_RunData` (a STAT_STATIC thinker holding the case and the current raid), `NBC_RunManager`, `map_pools.zs`, the Officer Down intercept in `NBC_Player.DamageMobj`, and a first `nbc/gangs.txt` with the names, mansions and kit variants from §6.9 (rosters and traits come in M4 and M7b).
@@ -546,6 +673,10 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 > **Debug commands (netevents):** `nbc_debug_case`, `nbc_skipblock`, `nbc_seed <n>`, `nbc_day <n>`.
 >
 > **Minimal HUD:** day and strikes, the gang and floor name, health, armor, ammo, Cash.
+>
+> **Backing (§2.5, §6.10):** store it in RunData (start 60), apply the changes this milestone can already see (retreat, going down, gang toppled), and turn 0 Backing into a strike that resets it to 40. Later milestones add their own changes through one `NBC_RunData.AddBacking(n, reason)` call.
+>
+> **Results screen** (`NBC_Results`, §4.3, §6.11): replace the M2 results card. It opens after every raid: title, kills out of total, accuracy, health lost, time, the letter grade, each officer with kills and a DOWN or promotion stamp (placeholder boxes until portraits exist), seized weapons with counts, Cash, Merit (0 until M8) and the Backing change. CONTINUE returns to the hub.
 
 **Done when:** you can start a case, raid a gang through all five blocks, topple them, go down on another raid and take a strike, and the same seed gives the same city and the same floors.
 
@@ -567,6 +698,10 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 > - explosive barrels and sandbags dressed into the mansion floors
 >
 > Leave lookouts, ambush and "cover blows faster" for M9. Use the budget formula in §6.2. Enemy pathing uses Corpo Wars' `nav.zs` graph (port it from `reference/corpowars/`; per the port map it only needs `CW_Blocker`), which builds automatically on any map. Spawn in 2–4 waves; the next wave starts when 70% of the current wave is dead or after 30 seconds. Spawn at spots the player can't see and that are at least 384 units away; perches (role 1) get tier 1–2 shooters. Use a short spawn-in effect. The objective unlocks NBC_Exit and announces "BLOCK SECURE". Elites: the chance comes from the gang's tier (§6.2). Modifiers (pick 1; tier-3 gangs and the Crown can roll 2): Armored (2× health, takes 0.5× damage from bullets), Wired (1.4× speed), Volatile (explodes on death), Shot Caller (calls 3 low-tier enemies at 50% health), Landlord's Own (3× Cash plus a guaranteed Intel shard). Show elites with a translation, and show their name when you aim at them. Remove placed vanilla monsters from generated maps. Add a `nbc_debug_director` command that prints the remaining budget, the current wave and the living enemies.
+>
+> **Surrender (`NBC_Morale`, §4.3):** once the objective (or the leader) is done and about 75% of the block's crew is down, the rest drop their guns and kneel for 20 seconds (use an idle or pain frame held still; no new art), cuffable with Use. Uncuffed ones then run to the map edge and despawn. Print "BLOCK SECURE: head for the exit" and post "They're running!" to the squad log. Gangs with the morale weakness break at 50%.
+>
+> **Cap enemy explosives** (the biggest complaint about *Hamburger Hill*): at most **one** enemy may throw a grenade or Molotov, or fire a rocket, at a time across the block; each throw has a 0.6-second wind-up with a sound cue, never targets something it can't see, and the same enemy waits at least 8 seconds before the next. Check every grenade, Molotov and rocket user in the enemy pack and route them through this limit.
 
 **Done when:** blocks feel like real fights that get harder with depth, and the exit only opens after a clear.
 
@@ -576,7 +711,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 
 ### M5 — Squad I: one officer that works
 **Prompt:**
-> Do PLAN.md milestone M5: §2.1 and the NBC_Ally and NBC_SquadManager rows of §4.3. Do not rely on the built-in FRIENDLY behavior. The pack's enemies have +NOTARGET, +NOINFIGHTING and DamageFactor "Enemy" 0, and their projectiles use DamageType "Enemy" (see actors/bullets.txt); confirm this in the code first. Build the `NBC_Ally` base class and one subclass, `NBC_PatrolOfficer`, using specopM sprites and a navy police translation, with an SMG firing AllyTracer (or an NBC tracer without the Enemy damage type). Implement: formation following (keep 96–192 units away, slot offsets behind and beside the player); custom target-finding (the nearest visible hostile within 1,536 units, preferring enemies that are targeting the player; hold fire if the player is in the line of fire, checked with LineTrace, and sidestep); **pathing on Corpo Wars' `nav.zs` graph** (auto-built on every map, including kit floors) when the player isn't in a straight line; catch-up teleporting only as a last resort (more than 1,024 units away and unseen for 3 seconds → a free spot behind the player); no friendly fire either way (including splash damage and Molotov fire: give allies DamageFactor "Fire" 0, since the fire may not credit the player as the attacker); a downed state at 0 HP with a 20-second bleed-out; revive with Use (an Actor.Used override) after staying within 64 units for 2 seconds, back at 40% HP; and "out" if the bleed-out finishes. In NBC_SquadManager: spawn the squad from the RunData snapshot at NBC_SquadStart (or near the player start) on WorldLoaded, save its health and state before the exit, and retarget enemies onto allies (each second, an enemy targeting the player has a 35% chance to switch to a closer visible ally). Add a floating chevron marker or name over each ally, and a HUD squad strip showing name, health, state and bleed-out timer. For M5, every raid starts with one Patrol Officer. Add debug commands: `nbc_squad_add <class>`, `nbc_squad_down <i>`, `nbc_debug_squad`.
+> Do PLAN.md milestone M5: §2.1 and the NBC_Ally and NBC_SquadManager rows of §4.3. Do not rely on the built-in FRIENDLY behavior. The pack's enemies have +NOTARGET, +NOINFIGHTING and DamageFactor "Enemy" 0, and their projectiles use DamageType "Enemy" (see actors/bullets.txt); confirm this in the code first. Build the `NBC_Ally` base class and one subclass, `NBC_PatrolOfficer`, using specopM sprites and a navy police translation, with an SMG firing AllyTracer (or an NBC tracer without the Enemy damage type). Implement: formation following (keep 96–192 units away, slot offsets behind and beside the player); custom target-finding (the nearest visible hostile within 1,536 units, preferring enemies that are targeting the player; hold fire if the player is in the line of fire, checked with LineTrace, and sidestep); **pathing on Corpo Wars' `nav.zs` graph** (auto-built on every map, including kit floors) when the player isn't in a straight line; catch-up teleporting only as a last resort (more than 1,024 units away and unseen for 3 seconds → a free spot behind the player); no friendly fire either way (including splash damage and Molotov fire: give allies DamageFactor "Fire" 0, since the fire may not credit the player as the attacker); a downed state at 0 HP with a 20-second bleed-out; revive with Use (an Actor.Used override) after staying within 64 units for 2 seconds, back at 40% HP; a downed officer within 192 units of the exit when you leave is carried out alive; and **killed** if the bleed-out finishes (a death sound, a body that stays, "Officer down — [name] is gone" in the squad log; the roster removal comes in M6). In NBC_SquadManager: spawn the squad from the RunData snapshot at NBC_SquadStart (or near the player start) on WorldLoaded, save its health and state before the exit, and retarget enemies onto allies (each second, an enemy targeting the player has a 35% chance to switch to a closer visible ally). Add a floating chevron marker or name over each ally, and a HUD squad strip showing name, health, state and bleed-out timer. For M5, every raid starts with one Patrol Officer. Add debug commands: `nbc_squad_add <class>`, `nbc_squad_down <i>`, `nbc_debug_squad`.
 
 **Done when:** a single officer is clearly useful, survives between maps and is never a burden: no blocking doorways, no shooting you, no getting lost.
 
@@ -591,11 +726,11 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 
 ### M6 — Squad II: classes, orders, roster and ranks
 **Prompt:**
-> Do PLAN.md milestone M6 using §6.5. Every class (including the Patrol Officer from M5) gets the reload pauses in §6.5, with a callout, and officers stagger their reloads so they don't all reload at once. Add the classes NBC_Breacher (MiltiaShotgun sprites), NBC_Marksman (Sniper sprites) and NBC_Paramedic (specopF sprites), each with its own police translation and the behavior in §6.5. The Breacher opens closed doors ahead of the squad when ordered to move through them. The Marksman prefers holding a spot with a long sightline. The Paramedic heals the player when they're under 50% HP (once per 20 seconds) and revives in 1 second. Orders: KEYCONF aliases `nbc_order_follow`, `nbc_order_hold` and `nbc_order_move` → `netevent nbc_order N`, with default binds Z/X/C. "Move" puts a goal marker where the player is aiming (LineTrace) and shows it briefly. Each order plays an acknowledgment sound (placeholder) and shows a HUD message. Build `NBC_Roster` on the `nbc_roster` CVar: recruiting, generated names, XP and ranks (Officer/Corporal/Sergeant: +15% HP, +10% accuracy, faster reactions per rank), hospital (an officer knocked out of a raid spends 2 days there), and a 1-slot squad limit for now (slots come from unlocks in M8). Build the Squad Room menu in NBC_HUB (pick officers, see ranks and hospital status). Start every new save with 2 free Patrol Officers on the roster.
+> Do PLAN.md milestone M6 using §6.5. Every class (including the Patrol Officer from M5) gets the reload pauses in §6.5, with a callout, and officers stagger their reloads so they don't all reload at once. Add the classes NBC_Breacher (MiltiaShotgun sprites), NBC_Marksman (Sniper sprites) and NBC_Paramedic (specopF sprites), each with its own police translation and the behavior in §6.5. The Breacher opens closed doors ahead of the squad when ordered to move through them. The Marksman prefers holding a spot with a long sightline. The Paramedic heals the player when they're under 50% HP (once per 20 seconds) and revives in 1 second. Orders: KEYCONF aliases `nbc_order_follow`, `nbc_order_hold`, `nbc_order_move`, `nbc_order_holdfire` and `nbc_order_free` → `netevent nbc_order N`, with default binds Z/X/C/V/B. "Hold" and "Move" pick the nearest free spot (within 128 units of the target) that enemies in the block can't see, falling back to the exact point; "Move" puts a goal marker where the player is aiming (LineTrace) and shows it briefly. "Hold Fire" stops them shooting unless they're shot at; "Weapons Free" undoes it. Each order plays an acknowledgment sound (placeholder) and goes into the **squad log** (a few lines, bottom left, fading). Build `NBC_Roster` on the `nbc_roster` CVar: recruiting by class with prices and an AUTO button, generated names, XP and ranks (Officer/Corporal/Sergeant: +15% HP, +10% accuracy, faster reactions and one more kit slot per rank), hospital (an officer who went down spends 2 days there), **deaths in the line of duty** (an officer who bled out is removed from the roster and written to `nbc_memorial`), and a 1-slot squad limit for now (slots come from unlocks in M8). Build the Squad Room menu in NBC_HUB in the deploy-screen layout (§2.7): roster on the left with a count per class, squad slots in the middle, the officer's details on the right (rank, XP, raids, hospital days), plus RECRUIT and AUTO. Add the memorial wall: a map thing in the Squad Room that lists the fallen when used. Start every new save with 2 free Patrol Officers on the roster.
 
 **Done when:** you choose who comes along, they act differently, and losing one stings.
 
-**You check:** order "hold" at a corridor, run ahead and confirm they stay. Order "move" across a courtyard, and have the Breacher open a door. Lose an officer and confirm they're in the hospital for the next 2 days.
+**You check:** order "hold" at a corridor, run ahead and confirm they stay, and that they stand somewhere sensible, not in the open. Order "move" across a courtyard, and have the Breacher open a door. Order "hold fire" and confirm they don't shoot until shot at. Let an officer go down and get revived: hospital for 2 days. Let one bleed out: gone from the roster, name on the memorial wall.
 
 ---
 
@@ -618,7 +753,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 > - **Level 2:** signature tactic, weakness and the random traits
 > - **Level 3:** the floor plan
 >
-> It also shows the gang's alert (0–3) and whether it's toppled. A case-file tab shows days left, strikes, toppled gangs, the Crown's current defenses and a news line.
+> It also shows the gang's alert (0–3), whether it's toppled, and the **estimated crew size** on the turf itself (a ±40% range drawn once per day from the case RNG with no intel, exact from level 1). A top bar shows the day, Cash, Backing, strikes and the weather. A case-file tab shows days left, strikes, toppled gangs, the Crown's current defenses and a news line.
 >
 > **Actions:**
 > - **RAID** starts the M3 raid on that gang.
@@ -630,21 +765,48 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 >
 > **Interrogation:** each arrest has a 25% chance to reveal that gang's next unknown trait, and Warrant targets always do (the hook is ready; arrests arrive in M9). Evidence ledgers give +1 level on a random other gang.
 >
-> **The daily gang tick** follows the six rules in §2.4: decay, fortifying, expansion, retaliation, the Crown growing, news. Keep its numbers in one tuning class.
+> **The daily gang tick** follows rules 1, 2, 4, 5 and 7 in §2.4: decay, fortifying, retaliation, the Crown growing, news. Rules 3 and 6 (reclaimed blocks, counter-raids, turf income and side jobs) come in M7c and M9; for now a toppled gang's turf simply stays empty. Keep the tick's numbers in one tuning class.
 >
 > Replace M3's temporary list menu with this map, opened from the wall terminal in NBC_HUB and with the M key. Add `nbc_intel <gang> <level>` and `nbc_simdays <n>` (a soak test that runs the tick n times and prints the result).
 
 **Done when:** each new case shows a different Bricks, dossiers fill in as you buy tips, gangs react day to day, and toppling gangs strips the Crown's defenses.
 
-**You check:** start 3 cases and compare the maps. Buy tips up to level 3 on one gang and confirm the automap marks and the entry choice in the raid. Raid one gang twice and watch its alert climb. Topple one gang and watch its neighbor take the turf. Run `nbc_simdays 30` and read the log for anything silly.
+**You check:** start 3 cases and compare the maps. Buy tips up to level 3 on one gang and confirm the automap marks, the entry choice in the raid, and the crew estimate turning exact. Raid one gang twice and watch its alert climb. Run `nbc_simdays 30` and read the log for anything silly.
 
 ---
 
-### M8 — Meta progression: Captain's Board
+### M7c — The deploy screen and the turf war
 **Prompt:**
-> Do PLAN.md milestone M8 using §6.4. Add CVARINFO entries for the meta CVars in §4.3. Merit: +2 per block, +15 per gang toppled, +1 per elite, +3 per arrest (once M9 adds arrests), +5 per officer brought home alive from a raid, +50 for taking the Crown. It's banked **after every raid**, whether it succeeded or failed. Show a raid summary overlay after each raid (blocks, kills, elites, arrests, Cash, Merit, intel learned, how each officer did, and what took you down), and a case summary when the case ends (days used, gangs toppled, strikes, total Merit). Captain's Board in NBC_HUB (NBC_BoardMenu): the unlocks, their costs and their state, with purchases setting bits in `nbc_unlocks`. Unlocks feed into the start loadout, max health, the Intel pool, the shop and squad slots. Recruiting new officers (Squad Room) costs Merit. Armory locker: choose the starting sidearm and melee from what's unlocked. Options menu: "Reset New Bricks City progress" with a confirmation.
+> Do PLAN.md milestone M7c (§2.4 rule 3 and 6, §2.5, §2.7, §6.6 Hold the Block, §6.10). Read `docs/hamburger-hill-analysis.md` for the screens this borrows.
+>
+> **Deploy screen** (`NBC_Deploy`, §4.3): every raid, defense and side job now opens it from the city map. Build it on the `CW_UiMenu` framework in the §2.7 layout: roster left, squad slots middle, kit right, a totals strip at the bottom, BACK and ASSAULT (DEFEND for a defense). Time of day (Day/Dusk/Night) sets the kit's outdoor light, the share of lamps that are on, and (Night) a third of the first wave spawning idle; store it in RunData. Weather is rolled per day from the case RNG: rain and fog are cosmetic for now (fog density; rain particles outdoors). Ways in: On foot always; Unmarked van needs the Motor Pool unlock (M8; for now enable it with `nbc_unlock`), Over the roofs needs Roof Access, Through the tunnels needs intel level 2 and a turf with tunnels. Each way in picks the matching kit entry for the approach block's player start. AUTO fills the slots with the healthiest officers in a class mix. Hospital officers are greyed out with their days left.
+>
+> **Kits:** each officer has a Primary (their class's issue weapon, or a matching seized weapon from the Evidence Locker, per §2.7), pouches by rank (1/2/3) holding Molotovs, medkits, debris or flashbangs, and an optional vest. A seized primary switches the officer's attack to that weapon's damage type and fire pattern (Uzi bursts `NBC_Light`, AK `NBC_Rifle`, shotgun `NBC_Shell`). Officers **use** their pouches: a Molotov at a group of 3+ enemies at least 256 units from the player (an officer's fire never hurts the player: filter it in `NBC_Player.DamageMobj`; allies are already fire-immune), a medkit on themselves under 30% HP. Kits come out of the locker at deploy and return after the raid; a fallen officer's kit is lost.
+>
+> **Reclaimed blocks and counter-raids:** a toppled gang's turf becomes a reclaimed block (shown in police blue on the city map) that pays turf income in the gang tick (§6.10). Add the counter-raid rule (§2.4 rule 3): the next day the block shows UNDER ATTACK with a card under the map's END DAY button. DEFEND runs **Hold the Block** (§6.6) on that turf's street kit; ignoring it or failing loses the block to the attacker. Two attackers at once is a two-front defense: two waves from opposite edges.
+>
+> **Backing** (§6.10): wire in every change (officer killed or hospitalized, resident killed, retreat, going down, arrests, clean raid, gang toppled, block defended or lost) and the high and low effects.
+>
+> **Debug:** `nbc_counterraid <gang>` forces a counter-raid tomorrow; `nbc_backing <n>`; `nbc_unlock <room>` (until M8).
 
-**Done when:** progress survives quitting UZDoom completely, and unlocks plus squad choices change the next case.
+**Done when:** before every raid you choose when, how and with whom you go in, your officers carry the guns you seized, and the gangs push back on the turf you've taken.
+
+**You check:**
+- Raid at Day and at Night on the same gang: is night darker, with more of the crew idle?
+- Try every way in and confirm where you start.
+- Give an officer a seized AK and watch them use it; give one a Molotov pouch and watch them throw it (never at you or the squad).
+- Topple a gang, then `nbc_counterraid` a neighbor: defend the block once and lose it once. Check the income and Backing both ways.
+- Let an officer die with a seized weapon in their kit and confirm it's gone from the locker.
+
+---
+
+### M8 — Meta progression: rebuilding the precinct
+**Prompt:**
+> Do PLAN.md milestone M8 using §2.6 and §6.4. Add CVARINFO entries for the meta CVars in §4.3. Merit: +2 per block, +15 per gang toppled, +1 per elite, +3 per arrest (once M9 adds arrests), +5 per officer brought home alive from a raid, +4 per block defended, +50 for taking the Crown. It's banked **after every raid**, whether it succeeded or failed. Add Merit and intel learned to the M3 results screen, and add a case summary when the case ends (days used, gangs toppled, strikes, blocks held, officers lost, total Merit).
+>
+> **Rebuilding the precinct.** Rebuild NBC_HUB (`tools/make_hub_map.py`) with every room in §2.6 built in, each behind a boarded door and dark, with `NBC_RoomMarker` things (arg0 = room ID) marking its door, lights, furniture spots and NPC spot. `NBC_Precinct` (§4.3) opens the rooms whose unlocks are bought: it removes the boards, raises the light, and spawns the room's Corpo Wars furniture and an officer NPC at the desk (a recolored specopM/F standing idle; no new art). The Captain's Office menu (NBC_BoardMenu; it lives in the Captain's Office, which is open from the start as a desk in the corridor until the room itself is reopened) lists the rooms and their unlocks with costs and state; buying sets bits in `nbc_unlocks`. Unlocks feed the start loadout, max health, the Intel pool, the shop, the ways in, hospital time and squad slots. Recruiting new officers (Squad Room) costs Merit. Armory locker: choose the starting sidearm and melee from what's unlocked. Options menu: "Reset New Bricks City progress" (Merit, unlocks, roster and memorial) with a confirmation. Replace M7c's `nbc_unlock` debug path with the real unlocks.
+
+**Done when:** progress survives quitting UZDoom completely, unlocks plus squad choices change the next case, and you can see the precinct coming back to life.
 
 > **The MVP is complete here.** Play 3 full cases before going further, and write down what's boring or frustrating, especially about the squad and how much scouting actually changes your plan.
 
@@ -654,7 +816,9 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 **Prompt:**
 > Do PLAN.md milestone M9 using §6.6 and §2.4.
 >
-> **Objectives.** Add the objective classes Lab Bust, Evidence Run, Informant Extraction (an escort NPC built on the NBC_Ally follow code, using a Civilians2 sprite; it can't fight; if it dies, the objective fails and the reward is lost, but the exit still unlocks after a sweep), Rooftop Pursuit and Warrant. The RunManager picks from the objectives the kit variant supports (§6.7), never the same one twice in a row in a raid.
+> **Objectives.** Add the objective classes Lab Bust, Evidence Run, Informant Extraction (an escort NPC built on the NBC_Ally follow code, using a Civilians2 sprite; it can't fight; if it dies, the objective fails and the reward is lost, but the exit still unlocks after a sweep), Rooftop Pursuit, Warrant and Foot Patrol. The RunManager picks from the objectives the kit variant supports (§6.7), never the same one twice in a row in a raid. **Escorts must behave** (*Hamburger Hill*'s rescue missions failed here): the informant always follows you, crouches in cover when you stop or a fight starts (the nearest spot out of enemy sight within 128 units), never stands in the open, and catches up by teleporting like an officer.
+>
+> **Side jobs** (§2.4): roll 0–2 per day in the gang tick (3 with the Radio Room, +1 at high Backing) from Foot Patrol, Evidence Run, Informant Pickup and Warrant, each on a gang's turf with its reward drawn up front. They show on the city map; selecting one opens a briefing card (a placeholder picture box, two lines of orders, the reward, ACCEPT and DECLINE). Accepting goes through the deploy screen and takes the day. A side job is one block.
 >
 > **Undercover: port Corpo Wars' stealth, don't write a new one.** Port from `reference/corpowars/zscript/` (the "Guard awareness" and "Civilians" sections of `docs/corpowars-port-map.md` list what they depend on) `guard.zs` (the unaware/suspicious/alert states, vision cones, the light, crouch and speed visibility meter, the noise radii, finding bodies) with UEAI. Make it drive the enemy pack's DECORATE enemies through a controller item given at spawn, with the HUD visibility meter. Undercover openers: 30% of blocks, plus "Night shift" (always) and the Quiet (never). The first wave spawns idle at their posts.
 >
@@ -668,7 +832,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 >
 > **Fists for arrests:** a fist hit on an enemy under 35% HP always staggers it (like a brick), so you can cuff without firing a shot.
 >
-> **Residents:** port `CW_Civilian` with Civilians2 sprites into RF_CIV rooms. They flee gunfire, scream and alert nearby enemies if they see you shoot, and can be knocked out from behind. **A resident killed by the player or the squad costs −5 Merit and shows in the raid summary** (rules of engagement). Hostages (the trait) are residents tied up on the mansion floors: free them with Use for +4 Merit.
+> **Residents:** port `CW_Civilian` with Civilians2 sprites into RF_CIV rooms. They flee gunfire, scream and alert nearby enemies if they see you shoot, and can be knocked out from behind. More are out on the streets by Day than at Night. **A resident killed by the player or the squad costs −5 Merit and Backing (§6.10) and shows on the results screen** (rules of engagement). Hostages (the trait) are residents tied up on the mansion floors: free them with Use for +4 Merit.
 >
 > **Stakeouts:** enable STAKE OUT on the city map. It's one approach-style block on that gang's turf, undercover, with 3 marked targets (a lookout, a stash, a face). Look at each one from cover for 2 seconds (a camera-style HUD frame) and then leave. Mark all 3 for +1 intel level. If cover is blown, there's no strike, but the gang goes +1 alert.
 
@@ -693,7 +857,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later. The 
 >
 > **The Crown:** two K2 luxury floors, then the hand-built `NBC_CROWN` penthouse and roof (build a placeholder; the owner will rebuild it in UDB). BruteMiniGUN has a phase change at 50% (PMC adds, flickering lights), then the Landlord escapes across the roof as a final Rooftop Pursuit. Apply the Crown's active defenses from the gang tick, minus those stripped by toppled gangs.
 >
-> **Winning:** a win screen → the case summary → unlock "Demolition Day" mode on the Board (+25% budget, elites ×2, 20 days instead of 30). Allies must handle every leader floor and the Crown: no getting stuck.
+> **Winning:** a win screen → the case summary → unlock "Demolition Day" mode in the Captain's Office (+25% budget, elites ×2, 20 days instead of 30, Backing starts at 40). Optional Demolition Day rule, off by default: when you go down, you take over the nearest living officer instead (*Hamburger Hill*'s rule); the raid fails only when the whole squad is down. Allies must handle every leader floor and the Crown: no getting stuck.
 
 ---
 
@@ -713,6 +877,8 @@ Split this across several Codex tasks:
 - **Weapon mods:** pickups roll Standard/Tuned/Custom.
 - **Daily seed:** a case of the day (same city for everyone that day) on the city map terminal.
 - **Title, HUD art, perk icons, gang emblems for the city map, police mugshot HUD face, music per gang turf** (CC-licensed, credited).
+- **One bottom-bar HUD:** the squad log on the left; a portrait per officer that bloodies as their health drops (greys out when down), with a class icon and a rank chevron; your own face; the time of day, weather and a compass; pouch counts; magazine and reserve; the weapon. The portraits are new original art (a few faces × damage states); the results screen and deploy screen reuse them.
+- **Briefing card pictures** for side jobs and the deploy screen (original art).
 - **Balance logging:** a `nbc_log_balance` CVar that writes per-block time, damage taken, ally downs and kills to the log.
 - **Release:** `tools/build_pk3.py` → `dist/NewBricksCity.pk3`, plus a README with the launch line, credits and the Freedoom 2 requirement.
 
@@ -785,32 +951,42 @@ Which enemies fill each tier comes from the raid's gang (§6.9). The Director sp
 | Off the Books | Survive one lethal hit per case with 25 HP (no strike) | Rare | no |
 | Deep Cover | Undercover openers 2× more likely; cover takes 50% longer to blow | Rare | no |
 
-### 6.4 Captain's Board unlocks (meta)
+### 6.4 Precinct rooms and their unlocks (meta, §2.6)
 
-| Unlock | Cost (Merit) | Effect |
-|---|---|---|
-| **Squad Slot 2** | 40 | Bring 2 officers |
-| **Squad Slot 3** | 100 | Bring 3 officers |
-| **Breacher / Marksman / Paramedic Clearance** | 30 / 40 / 50 | That class can be recruited |
-| **Recruit Officer** | 15 each | Add an officer to the roster (Squad Room) |
-| **Field Training** | 35 | New recruits start as Corporals |
-| Precinct Doc | 20 | +10 starting max health (buy 3 times) |
-| Spare Mags | 15 | +24 starting light ammo |
-| Blade | 30 | CombatKnife can be chosen as starting melee |
-| Seized Uzi | 40 | MicroUzi can be chosen as starting sidearm |
-| Dual Service Pistols | 45 | Dual92 can be chosen as starting sidearm |
-| Range Qualification | 30 | All reloads 10% faster, permanently |
-| Street Smarts | 20 | Start every block carrying 2 bricks |
-| Evidence Locker: Molotovs | 25 | Start each raid with 2 Molotovs |
-| Street Contacts | 30 | Informant tips cost 30% less |
-| Case Detective | 50 | Start every case with intel level 1 on every gang |
-| Long Case | 60 | Cases last 35 days instead of 30 |
-| Vest Issue | 35 | Start with 25 armor |
-| Informant Network | 30 | The shop stocks one extra item |
-| Case Files I–III | 25 each | Adds Rare perks to the pool |
-| Lucky Break | 60 | The first Intel pick offers 4 choices |
-| Second Dash (M11) | 50 | +1 dash charge |
-| Demolition Day (M10) | Win once | Hard mode toggle |
+Reopening a room costs its listed price and gives its first unlock; the room's other unlocks are bought separately once it's open.
+
+| Room | Unlock | Cost (Merit) | Effect |
+|---|---|---|---|
+| Squad Room (open) | **Recruit Officer** | 15 each (by class: Patrol 15, Breacher 20, Marksman 25, Paramedic 25) | Add an officer to the roster |
+| Squad Room | **Breacher / Marksman / Paramedic Clearance** | 30 / 40 / 50 | That class can be recruited |
+| Armory cage (open) | Spare Mags | 15 | +24 starting light ammo |
+| Armory cage | Blade | 30 | CombatKnife can be chosen as starting melee |
+| Armory cage | Seized Uzi | 40 | MicroUzi can be chosen as starting sidearm |
+| Armory cage | Dual Service Pistols | 45 | Dual92 can be chosen as starting sidearm |
+| Armory cage | Vest Issue | 35 | Start with 25 armor; one vest in the locker for an officer each case |
+| Armory cage | Evidence Locker: Molotovs | 25 | Start each raid with 2 Molotovs |
+| Armory cage | Street Smarts | 20 | Start every block carrying 2 bricks |
+| **Captain's Office** (reopen 30) | **Squad Slot 2** | 40 | Bring 2 officers |
+| Captain's Office | **Squad Slot 3** | 100 | Bring 3 officers |
+| Captain's Office | Long Case | 60 | Cases last 35 days instead of 30 |
+| Captain's Office | Case Files I–III | 25 each | Adds Rare perks to the pool |
+| Captain's Office | Lucky Break | 60 | The first Intel pick offers 4 choices |
+| Captain's Office | Demolition Day (M10) | Win once | Hard mode toggle |
+| **Motor Pool** (reopen 45) | **Unmarked Van** | (with the room) | The van way in (§2.7) |
+| Motor Pool | Radio for Backup | 25 | The shop stocks Radio for Backup |
+| **Radio Room** (reopen 35) | Street Contacts | (with the room) | Informant tips cost 30% less |
+| Radio Room | Dispatch | 30 | One extra side job each day |
+| Radio Room | Informant Network | 30 | The shop stocks one extra item |
+| **Infirmary** (reopen 40) | **Ward Beds** | (with the room) | Hospital stays 2 → 1 day |
+| Infirmary | Precinct Doc | 20 | +10 starting max health (buy 3 times) |
+| Infirmary | Trauma Training | 40 | Officers revive each other (2 seconds, within 64 units) |
+| **Range** (reopen 30) | Range Qualification | (with the room) | All reloads 10% faster, permanently |
+| Range | **Field Training** | 35 | New recruits start as Corporals |
+| **Crime Lab** (reopen 50) | Case Detective | (with the room) | Start every case with intel level 1 on every gang |
+| Crime Lab | Ballistics | 30 | Interrogation chance 25% → 40% |
+| **Holding Cells** (reopen 35) | Booking Desk | (with the room) | Arrests give +2 Merit |
+| **Roof Access** (reopen 40) | **Rooftop Entry** | (with the room) | The over-the-roofs way in (§2.7) |
+| Roof Access | Second Dash (M11) | 50 | +1 dash charge |
 
 ### 6.5 Squad classes
 
@@ -823,7 +999,11 @@ Which enemies fill each tier comes from the raid's gang (§6.9). The Director sp
 
 Reload pauses (about 1.5 seconds, with a "Reloading!" callout): Patrol every 30 rounds, Breacher every 6 shells, Marksman every 5 shots, Paramedic every 25 rounds. Officers in the same squad try not to reload at the same moment.
 
-Ranks: Officer → Corporal (3 raids survived) → Sergeant (8). Each rank gives +15% HP, +10% accuracy and a shorter reaction delay.
+Ranks: Officer → Corporal (3 raids survived) → Sergeant (8). Each rank gives +15% HP, +10% accuracy, a shorter reaction delay and **one more pouch slot** (1 / 2 / 3).
+
+Kit primaries by class (§2.7): Patrol takes the issue SMG, a seized Uzi or a seized AK; Breacher the issue or a seized shotgun; Marksman the issue rifle or a seized AK (single shots); Paramedic the issue light SMG, a seized Uzi or a Colt. The class's own sprites stay as they are.
+
+Officers who bleed out are **killed** and leave the roster for good (§2.1).
 
 ### 6.6 Raid objectives
 
@@ -835,12 +1015,14 @@ Ranks: Officer → Corporal (3 raids survived) → Sergeant (8). Each rank gives
 | Informant Extraction | Find a local informant and escort them to the exit (they follow you, can't fight, and can be revived once) | The informant reaches the exit (if they die, after a sweep) | +Merit, free Intel pick |
 | Rooftop Pursuit | A runner flees across the roofs to an escape point; catch them (arrest) or stop them before they get there | The runner is caught or dead | A Warrant-style reward if arrested |
 | Warrant | A named elite lieutenant is in the block; arrest them | The lieutenant is arrested or killed | ×2 Merit if arrested |
+| **Hold the Block** (M7c) | Defend a reclaimed block against a counter-raid: fortify a building on the street kit, the gang attacks in 3–4 waves from the map edges (two edges in a two-front defense) | The last wave breaks (surrender applies) | Keep the block; +Backing, +Merit. Lose it if you retreat or go down |
+| **Foot Patrol** (side job, M9) | Walk a marked route through the turf to a far checkpoint; light resistance, residents on the street | You reach the checkpoint | Cash and officer XP; low risk |
 
 ### 6.7 Kit variants used for the Bricks (ported from Corpo Wars, restyled)
 
 | NBC kit | From | Variants we use | Becomes | Objectives |
 |---|---|---|---|---|
-| `NBC_K1` street | K01 | street market, pawn shop, gambling den, drug lab, chop shop, club | Approach blocks on every turf. Restyle: burned cars (voxels), barricades, chain-link, corner stores, rubble, the Wall on one edge where a turf borders it. | Sweep, Evidence, Warrant, Lab (drug lab), Pursuit |
+| `NBC_K1` street | K01 | street market, pawn shop, gambling den, drug lab, chop shop, club | Approach blocks on every turf, Hold the Block defenses and Foot Patrols. Restyle: the foot of the towers on one side, burned cars (voxels), barricades, chain-link, corner stores, rubble, the Wall on one edge where a turf borders it, an elevated highway or the skyline over the other. | Sweep, Evidence, Warrant, Lab (drug lab), Pursuit, Hold the Block, Foot Patrol |
 | `NBC_K2` residential | K02 | **tenement** (the default Bricks floor), apartments, luxury apartments, hotel, den, **rooftops** | Mansion floors. Tenement uses boarded doors, graffiti and dark corridors; luxury and hotel become the Collectors' and the Crown's floors; rooftops is the top of a tower (fire escapes, roof huts, gaps). | All |
 | `NBC_K4` underground | K04 | parking garage, maintenance tunnels, underpass | The Iron Pit's fight club, the Rust Saints' garage, the Wall Watch's smuggling tunnels, and basement labs under any tower | Sweep, Lab, Evidence, Extraction |
 
@@ -911,6 +1093,42 @@ Rosters use the enemy pack's choice classes (from `Espawners.txt`). Damage types
 
 The data file holds each gang's name, colors, roster, damage factors, flags, kit variants, leader and Crown link, so new gangs can be added as data.
 
+### 6.10 Backing and turf income
+
+Backing runs from 0 to 100 and starts each case at 60 (40 in Demolition Day).
+
+| Event | Backing |
+|---|---|
+| Officer killed in the line of duty | −10 |
+| Officer hospitalized | −2 |
+| Resident killed by you or the squad | −5 |
+| Retreat from a raid | −5 |
+| You go down (Officer Down) | −10 (plus the strike) |
+| Reclaimed block lost | −10 |
+| Clean raid: no officers down, no residents hurt | +5 |
+| Arrest | +1 (at most +5 per raid) |
+| Gang toppled | +15 |
+| Block defended | +5 |
+| Side job completed | +2 |
+
+- **75 or more:** informant tips −20%, one extra side job a day.
+- **25 or less:** hospital stays +1 day; no Radio for Backup in the shop.
+- **0:** a strike, then Backing resets to 40.
+
+**Turf income:** each reclaimed block pays 100 × the toppled gang's tier in Cash every day, shown as tomorrow's income on the city map. A block under attack pays nothing that day.
+
+### 6.11 The results grade
+
+Points out of 100, then S (90+), A (75+), B (60+), C (40+), D (below 40):
+- crew taken down (killed or arrested) out of the total: 30
+- accuracy: 15 (60% or better gets full points)
+- health lost: 15 (none lost gets full points)
+- time against the block's par time (90 seconds per floor): 10
+- officers: 20, minus 10 per officer killed and 5 per officer down
+- residents: 10, minus 5 per resident killed
+
+The grade adds Merit from M8 (S +6, A +4, B +2).
+
 ---
 
 ## 7. Risks and how to handle them
@@ -932,3 +1150,8 @@ The data file holds each gang's name, colors, roster, damage factors, flags, kit
 | **Run state lost or duplicated across saves** | RunData is a STAT_STATIC thinker (saved with the game). Meta progress and the roster live in CVars (not saved with the game), so loading an old save can't roll back Merit. Tested in M3. |
 | **Asset credits get lost** | M0 merges the CREDITS files. Never delete `nbc/CREDITS.txt` entries. |
 | **Scope creep** | Don't start M9 until 3 full MVP cases feel good. |
+| **Enemy grenades and rockets wipe the squad** (*Hamburger Hill*'s worst problem) | M4's cap: one enemy explosive at a time, a telegraphed wind-up, no blind throws, a cooldown per thrower. Tune it in the M4 playtest before anything else. |
+| **Permanent deaths feel unfair** | Bleed-out is 20 seconds, revives work, a downed officer near the exit is carried out, the Infirmary's Trauma Training lets officers revive each other, and the memorial wall makes losses mean something. If it's still harsh, lengthen the bleed-out before softening the rule. |
+| **Escorts and allies stand in the open** (another *Hamburger Hill* complaint) | Hold, Move and escorts pick cover spots out of enemy sight (M6, M9). The playtests check for it. |
+| **The kits look boxy, not like a real city** | The scale rules and the "look" list in §4.4, the skyline, facades with rows of windows, props from the room sets, and lighting per room. Compare screenshots with the mood board at M2b and M12. If a space still reads wrong, it becomes a new kit variant or a hand-built set piece, not a return to Obsidian. |
+| **The campaign layer gets too long between raids** | One action per day, AUTO on every squad screen, and the deploy screen remembers the last squad and kits. |

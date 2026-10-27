@@ -2,7 +2,12 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Next milestone: M3** (the case and raid loop). M2's vertical slice is playable; its playtest list is under "Needs playtest".
+**Next milestone: M2b** (our own level architecture: the Bricks kits). M2's vertical slice is playable; its playtest list is under "Needs playtest".
+
+### Plan changes (2026-10-27, owner + Claude)
+- **Lore:** the police are losing a megacity to its gangs; Checkpoint 9 is all that's left, and the meta progression is rebuilding the precinct room by room (PLAN.md §1, §2.6). Tone references: *Dirty Harry*, *Bad Boys II*, *Den of Thieves* (tone only).
+- **Levels go back to our own architecture:** the Corpo Wars site kits, ported and rebuilt for the Bricks (new milestone **M2b**). Obsidian is frozen; NBC_CT01–04 stay until M2b replaces them.
+- **From *Hamburger Hill*** (`docs/hamburger-hill-analysis.md`): a deploy screen (time of day, way in, squad kits from seized weapons), reclaimed blocks with turf income, counter-raids and Hold the Block, Backing, permanent officer deaths with a memorial wall, surrender, a graded results screen, side jobs, and a cap on enemy explosives. New milestone **M7c**; the rest is folded into M3–M10 and M12.
 
 ## Done
 

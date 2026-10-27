@@ -1,6 +1,6 @@
 # AGENTS.md — New Bricks City
 
-This is a roguelite FPS mod for **UZDoom** (a GZDoom fork). You play an undercover cop leading a squad of allied officers on raids into a walled-off district of brick housing towers. The full design and the milestones are in `PLAN.md`. **Read `docs/STATUS.md` first**: it says what's done, what's verified and what's next. Do only the milestone you're asked for, then update `docs/STATUS.md`.
+This is a roguelite FPS mod for **UZDoom** (a GZDoom fork). The police are losing a megacity to its gangs; you play an undercover cop leading what's left of a gutted department on raids into a walled-off district of brick housing towers, and rebuilding the precinct one room at a time. The full design and the milestones are in `PLAN.md`. **Read `docs/STATUS.md` first**: it says what's done, what's verified and what's next. Do only the milestone you're asked for, then update `docs/STATUS.md`.
 
 ## Project facts
 - Engine: `uzdoom.exe` in the repo root. IWAD: `freedoom-0.13.0/freedoom2.wad`.
@@ -36,7 +36,8 @@ This is a roguelite FPS mod for **UZDoom** (a GZDoom fork). You play an undercov
 - Draw all case and raid randomness from the seeded RNG in `NBC_RunData`, never from bare `random()`, so seeds reproduce.
 - Map things the mod defines use DoomEdNums starting at **26000**, registered in MAPINFO. 25013 is taken by the imported Molotov.
 - Never remove entries from `nbc/CREDITS.txt`. Add credits for any new asset.
-- Keep names, characters, dialogue and audio original. *Brick Mansions* is setting inspiration only.
+- Keep names, characters, dialogue, art and audio original. *Brick Mansions* is setting inspiration only; *Dirty Harry*, *Bad Boys II* and *Den of Thieves* are tone only; *Hamburger Hill* (`docs/hamburger-hill-analysis.md`) is mechanics and screen layouts only.
+- Levels are our own kits (PLAN.md §4.4). The Obsidian pipeline in `tools/Obsidian/` is frozen: don't extend it.
 
 ## Allied officer (squad) rules
 - Allies are `NBC_Ally` subclasses with their own target-finding. Don't rely on the engine's built-in FRIENDLY AI: the pack's enemies have `+NOTARGET`, `+NOINFIGHTING` and `DamageFactor "Enemy", 0`.
