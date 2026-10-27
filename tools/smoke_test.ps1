@@ -18,6 +18,8 @@ param(
     [string[]]$Extra = @()
 )
 $ErrorActionPreference = "Stop"
+# With "powershell -File", -Map NBC_TEST,NBC_HUB arrives as one string: split it into maps.
+$Map = @($Map | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
 $root = Split-Path -Parent $PSScriptRoot
 $build = Join-Path $root "build"
 New-Item -ItemType Directory -Force $build | Out-Null
