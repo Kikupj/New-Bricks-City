@@ -34,6 +34,13 @@ $set = [ordered]@{
     "@procedural_gotcha" = "0"; "@procedural_gotcha_zdoom" = "0"; "@iwad_mode" = "0"
     "@compress_output" = "0"          # plain WAD, not a zip
     "float_overall_lighting_mult" = "1.3"   # Obsidian's interiors are very dark at 1.0
+    # The GUI saves fixed choices (steepness = none ...) that override the theme: hand them back to it.
+    "outdoors" = "mixed"; "caves" = "mixed"; "liquids" = "mixed"; "hallways" = "mixed"; "teleporters" = "mixed"
+    "steepness" = "mixed"; "parks" = "mixed"; "park_detail" = "mixed"; "porches" = "mixed"; "cages" = "mixed"
+    "natural_parks" = "none"          # nature parks are caves with trees, not city parks
+    "traps" = "none"                  # monster closets: the game places its own gangs
+    "room_heights" = "tall-ish"       # room for split levels, balconies and stair runs
+    "float_mons" = "0.6"              # a light layer: the game replaces it with the gang (only its spots count)
 }
 $lines = Get-Content (Join-Path $here "CONFIG.txt")
 $seen = @{}

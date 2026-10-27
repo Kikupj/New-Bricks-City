@@ -288,6 +288,26 @@ void UpdateNBCFlashlight()
 	nbcFlashlightBeam.A_SetPitch(pitch, SPF_INTERPOLATE);
 }
 
+// Officers never hurt you. On a raid, a hit that would kill you is OFFICER DOWN instead
+// (NBC_RunManager pulls you out and books the strike).
+override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
+{
+	if (source is "NBC_Ally" || (inflictor && inflictor.target is "NBC_Ally")) return 0;
+	let rd = NBC_RunData.Find();
+	if (!rd || !rd.raidActive || !player || damage >= TELEFRAG_DAMAGE || (flags & DMG_FORCED))
+		return Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+	if (rd.officerDown) return 0;
+
+	bool hadBuddha = (player.cheats & CF_BUDDHA) != 0;
+	int before = health;
+	player.cheats |= CF_BUDDHA;
+	int dealt = Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+	if (!hadBuddha) player.cheats &= ~CF_BUDDHA;
+	if (dealt >= before && !(player.cheats & (CF_GODMODE | CF_GODMODE2)))
+		rd.officerDown = true;
+	return dealt;
+}
+
 override void Tick()
 {
 	// Clear primary/secondary fire and reload before the engine advances weapon states.

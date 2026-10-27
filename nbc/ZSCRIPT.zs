@@ -8,6 +8,11 @@ version "4.10"
 #include "zscript/nbc/weapons/reload.zs"
 #include "zscript/nbc/weapons/firearms.zs"
 #include "zscript/nbc/hud.zs"
+#include "zscript/nbc/gangs.zs"
+#include "zscript/nbc/rundata.zs"
+#include "zscript/nbc/ally.zs"
+#include "zscript/nbc/runmanager.zs"
+#include "zscript/nbc/hub.zs"
 
 // Corpo Wars props and decor, placeable map things (tools/import/port_cw_props.py)
 #include "zscript/cw/furniture.zs"

@@ -399,6 +399,16 @@ OUTDOOR = [
                       debris=[(-20, -34)])),
     ("ac_unit", I([("CW_FAcUnit", 0, 0, 0)], 20, trash=[(36, 30)])),
 ]
+# Ungrouped park decor: the projects' playground and the strip of dead grass
+PARK = [
+    ("park_benches", I([("CW_FPew", 0, -24, 90), ("CW_FPew", 0, 24, 270)], 60, trash=[(56, 0)])),
+    ("park_bench", I([("CW_FPew", 0, 0, 90), ("CW_FLampPost", 56, -16, 0)], 60, trash=[(-50, 10)])),
+    ("park_picnic", I([("CW_FRoundTable", 0, 0, 0), ("CW_FStool", 0, 30, 0), ("CW_FStool", 0, -30, 0),
+                       ("CW_FStool", 30, 0, 0)], 40, trash=[(-36, 30)])),
+    ("park_lamp", I([("CW_FLampPost", 0, 0, 0)], 40, debris=[(24, 20)], trash=[(-20, -24)])),
+    ("park_camp", I([("CW_FBed", 0, 0, 0), ("BurningBarrel", 48, 40, 0)], 25, trash=[(-30, 40)], debris=[(40, -30)])),
+    ("park_rubble", I([("NBC_RubblePile", 0, 0, 0)], 30, debris=[(30, 24), (-28, -20)])),
+]
 # Ungrouped indoor clutter for Bricks rooms that didn't get a room set
 INDOOR = [
     ("rubble_in", I([("NBC_RubblePile", 0, 0, 0)], 30, debris=[(30, 24), (-24, -28)])),
@@ -610,7 +620,8 @@ def main():
         if islands:
             emit("decor", "nbc_cw_" + group, islands)
             n_decor += len(islands)
-    for env, base, sets, prob_mult in (("outdoor", "nbc_cw_street", OUTDOOR, 100), ("building", "nbc_cw_clutter", INDOOR, 50)):
+    for env, base, sets, prob_mult in (("outdoor", "nbc_cw_street", OUTDOOR, 100), ("park", "nbc_cw_park", PARK, 150),
+                                     ("building", "nbc_cw_clutter", INDOOR, 50)):
         entries = []
         for name, spec in sets:
             fab, size, slots = build_island(spec)

@@ -474,3 +474,6 @@ Ledge climbing: "Ledge Climbing" by Dodopod (2018, "use or modify, attribute me"
 Tactical lean: reworked from "Tactical Lean" (lean.pk3, author uncredited), with Corpo Wars changes.
 Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash Muhandes' NashMove, with code
   from Can't Sleep and BROS_ETT_311.
+
+== Fonts ==
+- BIGFONT.lmp: "Miniplicity" (shadowed white variant) by Jimmy, based on the Ultimate Simplicity bigfont brought to Doom by Agent Spork (MiniplicityFont.pk3).

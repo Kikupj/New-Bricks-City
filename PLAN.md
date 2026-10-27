@@ -504,32 +504,28 @@ The Python tools are in `tools/cw/`. Credits are merged into `nbc/CREDITS.txt`. 
 
 ---
 
-### M2 — The Bricks level generator (ported site kits) and placeholder hub
-**Prompt:**
-> Do PLAN.md milestone M2 (§4.4, §6.7). Read `reference/corpowars/Design Docs/site-kits.md` and the "Site kits" section of `docs/corpowars-port-map.md` first. Port the kit code from `reference/corpowars/zscript/corpowars/` into `nbc/zscript/cw/` and include it from `nbc/ZSCRIPT.zs`. For every class on the port map's "uses from outside" list, bring it along, replace it with a small NBC version, or cut the code that needs it (contracts, ledger, city and security passes get cut). Activate the prop models (the entries the kits need from `reference/corpowars/modeldef.props.txt`; the OBJ files are already in `nbc/models/props/`) and the lamp lights and city brightmaps from its `gldefs.txt`. Check which thing numbers the template maps `nbc/maps/NBC_K1/K2/K4.wad` contain, and define or replace them. Port these: `CW_KitGen` plus kit_street, kit_residential and kit_underground, with procgen, props, furniture, stairs and themes. Make them run on `NBC_K1`, `NBC_K2` and `NBC_K4`, with the variant and seed set by CVars for now (`nbc_kitvariant`, `nbc_kitseed`; M3 sets them from the case). **Strip the Corpo Wars mission layer** out of the kit pipeline: no CW guards, bystanders, contracts or security passes. Keep rooms, links, carving, painting, dressing, lights, entries, the objective planner and the reachability check.
->
-> Add an NBC layer that runs after the kit is built. It places:
-> - **`NBC_SpawnSpot`s**: ground spots in RF_PATROL and RF_PEOPLE rooms; perches at windows, fire escapes and balconies; reinforcement spots at the far stair core
-> - **`NBC_SquadStart`** and **`NBC_Exit`** at the chosen entry and at the far stair core (on the top floor, at the roof door)
-> - **`NBC_ObjectiveMarker`s** from the objective planner (destroy → lab, steal → evidence, turn-in → informant)
-> - **2–5 `NBC_RubblePile`s and loose debris** in derelict and outdoor rooms
-> - **resident spots** in RF_CIV rooms
->
-> Define every NBC thing with DoomEdNums from 26000 in MAPINFO.
->
-> **Restyle for the Bricks:** the tenement is the default residential look (brick, boarded doors, dark corridors); burned-out voxel cars and barricades on K1 streets; the Corpo Wars skyline sprites outside windows.
->
-> **Check that the squad fits:** sample doorway and corridor widths across 20 seeds of each variant, and widen the kit's door and corridor sizes if any are under 64 and 96 units.
->
-> Run Corpo Wars' sweep idea as `tools/kit_sweep.ps1`: every variant × 3 seeds, failing on script errors, unreachable rooms or missing objectives. Also make placeholder NBC_HUB (Checkpoint 9: city map terminal, armory, Squad Room, Board) and NBC_SAFE (the staging flat) as simple hand-made UDMF rooms. Add MAPINFO entries, with the NBC player class and no intermission.
+### M2 — Obsidian districts, the hub and the vertical slice — 🔄 IN PROGRESS (Claude, 2026-10-27)
+**Changed course (owner, 2026-10-27):** levels come from **Obsidian**, not from ported Corpo Wars kits.
+Obsidian can't run inside UZDoom, so districts are built ahead of time into a **pool**:
+- `tools/Obsidian/make_bricks.ps1` builds the New Bricks City theme (`tools/Obsidian/addons/NewBricksCity/`): city blocks, steep multi-level buildings with stairs, lifts and balconies, parks, Corpo Wars room sets, voxel cars and debris. `export_maps.py` writes `nbc/maps/NBC_CT01…` and `nbc/districts.txt` (the pool the game reads).
+- Obsidian places only a light monster layer. The game removes it on load and uses those spots for its own gang spawns, so **the game, not Obsidian, sets the enemy count**.
+- **NBC_HUB** (Checkpoint 9) is a hand-made precinct: the raid board, the armory crate, the exit to the street.
 
-**Done when:** `map NBC_K2 +nbc_kitvariant 0 +nbc_kitseed N` gives a different, fully walkable tenement floor for each N, and the sweep passes for every variant.
+**The vertical slice loop:**
+1. The raid board (Use) starts a case if none is running: seeded, day 1, 0 strikes, 4 gangs from `nbc/gangs.txt` each holding one district from the pool.
+2. Pick a district → raid. The game replaces Obsidian's monsters with that gang's roster (a budget from the gang tier and alert), puts the **gang leader** (an elite) near the map's exit, and spawns **2 officers** (`NBC_Ally`) with the player.
+3. Take down the leader, then exit → gang **toppled**. Exit early → retreat (day lost, gang on alert). Lethal damage → **OFFICER DOWN** → strike, back to the hub.
+4. Back at the hub: a results card, the day advances. Topple all 4 → case closed. 3 strikes or day 30 → case over.
 
-**You check:** load 5 seeds of tenement, rooftops, the street drug lab and the parking garage. Do they read as the Bricks? Is there cover? Can you reach every room? Does the far stair core feel like "up"?
+The full city map, staging flat, intel and gang tick stay in M7b and later. The ported kits (old M2) are dropped; their props survive as the Obsidian room sets.
+
+**Done when:** you can start a case at the hub, raid every district, topple a gang, go down and take a strike, and close or lose the case.
 
 ---
 
 ### M3 — The case and raid loop (the heart of the roguelite)
+*Note (2026-10-27): M2's vertical slice already delivers the core of this on Obsidian districts. What remains: the multi-block raid (approach, staging flat, floors) is replaced by one district per raid; Cash, debug commands and save/load checks still to do.*
+
 **Prompt:**
 > Do PLAN.md milestone M3 (§2, §4.3 NBC_RunData, NBC_RunManager and NBC_Gangs). Implement `NBC_RunData` (a STAT_STATIC thinker holding the case and the current raid), `NBC_RunManager`, `map_pools.zs`, the Officer Down intercept in `NBC_Player.DamageMobj`, and a first `nbc/gangs.txt` with the names, mansions and kit variants from §6.9 (rosters and traits come in M4 and M7b).
 >

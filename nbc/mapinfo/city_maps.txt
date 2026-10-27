@@ -2,24 +2,36 @@
 
 map NBC_CT01 "Mercer Street"
 {
+  levelnum = 101
   sky1 = "CITYSKY", 0
-  next = "NBC_CT02"
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
 }
 
 map NBC_CT02 "Wexford Row"
 {
+  levelnum = 102
   sky1 = "CITYSKY", 0
-  next = "NBC_CT03"
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
 }
 
 map NBC_CT03 "Sutter Alley"
 {
+  levelnum = 103
   sky1 = "CITYSKY", 0
-  next = "NBC_CT04"
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
 }
 
 map NBC_CT04 "Cypress Avenue"
 {
+  levelnum = 104
   sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
 }
-

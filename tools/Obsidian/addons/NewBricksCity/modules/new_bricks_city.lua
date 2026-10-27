@@ -114,6 +114,10 @@ NBC_BRICKS.MATERIALS =
   CWASPH   = { f="CWASPH",   t="CWRETAIN" },
   CWPAVE   = { f="CWPAVE",   t="CWRETAIN" },
 
+  -- park ground (Freedoom's grass, kept: the remap would turn it to dirt)
+  GRASS1   = { f="GRASS1",   t="CWRETAIN" },
+  GRASS2   = { f="GRASS2",   t="CWRETAIN" },
+
   -- ceilings
   AXDU03   = { f="AXDU03",   t="CWWALL1" },
   CWCEILD  = { f="CWCEILD",  t="CWWALLD" },
@@ -203,7 +207,8 @@ NBC_BRICKS.rooms =
   -- courtyards, lots and sidewalks between the towers
   Outdoors_yard = { base = "urban_Outdoors_generic", env = "outdoor", prob = 60,
     floors   = { CWPAVE=50, CWASPH=30, AXF01=20, CWCONCF=20 },
-    naturals = { CWCONCF=50, AXF05=30, AXF06B=10 } },
+    -- park ground: worn grass, dirt and broken concrete
+    naturals = { GRASS1=40, GRASS2=20, AXF06B=30, CWCONCF=15 } },
 }
 
 
@@ -277,13 +282,14 @@ NBC_BRICKS.theme_overrides =
     doors = { some = 50, heaps = 50 },
     teleporters = { none = 100 },
     cages = { none = 100 },
-    steepness = { none = 30, few = 70 },
+    steepness = { some = 40, heaps = 60 },   -- split-level floors, stairs and lifts everywhere
     symmetry = { none = 40, few = 40, some = 20 },
     keys = { none = 20, few = 60, some = 20 },
     scenics = { none = 100 },   -- vistas are built like caves: cliffs, not city
-    parks = { none = 100 },
+    parks = { few = 30, some = 50, heaps = 20 },
+    park_detail = { some = 50, heaps = 50 },
     fences = { few = 30, some = 70 },
-    porches = { some = 60, heaps = 40 },
+    porches = { some = 30, heaps = 70 },
     pictures = { none = 70, few = 30 },
   },
 

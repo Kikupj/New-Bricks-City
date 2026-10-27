@@ -1,0 +1,90 @@
+// New Bricks City gangs (PLAN.md §6.9). Read by NBC_Gangs (zscript/nbc/gangs.zs) at every map load.
+//
+// gang <id> { key = value ... }
+//   name / short      full and short display names
+//   tier              1-3: sets the base enemy count and the leader bounty
+//   color             text colour on the board and HUD (a font colour name)
+//   budget            enemy count multiplier (Swarm gangs > 1)
+//   health            gang members' health multiplier
+//   roster1..3        enemy choice classes (actors/enemies/Espawners.txt) by tier; spawners are resolved in code
+//   leader            the leader's class; leaderhealth multiplies its health; leadertitle names it
+//   escorts           how many roster2 guards stand with the leader
+//   damage            pairs of <damage type> <factor> taken by gang members (NBC_Light, NBC_Shell, NBC_Rifle, Fire, Melee, Blunt)
+//   painchance        multiplier on gang members' pain chance (stagger resistance < 1)
+//   trait             one line for the raid board dossier
+
+gang stoop_kings
+{
+	name = "The Stoop Kings"
+	short = "Stoop Kings"
+	tier = 1
+	color = "Gold"
+	budget = 1.3
+	health = 0.8
+	roster1 = eGOONchoice eGOONGIRLchoice eHOODYchoice eCROOKchoice eSCUMMANchoice eSCUMFchoice
+	roster2 = eSTREETMchoice eSTREETFchoice eROBMANchoice eBANGERchoice
+	roster3 = eKILLERchoice
+	leader = eKILLERchoice
+	leadertitle = "the Stoop King"
+	leaderhealth = 6
+	escorts = 3
+	trait = "Swarm: more of them on every stoop, but they drop fast."
+}
+
+gang rust_saints
+{
+	name = "The Rust Saints"
+	short = "Rust Saints"
+	tier = 1
+	color = "Orange"
+	budget = 1.0
+	health = 1.0
+	roster1 = ePUNKMchoice ePUNKFchoice eREDNECKchoice eROBBERFchoice
+	roster2 = eREDNECKchoice ePUNKMchoice ePYROchoice
+	roster3 = ePYROchoice
+	leader = BruteGL
+	leadertitle = "the Saint with the launcher"
+	leaderhealth = 2
+	escorts = 2
+	damage = Fire 0
+	trait = "Pyros: fire and explosives, and fire won't touch them."
+}
+
+gang iron_pit
+{
+	name = "The Iron Pit"
+	short = "Iron Pit"
+	tier = 2
+	color = "Red"
+	budget = 0.85
+	health = 1.4
+	roster1 = eTOUGHchoice
+	roster2 = eBUFFchoice eMUSCLEchoice eROIDchoice
+	roster3 = eCHUBBchoice eDOORMANchoice
+	leader = eROIDchoice
+	leadertitle = "the Champion"
+	leaderhealth = 7
+	escorts = 3
+	damage = Fire 1.5
+	painchance = 0.4
+	trait = "Roiders: they shrug off stagger. Fire hurts them half again."
+}
+
+gang collectors
+{
+	name = "The Collectors"
+	short = "Collectors"
+	tier = 2
+	color = "LightBlue"
+	budget = 1.0
+	health = 1.0
+	roster1 = eSUITMANchoice eSUITGIRLchoice eMOBSchoice
+	roster2 = eMOOKSHOTchoice eMOOKSHOT2choice eYAKUZAchoice ePIMPchoice
+	roster3 = eSUITAKchoice
+	leader = eSUITMANchoice
+	leadertitle = "the Head Collector"
+	leaderhealth = 8
+	escorts = 3
+	damage = NBC_Light 0.6
+	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles."
+}

@@ -1,0 +1,2 @@
+// New Bricks City CVars
+server int nbc_seed = 0;   // non-zero: every new case uses this seed (reproduce a case)
