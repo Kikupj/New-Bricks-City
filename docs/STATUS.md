@@ -117,6 +117,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `tools/Obsidian/make_cw_fabs.py` remakes Corpo Wars' room recipes (kit_*.zs `Dress()`) as Obsidian prefabs: 18 room sets (living, kitchen, bedroom, bath, office, storage, utility, laundry, workshop, garage, lockers, lab, grow, den, camp, lobby, shop, bar) with furniture along the walls, free-standing groups, random wall sprites and clutter, and loose debris (26000–26004) in squats, dens, storage and on the street. Each Bricks room theme picks from its own list of room sets.
 
 ## Verified
+- **M2c on Windows (owner, 2026-10-27):** `powershell -File tools\smoke_test.ps1 -Map NBC_TEST,NBC_HUB,NBC_KT,NBC_KS,NBC_KB,NBC_KR` → PASS on all six, two runs.
 - **M2c checks (2026-10-27, cloud session, UZDoom 5.0.3 built from source on Linux):**
   - `python tools/check_lumps.py` → `0 new problem(s), 13 known`.
   - `tools/smoke_test.sh NBC_TEST NBC_HUB NBC_KT NBC_KS NBC_KB NBC_KR` → PASS on all six.
