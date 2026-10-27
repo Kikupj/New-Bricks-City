@@ -93,7 +93,14 @@ We take **mechanics and screen layouts only**. Names, art, text and audio stay o
 - **Allies stick to cover** when holding: M6's Hold order should pick a nearby spot out of the enemy's sightline, not stand on the exact point.
 - **Keep variety up:** rotate objectives and gangs so raids don't repeat after an hour.
 
-## Suggested order
+## Decisions (2026-10-27)
+Written into `PLAN.md`:
+- **Permanent deaths: yes.** An officer who bleeds out is killed for good (memorial wall); one who goes down and is revived or carried out spends 2 days in hospital.
+- **Backing: yes**, as one 0–100 meter; zero costs a strike (§2.5, §6.10).
+- **Taking over an officer when you go down: no** in the standard game; an optional Demolition Day rule (M10).
+- **New milestone M7c** (deploy screen and turf war); the rest is folded into M3, M4, M5, M6, M7b, M8, M9, M10 and M12.
+
+## Suggested order (as first proposed)
 1. **Fold into existing milestones** (no new milestone needed): results screen (M3), the Squad Room layout with AUTO (M6), Hold Fire / Weapons Free orders (M6), morale break (M4 or M9), the explosives cap (M4), side jobs on the board (M7b/M9).
 2. **New milestone "M7c: Deploy screen and turf war":** time of day, insertion choice, officer kits from the evidence locker, counter-raids and Hold the Block, daily turf income, Department Backing.
 3. **Owner decisions first:** permadeath or hospital; whether to have Department Backing; whether taking over an officer on death exists at all.
