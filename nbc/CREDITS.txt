@@ -489,6 +489,10 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
   tools/art/make_vehicle_art.py. In the field the vehicles are the Voxel Vehicles Pack (credited above).
 - maps/NBC_RF01-08.wad: rooftop maps generated with Obsidian and the New Bricks City theme.
 
+== Time of day ==
+- textures/nbc/NBCSKYMR.png, NBCSKYDY.png, NBCSKYDK.png (the morning, afternoon and dusk skylines): recoloured
+  from Corpo Wars' night skyline (textures/cw/CITYSKY.png, the project owner's) by tools/art/make_sky_variants.py.
+
 == HQ characters ==
 - sprites/npcs/NCAPA0-G0.png (the captain, standing and smoking) from art/PMC-boss*.png, sprites/npcs/NPLTA0.png
   (the pilot) from art/Pilot.png, graphics/NBCHELI.png (the helicopter) from art/helicopter.png: art by the

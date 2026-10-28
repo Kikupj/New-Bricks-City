@@ -1,5 +1,7 @@
 // Roll out (owner requests, 2026-10-28): the last step before a raid, at the pilot. READY on the deploy screen
 // plans the raid; talking to Rook brings this up:
+//   WHEN        the hour (clock.zs): what each does to this gang (how many are out, how many off guard); the
+//               day's event in this district fixes the hour
 //   INSERTION   STREET (the land vehicles; the raid starts on the street) or ROOFTOP (a helicopter; the raid starts
 //               on the district's rooftop map, with the shoot-down risk shown: shot down means a crash landing)
 //   MOTORCADE   the garage: pick the vehicles that go (AUTO picks enough seats); the seats have to carry everyone
@@ -8,7 +10,7 @@
 
 class NBC_WheelsUp : NBC_UI
 {
-	enum EId { ID_GO = 1, ID_PLAN, ID_NOTYET, ID_INSERT, ID_ROLL, ID_AUTO }
+	enum EId { ID_GO = 1, ID_PLAN, ID_NOTYET, ID_INSERT, ID_ROLL, ID_AUTO, ID_WHEN }
 
 	override void Init(Menu parent)
 	{
@@ -40,6 +42,10 @@ class NBC_WheelsUp : NBC_UI
 		case ID_INSERT: Send(NBC_Department.OP_INSERTION, 0, arg); return;
 		case ID_ROLL: Send(NBC_Department.OP_ROLL, arg); return;
 		case ID_AUTO: Send(NBC_Department.OP_AUTO_MOTORCADE); return;
+		case ID_WHEN:
+			if (rd.EventIn(rd.readyDistrict)) MenuSound("menu/invalid");
+			else Send(NBC_Department.OP_WINDOW, 0, arg);
+			return;
 		}
 	}
 
@@ -58,7 +64,7 @@ class NBC_WheelsUp : NBC_UI
 		int d = rd.readyDistrict;
 		let g = rm.DistrictGang(rd, d);
 		bool roof = dept.insertion == NBC_Motor.INS_ROOFTOP;
-		double x = 50, y = 30, w = VW - 100, h = 540;
+		double x = 50, y = 20, w = VW - 100, h = 560;
 		Panel(x, y, w, h, roof ? "WHEELS UP?" : "ROLL OUT?");
 
 		// where to
@@ -98,8 +104,35 @@ class NBC_WheelsUp : NBC_UI
 			Text(BigFont, risk >= 30 ? Font.CR_RED : (risk >= 15 ? Font.CR_GOLD : Font.CR_GREEN), ix + iw, y + 142, String.Format("%d%%", risk), 15, 2);
 		}
 
+		// when: the hour, and what it does to them
+		double wy = y + 172;
+		int ev = rd.EventIn(d) ? rd.evKind : NBC_Clock.EV_NONE;
+		int when = rd.WindowFor(d);
+		Text(NewSmallFont, Font.CR_GRAY, x + 16, wy, "WHEN", 10);
+		if (ev != NBC_Clock.EV_NONE)
+			Text(NewSmallFont, Font.CR_GOLD, x + 80, wy, String.Format("%s: today it's %s or not at all", NBC_Clock.EV_NAME[ev], NBC_Clock.WIN_NAME[rd.evWindow]), 10);
+		else if (g) Text(NewSmallFont, Font.CR_DARKGRAY, x + 80, wy, g.hours, 10);
+		double cw = (w - 32 - 3 * 8) / 4;
+		for (int k = 0; k < NBC_Clock.W_COUNT; k++)
+		{
+			double cx = x + 16 + k * (cw + 8), cy = wy + 14;
+			bool on = k == when;
+			bool open = ev == NBC_Clock.EV_NONE || k == rd.evWindow;
+			Inset(cx, cy, cw, 46, on ? C_AMBER : -1);
+			Text(BigFont, on ? Font.CR_GOLD : (open ? Font.CR_WHITE : Font.CR_DARKGRAY), cx + 10, cy + 6, NBC_Clock.WIN_HOUR[k], 14);
+			Text(NewSmallFont, on ? Font.CR_GOLD : (open ? Font.CR_GRAY : Font.CR_DARKGRAY), cx + cw - 10, cy + 8, NBC_Clock.WIN_NAME[k], 10, 2);
+			if (g)
+			{
+				double str = g.StrengthAt(k) * NBC_Clock.EV_STRENGTH[on ? ev : 0];
+				Text(NewSmallFont, !open ? Font.CR_DARKGRAY : (str > 1.05 ? Font.CR_RED : (str < 0.95 ? Font.CR_GREEN : Font.CR_WHITE)),
+					cx + 10, cy + 28, NBC_Clock.GangLine(g, k, on ? ev : 0), 9);
+			}
+			Region(ID_WHEN, k, cx, cy, cw, 46);
+			if (IsFocus(ID_WHEN, k)) FocusFrame(cx, cy, cw, 46);
+		}
+
 		// the motorcade
-		double my = y + 176;
+		double my = y + 244;
 		int seats = dept.Seats(dept.insertion), need = dept.SeatsNeeded();
 		Text(NewSmallFont, Font.CR_GRAY, x + 16, my, "MOTORCADE", 10);
 		Text(NewSmallFont, seats >= need ? Font.CR_GREEN : Font.CR_RED, x + 120, my, String.Format("SEATS %d / %d NEEDED", seats, need), 10);
@@ -111,42 +144,43 @@ class NBC_WheelsUp : NBC_UI
 			bool fits = dept.Fits(v, dept.insertion);
 			bool on = v.rolling && fits;
 			bool f = IsFocus(ID_ROLL, v.id);
-			Inset(cx, cy, 100, 104, on ? C_AMBER : -1);
-			Pic(NBC_Motor.TYPE_ART[v.type], cx + 6, cy + 6, 88, 44, fits ? 1.0 : 0.3, !fits);
-			Text(NewSmallFont, on ? Font.CR_GOLD : (fits ? Font.CR_WHITE : Font.CR_DARKGRAY), cx + 50, cy + 54, NBC_Motor.TYPE_SHORT[v.type], 10, 1);
-			Text(NewSmallFont, Font.CR_GRAY, cx + 50, cy + 68, String.Format("%d seats", v.Seats()), 9, 1);
-			Text(NewSmallFont, v.Ready() ? Font.CR_GRAY : Font.CR_RED, cx + 50, cy + 80, v.Ready() ? String.Format("%d%%", v.cond) : "IN THE SHOP", 9, 1);
+			Inset(cx, cy, 100, 92, on ? C_AMBER : -1);
+			Pic(NBC_Motor.TYPE_ART[v.type], cx + 10, cy + 4, 80, 40, fits ? 1.0 : 0.3, !fits);
+			Text(NewSmallFont, on ? Font.CR_GOLD : (fits ? Font.CR_WHITE : Font.CR_DARKGRAY), cx + 50, cy + 46, NBC_Motor.TYPE_SHORT[v.type], 10, 1);
+			Text(NewSmallFont, Font.CR_GRAY, cx + 50, cy + 60, String.Format("%d seats", v.Seats()), 9, 1);
+			String st = !v.Ready() ? "IN THE SHOP" : (!fits && NBC_Motor.SoloOnly(v.type) && !roof ? "1 OFFICER MAX" : String.Format("%d%%", v.cond));
+			Text(NewSmallFont, v.Ready() && fits ? Font.CR_GRAY : Font.CR_RED, cx + 50, cy + 72, st, 9, 1);
 			if (on) Text(BigFont, Font.CR_GOLD, cx + 94, cy + 4, "IN", 10, 2);
-			Region(ID_ROLL, v.id, cx, cy, 100, 104);
-			if (f) FocusFrame(cx, cy, 100, 104);
+			Region(ID_ROLL, v.id, cx, cy, 100, 92);
+			if (f) FocusFrame(cx, cy, 100, 92);
 		}
 
 		// who's going
-		double gy = my + 136;
+		double gy = my + 118;
 		Text(NewSmallFont, Font.CR_GRAY, x + 16, gy, "GOING IN", 10);
 		double cx = x + 16;
-		Inset(cx, gy + 14, 90, 112, C_AMBER_DIM);
-		Pic(dept.PlayerPortrait(), cx + 7, gy + 20, 76, 76);
-		Text(NewSmallFont, Font.CR_WHITE, cx + 45, gy + 98, "Det. Vance", 9, 1);
-		Text(NewSmallFont, Font.CR_GOLD, cx + 45, gy + 110, NBC_DeployMenu.KitLine(dept.pPrimary, dept.pSidearm), 7, 1);
+		Inset(cx, gy + 14, 90, 100, C_AMBER_DIM);
+		Pic(dept.PlayerPortrait(), cx + 12, gy + 18, 66, 66);
+		Text(NewSmallFont, Font.CR_WHITE, cx + 45, gy + 86, "Det. Vance", 9, 1);
+		Text(NewSmallFont, Font.CR_GOLD, cx + 45, gy + 99, NBC_DeployMenu.KitLine(dept.pPrimary, dept.pSidearm), 7, 1);
 		cx += 98;
 		for (int s = 0; s < dept.squad.Size(); s++)
 		{
 			let o = dept.OfficerById(dept.squad[s]);
 			if (!o) continue;
-			Inset(cx, gy + 14, 90, 112, NBC_Orders.TEAM_COLOR[o.team == NBC_Orders.TEAM_ALPHA ? 0 : 1]);
-			Pic(o.Portrait(), cx + 7, gy + 20, 76, 76);
-			Text(NewSmallFont, Font.CR_WHITE, cx + 45, gy + 98, o.RankedName(), 9, 1);
-			Text(NewSmallFont, Font.CR_GRAY, cx + 45, gy + 110, String.Format("%s - %s", o.ClassName(), o.team == NBC_Orders.TEAM_ALPHA ? "A" : "B"), 7, 1);
+			Inset(cx, gy + 14, 90, 100, NBC_Orders.TEAM_COLOR[o.team == NBC_Orders.TEAM_ALPHA ? 0 : 1]);
+			Pic(o.Portrait(), cx + 12, gy + 18, 66, 66);
+			Text(NewSmallFont, Font.CR_WHITE, cx + 45, gy + 86, o.RankedName(), 9, 1);
+			Text(NewSmallFont, Font.CR_GRAY, cx + 45, gy + 99, String.Format("%s - %s", o.ClassName(), o.team == NBC_Orders.TEAM_ALPHA ? "A" : "B"), 7, 1);
 			cx += 98;
 		}
-		if (!dept.squad.Size()) Text(NewSmallFont, Font.CR_RED, x + 120, gy + 60, "No officers with you. You're going in alone.", 12);
+		if (!dept.squad.Size()) Text(NewSmallFont, Font.CR_RED, x + 120, gy + 56, "No officers with you. You're going in alone.", 12);
 
 		// go?
 		bool canGo = rm.IsHub() && !rd.raidActive && rd.caseActive && g && !rm.DistrictTaken(rd, d) && seats >= need;
 		String why = seats < need ? String.Format("Not enough seats: %d going in, %d in the motorcade. Pick another vehicle or bench someone.", need, seats)
-			: String.Format("Day %d of %d. A raid takes the day.", rd.day, NBC_RunData.MAX_DAYS);
-		Text(NewSmallFont, seats < need ? Font.CR_RED : Font.CR_GRAY, x + 16, y + h - 82, why, 11);
+			: String.Format("Day %d of %d, going in at %s. A raid takes the day.", rd.day, NBC_RunData.MAX_DAYS, NBC_Clock.WindowLine(when));
+		Text(NewSmallFont, seats < need ? Font.CR_RED : Font.CR_GRAY, x + 16, y + h - 76, why, 11);
 		Button(ID_NOTYET, 0, x + 16, y + h - 60, 140, 44, "NOT YET", true, 15);
 		Button(ID_PLAN, 0, x + 166, y + h - 60, 180, 44, "CHANGE PLAN", true, 15);
 		Button(ID_GO, 0, x + w - 16 - 240, y + h - 60, 240, 44, roof ? "WHEELS UP" : "ROLL OUT", canGo, 21, C_AMBER);

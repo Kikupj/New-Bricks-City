@@ -294,6 +294,14 @@ class NBC_Terminal : NBC_UI
 			{
 				Text(NewSmallFont, down ? Font.CR_DARKGRAY : g.TextColor(), 448, y + 6, g.name, 11, 2);
 				if (down) Text(BigFont, Font.CR_GREEN, 448, y + 22, "TAKEN", 11, 2);
+				else if (rd.EventIn(d))
+				{
+					// today's event is here
+					String tag = String.Format("%s - %s", NBC_Clock.EV_NAME[rd.evKind], NBC_Clock.WIN_NAME[rd.evWindow]);
+					double tw = TextWidth(NewSmallFont, tag, 9) + 12;
+					Fill(448 - tw, y + 22, tw, 14, rd.evKind == NBC_Clock.EV_PINNED ? C_RED : C_AMBER_DIM);
+					Text(NewSmallFont, Font.CR_WHITE, 448 - 6, y + 24, tag, 9, 2);
+				}
 				else
 				{
 					int gi = rd.districtGang[d];
@@ -341,6 +349,23 @@ class NBC_Terminal : NBC_UI
 					px += tw + 6;
 				}
 			}
+			// by the clock: how many are out, how many off guard, at each hour
+			if (!down)
+			{
+				double cy = y + 206, cw = (w - 40 - 3 * 6) / 4;
+				Text(NewSmallFont, Font.CR_GRAY, x + 20, cy, "BY THE CLOCK", 10);
+				Text(NewSmallFont, Font.CR_DARKGRAY, x + w - 20, cy, g.hours, 9, 2);
+				for (int k = 0; k < NBC_Clock.W_COUNT; k++)
+				{
+					double cx = x + 20 + k * (cw + 6);
+					double str = g.StrengthAt(k);
+					Fill(cx, cy + 14, cw, 34, C_INSET);
+					Frame(cx, cy + 14, cw, 34, C_INSET_LINE);
+					Text(NewSmallFont, Font.CR_WHITE, cx + 6, cy + 17, NBC_Clock.WIN_NAME[k], 9);
+					Text(NewSmallFont, str > 1.05 ? Font.CR_RED : (str < 0.95 ? Font.CR_GREEN : Font.CR_GRAY), cx + 6, cy + 31,
+						String.Format("%d%% out, %d%% asleep", int(round(100 * str)), g.OffGuardAt(k)), 8);
+				}
+			}
 			if (down)
 			{
 				Stamp(x + w / 2, 432, "TOPPLED", C_GREEN, 26);
@@ -351,7 +376,14 @@ class NBC_Terminal : NBC_UI
 		let dept = NBC_Department.Find();
 		int ready = 0;
 		if (dept) for (int i = 0; i < dept.roster.Size(); i++) if (dept.roster[i].Available()) ready++;
-		Text(NewSmallFont, Font.CR_GRAY, x + 20, 466, String.Format("Squad: %d picked, %d of %d officers fit for duty.",
+		if (rd.EventIn(d))
+		{
+			// today's event, here
+			Fill(x + 20, 452, w - 40, 30, rd.evKind == NBC_Clock.EV_PINNED ? 0x4A2A2A : 0x3A3020);
+			Wrap(NewSmallFont, Font.CR_GOLD, x + 26, 454, w - 52, String.Format("%s: %s", NBC_Clock.EV_NAME[rd.evKind],
+				NBC_Clock.EventLine(rd.evKind, rm.TurfTitle(d), rd.evWindow)), 9, 2);
+		}
+		else Text(NewSmallFont, Font.CR_GRAY, x + 20, 466, String.Format("Squad: %d picked, %d of %d officers fit for duty.",
 			dept ? dept.squad.Size() : 0, ready, dept ? dept.roster.Size() : 0), 11);
 		Button(ID_PLAN, 0, x + w - 20 - 190, 486, 190, 46, "PLAN RAID", CanRaid(d), 19, C_AMBER);
 		Button(ID_ENDDAY, 0, x + 20, 486, 140, 46, "CLOSE THE DAY", !rd.raidActive, 11);

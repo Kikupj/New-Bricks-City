@@ -12,6 +12,11 @@
 //   damage            pairs of <damage type> <factor> taken by gang members (NBC_Light, NBC_Shell, NBC_Rifle, Fire, Melee, Blunt)
 //   painchance        multiplier on gang members' pain chance (stagger resistance < 1)
 //   trait             one line for the raid board dossier
+//   strength          the time of day (zscript/nbc/clock.zs): how many of them are out at each hour, a multiplier
+//                     on the crew for MORNING AFTERNOON DUSK NIGHT (four numbers)
+//   offguard          the share of the crew off guard at each hour (asleep, high, half-watching: slow to react), in
+//                     percent, MORNING AFTERNOON DUSK NIGHT
+//   hours             one line for the raid board on how they keep the clock
 //   mansion           the kit floors the gang holds (PLAN.md §6.7, §6.9), "<kit>:<variant>"; a raid picks one with
 //                     the case RNG. Kits and their variants (nbc/zscript/nbc/kit_*.zs):
 //                       tower     occupied floor, gallery floor, gang floor, burned-out floor, penthouse floor
@@ -35,6 +40,9 @@ gang stoop_kings
 	leaderhealth = 6
 	escorts = 3
 	trait = "Swarm: more of them on every stoop, but they drop fast."
+	strength = 0.75 0.95 1.25 1.15
+	offguard = 45 20 5 15
+	hours = "Stoop life: out in force from dusk, sleeping it off until noon."
 	mansion = "tower:gang floor" "tower:gallery floor" "street:corner stores" "roof:roof camp"
 }
 
@@ -55,6 +63,9 @@ gang rust_saints
 	escorts = 2
 	damage = Fire 0
 	trait = "Pyros: fire and explosives, and fire won't touch them."
+	strength = 0.85 0.9 1.0 1.3
+	offguard = 35 25 10 0
+	hours = "Night shift at the chop lot: full force after dark, thin and groggy in the morning."
 	mansion = "street:chop lot" "basement:parking garage" "tower:burned-out floor" "basement:cook lab"
 }
 
@@ -76,6 +87,9 @@ gang iron_pit
 	damage = Fire 1.5
 	painchance = 0.4
 	trait = "Roiders: they shrug off stagger. Fire hurts them half again."
+	strength = 1.2 1.0 0.85 1.1
+	offguard = 0 15 35 10
+	hours = "Early risers: they train at dawn and fight at night. Dusk finds them worn out."
 	mansion = "basement:fight pit" "basement:service basement"
 }
 
@@ -96,5 +110,8 @@ gang collectors
 	escorts = 3
 	damage = NBC_Light 0.6
 	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles."
+	strength = 1.0 1.25 1.0 0.7
+	offguard = 10 0 15 35
+	hours = "Business hours: the suits are all in by day; a skeleton crew minds the tower at night."
 	mansion = "tower:penthouse floor" "street:tower entrance"
 }

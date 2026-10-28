@@ -20,6 +20,8 @@ demolition crews roll in either way.
 - [Controls](#controls)
 - [The squad](#the-squad)
 - [Squad orders](#squad-orders)
+- [The motor pool](#the-motor-pool)
+- [Time of day](#time-of-day)
 - [The precinct screens](#the-precinct-screens)
 - [The gangs](#the-gangs)
 - [The districts](#the-districts)
@@ -58,10 +60,12 @@ dialogue, image and sound in the mod is original.
    who are fit for duty are there; talk to them with Use. Use the **raid board** (or the captain) to open a
    case. A seed deals the four gangs across eight districts.
 2. **Plan a raid.** Pick a district on the raid board. Its dossier shows the gang, its leader, its tier,
-   how alert it is, how many are on the block and what works on them.
+   how alert it is, how many are on the block, what works on them and how they keep the clock (how many are
+   out and how many are off guard at each hour). The day's event, if there is one, is flagged on its district.
 3. **Deploy.** Choose up to four officers, split them into fireteams ALPHA and BRAVO, and fit everyone out
    (you included) from the Evidence Locker. Press **READY** to lock in the plan.
-4. **Roll out.** Walk to Rook, the pilot, and talk to them. Choose the insertion and the motorcade:
+4. **Roll out.** Walk to Rook, the pilot, and talk to them. Choose **when** (morning, afternoon, dusk or
+   night; the day's event fixes the hour in its district), the insertion and the motorcade:
    **STREET** (land vehicles, the raid starts on the street) or **ROOFTOP** (a helicopter: the raid starts on the
    district's roofs, but it can be shot down, and a crash landing turns into a survival ambush round the wreck).
    The vehicles' seats have to carry everyone. **ROLL OUT** / **WHEELS UP** starts the raid.
@@ -227,17 +231,52 @@ with a panel van and an unmarked sedan.
 
 | Vehicle | Seats (you included) | Price | On a raid |
 |---|---|---|---|
-| Unmarked sedan | 2 | $350 | low profile: a sedans-only motorcade means fewer of them on the block |
-| Panel van | 4 | $800 | room for the stack |
+| Unmarked sedan | 2 | $350 | you alone or with one officer, and it rides alone; low profile: fewer of them on the block |
+| Panel van | 5 | $800 | room for you and a full squad |
 | Armored truck | 5 | $2,200 | officers take less damage; never wears down |
 | Helicopter | 5 | $4,000 | rooftop insertion, fewer of them up there; can be shot down |
 
-- **Street insertions** park the motorcade behind your start on the district map.
+- **Street insertions** park the motorcade out on the street nearest your start on the district map.
 - **Rooftop insertions** fly you onto the district's own rooftop map (`NBC_RF01-08`). The shoot-down risk (shown
   before you go) grows with the gang's tier and alert and the helicopter's damage.
 - **Shot down:** you come down in the street, hurt, next to the burning wreck, and the gang sends four waves at
   the crash site. Hold out until the way to the exit is clear and walk out. The helicopter is gone.
 - Vehicles wear down on raids, go to the shop under 30% condition and are written off at 0.
+
+## Time of day
+
+Like Hamburger Hill's missions, every raid goes in at an hour: **MORNING** (07:00), **AFTERNOON** (14:00),
+**DUSK** (19:30) or **NIGHT** (02:00). Pick it on Rook's roll-out screen; each hour shows what it does to the
+gang you're hitting.
+
+- **The gang keeps its own clock** (`strength` and `offguard` in `gangs.txt`): how many of them are out, and how
+  many of those are off guard (asleep, high, half-watching). An off-guard member stands frozen and notices
+  nothing until they're shot, someone fires nearby (they're up a few seconds later) or you walk right up to them.
+
+  | Gang | Their hours |
+  |---|---|
+  | The Stoop Kings | out in force from dusk; sleeping it off until noon |
+  | The Rust Saints | the night shift: full force after dark, thin and groggy in the morning |
+  | The Iron Pit | they train at dawn and fight at night; dusk finds them worn out |
+  | The Collectors | business hours: all in by day, a skeleton crew at night |
+
+- **The block:** the sky (a morning, afternoon and dusk skyline, `tools/art/make_sky_variants.py`), the light
+  (brighter by day, dark at night; the flashlight matters) and a tint.
+- **The squad:** officers see less far and shoot wider at dusk and at night.
+
+**The day's event.** Most mornings from day 2, something is going down somewhere (the case RNG). Raid that
+district today and you go in at its hour, in its situation:
+
+| Event | Hour | What it means |
+|---|---|---|
+| Gang war | dusk or night | a rival crew hit them: 30% fewer, and the rest are hurt |
+| Crowded streets | afternoon or dusk | the crowd covers you (30% more off guard), but the first shot wakes the whole block; fire in a crowd is a strike |
+| The deal | any | the leader's out with two more guards; double the bounty |
+| Blackout | night | the power's out: darker still, 20% more off guard |
+| Officer pinned down | morning or afternoon | everyone's awake and waiting. Urgent: leave it and it's a strike; get the unit out and City Hall pays $400 |
+
+The radio calls it in when you're back at Checkpoint 9, the captain brings it up, the HUD shows it, and the raid
+board flags its district.
 
 ## The precinct screens
 
@@ -255,7 +294,8 @@ follow Hamburger Hill's:
 - **Deploy:** the roster, the squad (you plus four, AUTO, ALPHA/BRAVO badges) and the kit of whoever is
   selected. Each slot opens a picker showing what's left in the locker. The bottom bar shows the locker
   totals, BACK and READY.
-- **Roll out** (talk to the pilot): the district, STREET or ROOFTOP insertion with the shoot-down risk, the
+- **Roll out** (talk to the pilot): the district, WHEN (the four hours with what each does to the gang), STREET
+  or ROOFTOP insertion with the shoot-down risk, the
   motorcade (pick vehicles, seats needed), everyone going in, and ROLL OUT / WHEELS UP, CHANGE PLAN, NOT YET.
 - **After-action report:** the outcome title, a stats table and letter grade, each officer's portrait
   with kills and KIA / CRITICAL / WOUNDED / PROMOTION stamps, the loot tiles, the cash, and CONTINUE.
@@ -365,6 +405,7 @@ AGENTS.md               the rules for anyone (or any AI agent) working on the co
 | `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results and the command map. |
 | `NBC_StatusBar` | `hud.zs` | The magazine and debris readouts, the raid readout, the squad strip, the threat ring, the radio log. |
 | `NBC_Motor`, `NBC_Vehicle` | `garage.zs` | The vehicle catalog, the garage's vehicles, seats, wear, the shoot-down risk, the crash site's fire. |
+| `NBC_Clock`, `NBC_OffGuard` | `clock.zs` | The time of day (sky, light, the squad's sight), the day's events, gang members off guard. |
 | `NBC_HQNpc` and kin | `hq.zs` | The captain, the pilot and the officers at Checkpoint 9: talk lines, the pilot's wheels-up step. |
 | `NBC_Player` | `player.zs` | The player class: weapon slots, flashlight, quick throw, the OFFICER DOWN intercept. |
 | `NBC_Gangs` | `gangs.zs` | Reads `gangs.txt` and `districts.txt`; gang damage profiles. |
@@ -410,6 +451,8 @@ Debug netevents, from the console:
 | `netevent nbc_debug_clear <n>` | on a raid: down the leader and n of the crew (0 = all) |
 | `netevent nbc_debug_cash <n>` | add seized cash |
 | `netevent nbc_deploy <district> <force>` | start a raid now (force 1: never shot down, 2: shot down) |
+| `netevent nbc_debug_event <kind> <district> <hour>` | set today's event (0 none, 1 gang war, 2 crowd, 3 deal, 4 blackout, 5 pinned; hour 0-3) |
+| `netevent nbc_debug_motorcade` | on a street raid: stand back from the parked motorcade |
 | `nbc_seed <n>` | every new case uses this seed |
 | `nbc_navdebug 1` | show the squad navigation graph's nodes |
 | `nbc_kittest <kit> <variant> <seed>` | generate a kit test floor |

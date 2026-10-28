@@ -3,7 +3,7 @@
 //   ROOFTOP insertion  the helicopter: the raid runs on the district's rooftop map (nbc/rooftops.txt), with
 //                      fewer of the gang watching the roofs, but it can be shot down on the way in, and the
 //                      raid becomes a crash landing on the street map: a survival ambush round the wreck
-// The seats (you included) have to carry the squad. Vehicles wear down on raids (the armored truck doesn't),
+// The seats (you included) have to carry the squad; the sedan is for you alone or you and one officer. Vehicles wear down on raids (the armored truck doesn't),
 // go to the shop below 30% condition, and are wrecked at 0; repairs cost cash. The garage belongs to the case,
 // like the Evidence Locker: a new case starts with the department's panel van and an unmarked sedan.
 
@@ -18,18 +18,20 @@ class NBC_Motor
 
 	static const String TYPE_NAME[] = { "Unmarked Sedan", "Panel Van", "Armored Truck", "Helicopter" };
 	static const String TYPE_SHORT[] = { "SEDAN", "VAN", "TRUCK", "HELI" };
-	static const int TYPE_SEATS[] = { 2, 4, 5, 5 };           // you included
+	static const int TYPE_SEATS[] = { 2, 5, 5, 5 };           // you included
 	static const int TYPE_PRICE[] = { 350, 800, 2200, 4000 };
 	static const String TYPE_ART[] = { "NBCVSEDN", "NBCVVAN", "NBCVTRUK", "NBCHELI" };
 	// what parks at the insertion (the voxel vehicle pack, actors/cw/vehicles.txt)
 	static const String TYPE_ACTOR[] = { "ModernCarDarkBlue", "VanDarkBlue", "ArmoredUACtruckBrown", "HelicopterDarkGreen" };
 	static const String TYPE_PERK[] = {
-		"Low profile: a motorcade of sedans only means 15% fewer of them on the block.",
-		"Room for the stack. The department's own.",
+		"You alone or with one officer, and it rides alone. Low profile: 15% fewer of them on the block.",
+		"Room for you and a full squad of four. The department's own.",
 		"Officers ride armored: they take 15% less damage on the raid. Never wears down.",
 		"Rooftop insertion: the raid starts on the district's roofs, 20% fewer of them up there. Can be shot down." };
 
 	clearscope static bool Flies(int t) { return t == V_HELI; }
+	// the sedan: a solo raid or one with a single partner, and nothing else rolls with it
+	clearscope static bool SoloOnly(int t) { return t == V_SEDAN; }
 	clearscope static int RepairCost(int t, int cond) { return (100 - clamp(cond, 0, 100)) * NBC_Motor.TYPE_PRICE[clamp(t, 0, V_COUNT - 1)] / 250; }
 	clearscope static int SellValue(int t, int cond) { return NBC_Motor.TYPE_PRICE[clamp(t, 0, V_COUNT - 1)] * clamp(cond, 0, 100) / 200; }
 

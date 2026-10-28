@@ -64,6 +64,11 @@ class NBC_StatusBar : DoomStatusBar
 			String title = rm.TurfTitle(rd.raidDistrict);
 			DrawString(nbcSmallFont, title .. (g ? "  -  " .. g.name : ""), (3, y), DI_TEXT_ALIGN_LEFT, g ? g.TextColor() : Font.CR_WHITE, scale: (0.4, 0.4));
 			y += 7;
+			// the hour (clock.zs) and the day's event, if it's this raid's
+			String when = NBC_Clock.WindowLine(rd.raidWindow);
+			if (rd.raidEvent > NBC_Clock.EV_NONE && rd.raidEvent < NBC_Clock.EV_COUNT) when = when .. "  -  " .. NBC_Clock.EV_NAME[rd.raidEvent];
+			DrawString(nbcSmallFont, when, (3, y), DI_TEXT_ALIGN_LEFT, rd.raidEvent ? Font.CR_GOLD : Font.CR_GRAY, scale: (0.4, 0.4));
+			y += 7;
 			String lead;
 			int lc = Font.CR_RED;
 			if (rd.leaderDown) { lead = "Leader down: get to the exit"; lc = Font.CR_GREEN; }
@@ -126,6 +131,10 @@ class NBC_StatusBar : DoomStatusBar
 		if (rd.caseActive)
 			DrawString(nbcSmallFont, String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS,
 				rd.strikes, NBC_RunData.MAX_STRIKES, rd.cash), (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, scale: (0.4, 0.4));
+		// at the precinct: today's event
+		if (rd.caseActive && !rd.raidActive && rd.evKind > NBC_Clock.EV_NONE && rd.evKind < NBC_Clock.EV_COUNT)
+			DrawString(nbcSmallFont, String.Format("TODAY: %s in %s, %s", NBC_Clock.EV_NAME[rd.evKind], rm.TurfTitle(rd.evDistrict),
+				NBC_Clock.WindowLine(rd.evWindow)), (3, y + 7), DI_TEXT_ALIGN_LEFT, rd.evKind == NBC_Clock.EV_PINNED ? Font.CR_RED : Font.CR_GOLD, scale: (0.4, 0.4));
 	}
 
 	override void Draw(int state, double TicFrac)

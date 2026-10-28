@@ -46,7 +46,9 @@ class NBC_ResultsMenu : NBC_UI
 		while (tsize > 22 && TextWidth(BigFont, title, tsize) > VW - 40) tsize -= 2;
 		Text(BigFont, Font.CR_BLACK, VW / 2 + 3, 15, title, tsize, 1, 0.7);
 		Text(BigFont, rep.outcome == NBC_Report.OUT_DOWN ? Font.CR_RED : Font.CR_WHITE, VW / 2, 12, title, tsize, 1);
-		Text(NewSmallFont, Font.CR_GRAY, VW / 2, 12 + tsize + 4, rep.title .. (rep.gang != "" ? "  -  " .. rep.gang : ""), 12, 1);
+		String when = NBC_Clock.WindowLine(rep.window);
+		if (rep.eventKind > NBC_Clock.EV_NONE && rep.eventKind < NBC_Clock.EV_COUNT) when = when .. ", " .. NBC_Clock.EV_NAME[rep.eventKind];
+		Text(NewSmallFont, Font.CR_GRAY, VW / 2, 12 + tsize + 4, rep.title .. (rep.gang != "" ? "  -  " .. rep.gang : "") .. "  -  " .. when, 12, 1);
 
 		// the numbers and the grade
 		Panel(16, 80, 420, 196);

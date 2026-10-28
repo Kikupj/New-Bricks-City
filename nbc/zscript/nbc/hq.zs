@@ -118,8 +118,18 @@ class NBC_Captain : NBC_HQNpc
 			if (rd && rd.caseResult != NBC_CASE_RUNNING) return "That one's gone, Vance. Wipe the board. We start again.";
 			return "Thirty days, Vance. City Hall signed the order. Open the case file on the board and let's make them count.";
 		}
+		// a unit pinned down comes before anything else
+		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
+		if (rm && rd.evKind == NBC_Clock.EV_PINNED)
+			return String.Format("Drop everything. A unit's pinned down in %s. Get them out by %s or IA hangs it on you.", rm.TurfTitle(rd.evDistrict), NBC_Clock.WIN_NAME[rd.evWindow].MakeLower());
 		Array<String> say;
 		say.Push(String.Format("Day %d of %d. %d of the gangs are still standing.", rd.day, NBC_RunData.MAX_DAYS, rd.GangsLeft()));
+		if (rm && rd.evKind != NBC_Clock.EV_NONE)
+		{
+			String ev = NBC_Clock.EventLine(rd.evKind, rm.TurfTitle(rd.evDistrict), rd.evWindow);
+			say.Push(ev); say.Push(ev);      // the news of the day, twice as likely
+		}
+		say.Push("Pick your hour. Some of them sleep all day, some never sleep. Read the file.");
 		if (rd.strikes > 0) say.Push(String.Format("Internal Affairs called again. You're on %d strike%s. Don't make it three.", rd.strikes, rd.strikes == 1 ? "" : "s"));
 		if (dept)
 		{
@@ -178,8 +188,8 @@ class NBC_Pilot : NBC_HQNpc
 		let dept = NBC_Department.Find();
 		if (rd && rd.readyDistrict >= 0 && rm)
 			return dept && dept.insertion == NBC_Motor.INS_ROOFTOP && dept.HasHeli() ?
-				String.Format("Bird's fueled for %s. Say the word.", rm.TurfTitle(rd.readyDistrict)) :
-				String.Format("Motorcade's gassed up for %s. Say the word.", rm.TurfTitle(rd.readyDistrict));
+				String.Format("Bird's fueled for %s, %s. Say the word.", rm.TurfTitle(rd.readyDistrict), NBC_Clock.WindowLine(rd.WindowFor(rd.readyDistrict))) :
+				String.Format("Motorcade's gassed up for %s, %s. Say the word.", rm.TurfTitle(rd.readyDistrict), NBC_Clock.WindowLine(rd.WindowFor(rd.readyDistrict)));
 		if (!rd || !rd.caseActive) return "No case, no flight. The captain's got the files.";
 		if (dept && !dept.HasHeli()) return "No bird in the motor pool, so I drive. Get us a helicopter and I'll put you on the roofs.";
 		static const String idle[] = {

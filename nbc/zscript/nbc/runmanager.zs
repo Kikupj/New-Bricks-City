@@ -31,6 +31,8 @@ class NBC_RunManager : EventHandler
 
 	// raid bookkeeping (this map only)
 	bool raidSetUp, reinforced, exitFound;
+	bool blockAwake, fireStrike;
+	Vector3 parkedAt;                   // where the motorcade parked (nbc_debug_motorcade)        // crowded streets: the first shot wakes the block; fire in the crowd (a strike)
 	int startCount, officerDownTics, cashAtStart;
 	Vector3 exitPos;
 	Actor leader;
@@ -64,8 +66,12 @@ class NBC_RunManager : EventHandler
 			let p = players[consoleplayer].mo;
 			if (p) StripKit(p);
 			if (!dept.reportPending)
-				Announce(rd.caseActive ? "CHECKPOINT 9. Plan the next raid at the raid board, or ask the captain." :
-					"CHECKPOINT 9. Talk to the captain, or open a case at the raid board.", 35 * 6);
+			{
+				String radio = rd.caseActive && rd.evKind != NBC_Clock.EV_NONE ? String.Format("\nRADIO, %s: %s", NBC_Clock.EV_NAME[rd.evKind],
+					NBC_Clock.EventLine(rd.evKind, TurfTitle(rd.evDistrict), rd.evWindow)) : "";
+				Announce(rd.caseActive ? "CHECKPOINT 9. Plan the next raid at the raid board, or ask the captain." .. radio :
+					"CHECKPOINT 9. Talk to the captain, or open a case at the raid board.", 35 * (radio != "" ? 10 : 6));
+			}
 			StaffHQ(dept);
 		}
 	}
@@ -165,15 +171,18 @@ class NBC_RunManager : EventHandler
 		int gi = rd && d >= 0 && d < rd.districtGang.Size() ? rd.districtGang[d] : -1;
 		return gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi];
 	}
-	// roughly how many are on the block (the raid's own count, before the dice)
-	clearscope int CrewEstimate(NBC_RunData rd, int d) const
+	// roughly how many are on the block (the raid's own count, before the dice), at an hour (-1: the one it'd go in at)
+	clearscope int CrewEstimate(NBC_RunData rd, int d, int w = -1) const
 	{
 		let g = DistrictGang(rd, d);
 		if (!g) return 0;
 		int gi = rd.districtGang[d];
 		int alert = gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0;
+		if (w < 0) w = rd.WindowFor(d);
+		int ev = rd.EventIn(d) ? rd.evKind : NBC_Clock.EV_NONE;
 		static const int baseCount[] = { 22, 18, 16 };
-		return int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert)) + 1 + g.escorts;
+		return int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev])
+			+ 1 + g.escorts + NBC_Clock.EV_ESCORTS[ev];
 	}
 
 	static int NewSeed()
@@ -428,6 +437,13 @@ class NBC_RunManager : EventHandler
 			}
 		}
 
+		// the hour and the day's event (clock.zs)
+		int w = clamp(rd.raidWindow, 0, NBC_Clock.W_COUNT - 1);
+		int ev = clamp(rd.raidEvent, 0, NBC_Clock.EV_COUNT - 1);
+		double hpMul = g.health * NBC_Clock.EV_HEALTH[ev];
+		int offGuard = clamp(g.OffGuardAt(w) + NBC_Clock.EV_OFFGUARD[ev], 0, 90);
+		blockAwake = false; fireStrike = false;
+
 		// 4. the leader, nearest the exit, with escorts
 		int leaderSpot = -1;
 		double best = 1e12;
@@ -446,11 +462,12 @@ class NBC_RunManager : EventHandler
 				leader.GiveInventoryType("NBC_LeaderToken");
 				leader.SetTag(g.leaderTitle);
 				leader.Scale *= 1.12;
-				for (int k = 0; k < g.escorts; k++)
+				int escorts = g.escorts + NBC_Clock.EV_ESCORTS[ev];
+				for (int k = 0; k < escorts; k++)
 				{
-					Vector2 off = Actor.AngleToVector(k * 360.0 / max(1, g.escorts), 72);
+					Vector2 off = Actor.AngleToVector(k * 360.0 / max(1, escorts), 72 + 24 * (k / 4));
 					Vector3 ep = (lp.xy + off, lp.z);
-					let esc = SpawnMember(PickRoster(g, rd, 2), ep, g, rd, g.health);
+					let esc = SpawnMember(PickRoster(g, rd, 2), ep, g, rd, hpMul);
 					if (esc) crew.Push(esc);
 				}
 			}
@@ -459,16 +476,20 @@ class NBC_RunManager : EventHandler
 		// 5. the crew: the game sets the count, not Obsidian
 		static const int baseCount[] = { 22, 18, 16 };
 		int alert = rd.gangAlert.Size() > rd.raidGang ? rd.gangAlert[rd.raidGang] : 0;
-		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * InsertionCrewFactor(rd));
+		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * InsertionCrewFactor(rd)
+			* g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev]);
 		want = min(want, cand.Size());
-		int placed = 0, k = 0;
+		int placed = 0, k = 0, asleep = 0;
 		while (placed < want && k < cand.Size())
 		{
 			int r = rd.Rand(0, 99);
 			int tier = r < 60 - alert * 5 ? 1 : (r < 90 ? 2 : 3);
-			let a = SpawnMember(PickRoster(g, rd, tier), cand[k].pos, g, rd, g.health);
+			let a = SpawnMember(PickRoster(g, rd, tier), cand[k].pos, g, rd, hpMul);
 			k++;
-			if (a) { crew.Push(a); placed++; }
+			if (!a) continue;
+			crew.Push(a);
+			placed++;
+			if (rd.Rand(0, 99) < offGuard) { a.GiveInventoryType("NBC_OffGuard"); asleep++; }
 		}
 		for (; k < cand.Size(); k++) spareSpots.Push(cand[k]);
 		allSpots.Copy(spots);
@@ -484,22 +505,30 @@ class NBC_RunManager : EventHandler
 			if (!a) continue;
 			a.Equip(o, s);
 			if (RolledOut(rd, NBC_Motor.V_TRUCK)) a.takeMul *= 0.85;     // they rode in armored
+			a.range *= NBC_Clock.SIGHT[w];                                 // the dark
+			a.spread *= NBC_Clock.SPREAD[w];
 			a.CatchUp(p);
 			squad.Push(a);
 		}
 
-		// 7. how you got here: the motorcade parks behind you, or the helicopter came down
+		// 7. the hour: the sky and the light
+		NBC_Clock.LightTheBlock(w, NBC_Clock.EV_DARK[ev]);
+
+		// 8. how you got here: the motorcade parks behind you, or the helicopter came down
 		int parked = rd.raidMode == NBC_Motor.MODE_STREET ? ParkMotorcade(p, rd) : 0;
 
-		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers, %d vehicles parked. Exit %s.",
+		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers, %d vehicles parked. %s, %d off guard. Exit %s.",
 			level.MapName, kit ? kit.VariantName() : TurfEnv(rd.raidDistrict), g.name, spots.Size(), startCount,
-			leader ? "leader" : "no leader", squad.Size(), parked, exitFound ? "found" : "not found (far spot)");
+			leader ? "leader" : "no leader", squad.Size(), parked, NBC_Clock.WindowLine(w), asleep, exitFound ? "found" : "not found (far spot)");
 		String title = TurfTitle(rd.raidDistrict);
 		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
 		if (rd.raidMode == NBC_Motor.MODE_CRASH) { CrashSite(p, rd, g); return; }
 		String how = rd.raidMode == NBC_Motor.MODE_ROOF ? "Rook puts you down on the roofs. " : "";
-		Announce(String.Format("%s%s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
-			how, title, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
+		String when = NBC_Clock.WindowLine(w);
+		if (ev != NBC_Clock.EV_NONE) when = String.Format("%s, %s", when, NBC_Clock.EV_NAME[ev]);
+		if (ev == NBC_Clock.EV_CROWD) when = when .. ": no fire in the crowd";
+		Announce(String.Format("%s%s, %s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
+			how, title, when, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
 	}
 
 	// ------------------------------------------------------------ the motorcade (garage.zs)
@@ -542,7 +571,7 @@ class NBC_RunManager : EventHandler
 		return false;
 	}
 
-	// fewer of them where they aren't looking: the roofs, or a motorcade of plain sedans
+	// fewer of them where they aren't looking: the roofs, or the unmarked sedan
 	double InsertionCrewFactor(NBC_RunData rd)
 	{
 		if (rd.raidMode == NBC_Motor.MODE_ROOF) return 0.8;
@@ -556,35 +585,41 @@ class NBC_RunManager : EventHandler
 		return 0.85;
 	}
 
-	// the vehicles that brought you, parked behind the start (where there's room)
-	// Each vehicle takes the first clear spot it can see from the start, behind you first, then round the sides.
+	// the vehicles that brought you, parked out on the street nearest the start (Obsidian's starts are often
+	// indoors): the closest clear spot under the sky, away from the gang; the rest of the motorcade parks beside
+	// the first
 	int ParkMotorcade(Actor p, NBC_RunData rd)
 	{
 		let dept = NBC_Department.Find();
 		if (!dept) return 0;
-		static const double turn[] = { 180, 150, 210, 120, 240, 90, 270, 60, 300, 30, 330, 0 };
-		static const double dist[] = { 160, 260, 380, 520 };
 		int n = 0;
+		Vector2 first = p.pos.xy;
 		for (int i = 0; i < rd.raidVehicles.Size(); i++)
 		{
 			let v = dept.VehicleById(rd.raidVehicles[i]);
 			if (!v) continue;
 			class<Actor> cls = NBC_Motor.TYPE_ACTOR[v.type];
 			if (!cls) continue;
+			// the first one: rings out from the start; the others: rings out from the first
+			Vector2 from = n ? first : p.pos.xy;
+			double r0 = n ? 120 : 96, r1 = n ? 480 : 1600;
 			bool parked = false;
-			for (int r = 0; r < dist.Size() && !parked; r++)
+			for (double r = r0; r <= r1 && !parked; r += 64)
 			{
-				for (int t = 0; t < turn.Size() && !parked; t++)
+				for (double a = 0; a < 360 && !parked; a += 15)
 				{
-					Vector2 at = p.pos.xy + Actor.AngleToVector(p.angle + turn[t], dist[r]);
-					if (!level.IsPointInLevel((at, p.pos.z))) continue;
-					double fz = p.GetZAt(at.x, at.y, 0, GZF_ABSOLUTEPOS);
-					if (abs(fz - p.floorz) > 24) continue;
-					let car = Actor.Spawn(cls, (at, fz), NO_REPLACE);
+					Vector2 at = from + Actor.AngleToVector(p.angle + 180 + a, r);
+					Sector sec = level.PointInSector(at);
+					if (sec.GetTexture(Sector.ceiling) != skyflatnum) continue;
+					bool near = false;
+					for (int c = 0; c < crew.Size() && !near; c++) if (crew[c] && (crew[c].pos.xy - at).Length() < 448) near = true;
+					if (near) continue;
+					let car = Actor.Spawn(cls, (at, sec.floorplane.ZatPoint(at)), NO_REPLACE);
 					if (!car) break;
-					if (!car.TestMobjLocation() || !p.CheckSight(car)) { car.Destroy(); continue; }
-					car.angle = p.angle;
+					if (!car.TestMobjLocation()) { car.Destroy(); continue; }
+					car.angle = p.angle + rd.Rand(-1, 1) * 10;
 					parked = true;
+					if (!n) { first = at; parkedAt = (at, car.pos.z); }
 					n++;
 				}
 			}
@@ -796,7 +831,7 @@ class NBC_RunManager : EventHandler
 		if (t.FindInventory("NBC_LeaderToken") && !rd.leaderDown)
 		{
 			rd.leaderDown = true;
-			rd.raidBounty = 300 * (g ? g.tier : 1);
+			rd.raidBounty = 300 * (g ? g.tier : 1) * (rd.raidEvent == NBC_Clock.EV_DEAL ? 2 : 1);
 			Announce(String.Format("%s is down. Get to the exit to take the block.", g ? g.leaderTitle : "The leader"), 35 * 6);
 		}
 	}
@@ -808,6 +843,17 @@ class NBC_RunManager : EventHandler
 		Actor t = e.Thing;
 		if (t.player) { rd.raidHealthLost += e.Damage; return; }
 		if (!t.bIsMonster || t is "NBC_Ally") return;
+		// crowded streets: the first shot sends the crowd running and wakes the block; fire in the crowd is a strike
+		if (rd.raidEvent == NBC_Clock.EV_CROWD && e.DamageSource && (e.DamageSource.player || e.DamageSource is "NBC_Ally"))
+		{
+			if (!blockAwake) { blockAwake = true; Announce("Shots fired! The crowd scatters and the whole block knows you're here.", 35 * 4); }
+			if (e.DamageType == 'Fire' && !fireStrike)
+			{
+				fireStrike = true;
+				rd.strikes++;
+				Announce(String.Format("Fire in a crowd. Internal Affairs will hear about this: strike %d of %d.", rd.strikes, NBC_RunData.MAX_STRIKES), 35 * 6);
+			}
+		}
 		// who gets the kill (this event comes just before the death)
 		if (t.health <= 0 && e.DamageSource)
 		{
@@ -953,6 +999,13 @@ class NBC_RunManager : EventHandler
 		}
 		rep.mode = rd.raidMode;
 		Wear(rd, dept, rep, taken);
+		// the day's event: a pinned-down unit got out
+		if (rd.raidEvent == NBC_Clock.EV_PINNED && !rd.officerDown)
+		{
+			rd.cash += NBC_Clock.PINNED_PAY;
+			rep.bounty += NBC_Clock.PINNED_PAY;
+			rep.notes.Push(String.Format("The pinned unit's out. City Hall pays $%d.", NBC_Clock.PINNED_PAY));
+		}
 		rep.cashRaid = rd.cash - cashAtStart - rep.bounty;
 		rep.balance = rd.cash;
 
@@ -963,8 +1016,13 @@ class NBC_RunManager : EventHandler
 		if (rd.officerDown) score = min(score, 25);
 		rep.grade = score >= 80 ? "A" : (score >= 65 ? "B" : (score >= 50 ? "C" : (score >= 35 ? "D" : "F")));
 
+		if (fireStrike) rep.notes.Push("Fire in a crowd: a strike from Internal Affairs.");
+		rep.window = rd.raidWindow;
+		rep.eventKind = rd.raidEvent;
+
 		rd.raidActive = false;
-		rd.EndDay(gi);
+		rd.EndDay(gi, rd.raidDistrict);
+		if (rd.missedUrgent) rep.notes.Push(String.Format("The unit pinned down in %s waited all day: a strike from Internal Affairs.", TurfTitle(rd.evDistrictWas)));
 		switch (rd.caseResult)
 		{
 		case NBC_CASE_WON: rep.dayLine = "CASE CLOSED. Every gang in the Bricks is down."; break;
@@ -983,6 +1041,23 @@ class NBC_RunManager : EventHandler
 		if (e.Name ~== "nbc_debug_case") { DebugCase(); return; }
 		if (e.Name ~== "nbc_debug_clear") { DebugClear(e.Args[0]); return; }
 		if (e.Name ~== "nbc_debug_cash") { let rd = NBC_RunData.Get(); rd.cash += e.Args[0]; return; }   // testing
+		if (e.Name ~== "nbc_debug_motorcade")   // testing: stand back from the parked motorcade, looking at it
+		{
+			let p = players[consoleplayer].mo;
+			if (!p || parkedAt == (0, 0, 0)) return;
+			Vector2 at = parkedAt.xy + Actor.AngleToVector(p.angle + 180, 220);
+			p.SetOrigin((at, p.GetZAt(at.x, at.y, 0, GZF_ABSOLUTEPOS)), false);
+			p.angle = p.AngleTo(Actor.Spawn("MapSpot", parkedAt));
+			return;
+		}
+		if (e.Name ~== "nbc_debug_event")       // testing: netevent nbc_debug_event <kind 0-5> <district> <hour 0-3>
+		{
+			let rd = NBC_RunData.Get();
+			rd.evKind = clamp(e.Args[0], 0, NBC_Clock.EV_COUNT - 1);
+			rd.evDistrict = rd.evKind ? clamp(e.Args[1], 0, districtMaps.Size() - 1) : -1;
+			rd.evWindow = clamp(e.Args[2], 0, NBC_Clock.W_COUNT - 1);
+			return;
+		}
 		if (e.Name.Left(9) ~== "nbc_dept.")
 		{
 			// "nbc_dept.<op>" a b c (SendNetworkEvent carries three numbers; the op rides in the name)
@@ -1008,7 +1083,9 @@ class NBC_RunManager : EventHandler
 		{
 			rd.EndDay(-1);
 			dept.NewDay();
-			Announce(rd.caseActive ? String.Format("You close the day. The squad rests. Day %d.", rd.day) : "The case is over.", 35 * 4);
+			String missed = rd.missedUrgent ? String.Format("\nYou left the unit pinned down in %s. Internal Affairs: strike %d of %d.",
+				TurfTitle(rd.evDistrictWas), rd.strikes, NBC_RunData.MAX_STRIKES) : "";
+			Announce((rd.caseActive ? String.Format("You close the day. The squad rests. Day %d.", rd.day) : "The case is over.") .. missed, 35 * 6);
 		}
 	}
 
@@ -1102,6 +1179,13 @@ class NBC_RunManager : EventHandler
 		if (!rd) { Console.Printf("nbc: no case data"); return; }
 		Console.Printf("nbc case: active %d result %d seed %d rng steps %d day %d strikes %d cash %d",
 			rd.caseActive, rd.caseResult, rd.seed, rd.rngSteps, rd.day, rd.strikes, rd.cash);
+		Console.Printf("  today: event %d in district %d at %s; planned hour %s", rd.evKind, rd.evDistrict, NBC_Clock.WindowLine(rd.evWindow), NBC_Clock.WindowLine(rd.planWindow));
+		if (IsRaidMap(rd))
+		{
+			int alive = 0, off = 0;
+			for (int i = 0; i < crew.Size(); i++) if (crew[i] && crew[i].health > 0) { alive++; if (crew[i].FindInventory("NBC_OffGuard")) off++; }
+			Console.Printf("  raid: %s, event %d, %d of the crew standing, %d off guard, block awake %d", NBC_Clock.WindowLine(rd.raidWindow), rd.raidEvent, alive, off, blockAwake);
+		}
 		for (int d = 0; d < districtMaps.Size(); d++)
 		{
 			int gi = d < rd.districtGang.Size() ? rd.districtGang[d] : -1;

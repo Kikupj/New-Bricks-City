@@ -10,12 +10,19 @@ class NBC_GangDef
 	Array<String> mansion;     // kit floors the gang holds, "K2:tenement" (kit:variant name); one is picked per raid
 	Array<Name> damageTypes;
 	Array<double> damageFactors;
+	// by the clock (NBC_Clock windows): how many are out, how many of those are off guard (percent), the board line
+	Array<double> strength;
+	Array<int> offGuard;
+	String hours;
 
 	clearscope int TextColor() const
 	{
 		int c = Font.FindFontColor(color);
 		return c == Font.CR_UNDEFINED ? Font.CR_WHITE : c;
 	}
+
+	clearscope double StrengthAt(int w) const { return w >= 0 && w < strength.Size() ? strength[w] : 1.0; }
+	clearscope int OffGuardAt(int w) const { return w >= 0 && w < offGuard.Size() ? offGuard[w] : 0; }
 
 	clearscope double DamageFactorFor(Name type) const
 	{
@@ -82,6 +89,7 @@ class NBC_Gangs
 				g.id = w[1];
 				g.name = w[1]; g.shortName = w[1]; g.color = "White";
 				g.tier = 1; g.budget = 1; g.health = 1; g.leaderHealth = 4; g.painChance = 1; g.escorts = 2;
+				for (int k = 0; k < NBC_Clock.W_COUNT; k++) { g.strength.Push(1.0); g.offGuard.Push(0); }
 				gangs.Push(g);
 				continue;
 			}
@@ -98,6 +106,9 @@ class NBC_Gangs
 			else if (key == "escorts") g.escorts = w[1].ToInt();
 			else if (key == "painchance") g.painChance = w[1].ToDouble();
 			else if (key == "trait") g.trait = w[1];
+			else if (key == "hours") g.hours = w[1];
+			else if (key == "strength") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.strength[k - 1] = w[k].ToDouble(); }
+			else if (key == "offguard") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.offGuard[k - 1] = clamp(w[k].ToInt(), 0, 100); }
 			else if (key == "mansion") { for (int k = 1; k < w.Size(); k++) g.mansion.Push(w[k]); }
 			else if (key == "roster1" || key == "roster2" || key == "roster3")
 			{

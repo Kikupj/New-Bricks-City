@@ -226,6 +226,8 @@ class NBC_Report
 	// what happened to the motorcade, and how the squad went in (NBC_Motor.MODE_*)
 	Array<String> notes;
 	int mode;
+	// the hour it went in at (NBC_Clock.W_*) and the day's event, if it was this raid's (NBC_Clock.EV_*)
+	int window, eventKind;
 
 	enum EOffState { OS_FIT, OS_WOUNDED, OS_CRITICAL, OS_KIA }
 }
@@ -342,14 +344,14 @@ class NBC_Department : Thinker
 	}
 
 	// ------------------------------------------------------------ the motor pool
-	// a new case: the department's own panel van and an unmarked sedan (seats for you and four)
+	// a new case: the department's own panel van (you and four) and an unmarked sedan (you and one)
 	void ResetGarage(NBC_RunData rd)
 	{
 		garage.Clear();
 		nextVehicle = 1;
 		insertion = NBC_Motor.INS_STREET;
 		AddVehicle(NBC_Motor.V_VAN, rd).rolling = true;
-		AddVehicle(NBC_Motor.V_SEDAN, rd).rolling = true;
+		AddVehicle(NBC_Motor.V_SEDAN, rd);
 	}
 
 	NBC_Vehicle AddVehicle(int type, NBC_RunData rd)
@@ -369,10 +371,12 @@ class NBC_Department : Thinker
 		return null;
 	}
 
-	// a vehicle counts for this insertion: ready, and flies for the roofs or drives for the street
+	// a vehicle counts for this insertion: ready, and flies for the roofs or drives for the street; a sedan only
+	// takes you alone or with one officer (owner request), and then it rides alone
 	clearscope bool Fits(NBC_Vehicle v, int ins) const
 	{
-		return v && v.Ready() && (NBC_Motor.Flies(v.type) == (ins == NBC_Motor.INS_ROOFTOP));
+		if (!v || !v.Ready() || NBC_Motor.Flies(v.type) != (ins == NBC_Motor.INS_ROOFTOP)) return false;
+		return !NBC_Motor.SoloOnly(v.type) || SeatsNeeded() <= NBC_Motor.TYPE_SEATS[v.type];
 	}
 	// seats in the motorcade as picked (you included)
 	clearscope int Seats(int ins) const
@@ -406,13 +410,18 @@ class NBC_Department : Thinker
 			if (best) best.rolling = true;
 			return;
 		}
+		// you alone or with one partner: the sedan, if there's one (low profile)
+		NBC_Vehicle car = null;
+		for (int i = 0; i < garage.Size(); i++)
+			if (NBC_Motor.SoloOnly(garage[i].type) && Fits(garage[i], insertion) && (!car || garage[i].cond > car.cond)) car = garage[i];
+		if (car) { car.rolling = true; return; }
 		for (int pass = 0; pass < NBC_Motor.MAX_VEHICLES && Seats(insertion) < SeatsNeeded(); pass++)
 		{
 			NBC_Vehicle best = null;
 			for (int i = 0; i < garage.Size(); i++)
 			{
 				let v = garage[i];
-				if (v.rolling || !Fits(v, insertion)) continue;
+				if (v.rolling || !Fits(v, insertion) || NBC_Motor.SoloOnly(v.type)) continue;
 				if (!best || v.Seats() > best.Seats() || (v.Seats() == best.Seats() && v.cond > best.cond)) best = v;
 			}
 			if (!best) break;
@@ -531,7 +540,8 @@ class NBC_Department : Thinker
 	{
 		OP_SQUAD_TOGGLE = 1, OP_SQUAD_AUTO, OP_PRIMARY, OP_POUCH, OP_VEST, OP_SIDEARM, OP_MELEE,
 		OP_PROMOTE, OP_RECRUIT, OP_SELL, OP_BUY, OP_DISMISS, OP_REPORT_SEEN, OP_AUTO_KIT, OP_TEAM,
-		OP_AVATAR, OP_BUY_VEHICLE, OP_REPAIR, OP_SELL_VEHICLE, OP_ROLL, OP_INSERTION, OP_AUTO_MOTORCADE
+		OP_AVATAR, OP_BUY_VEHICLE, OP_REPAIR, OP_SELL_VEHICLE, OP_ROLL, OP_INSERTION, OP_AUTO_MOTORCADE,
+		OP_WINDOW
 	}
 
 	// a: officer id (0 = you) for kit ops; b/c: the value
@@ -634,7 +644,12 @@ class NBC_Department : Thinker
 		case OP_ROLL:
 		{
 			let v = VehicleById(a);
-			if (v && (v.rolling || Fits(v, insertion))) v.rolling = !v.rolling;
+			if (!v || (!v.rolling && !Fits(v, insertion))) return;
+			v.rolling = !v.rolling;
+			// the sedan rides alone: picking it sends the rest back to the garage, and the other way round
+			if (v.rolling)
+				for (int i = 0; i < garage.Size(); i++)
+					if (garage[i] != v && (NBC_Motor.SoloOnly(v.type) || NBC_Motor.SoloOnly(garage[i].type))) garage[i].rolling = false;
 			return;
 		}
 		case OP_INSERTION:
@@ -643,6 +658,7 @@ class NBC_Department : Thinker
 			AutoMotorcade();
 			return;
 		case OP_AUTO_MOTORCADE: AutoMotorcade(); return;
+		case OP_WINDOW: if (rd) rd.planWindow = clamp(b, 0, NBC_Clock.W_COUNT - 1); return;
 		case OP_TEAM:
 		{
 			let o = OfficerById(a);

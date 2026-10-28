@@ -26,6 +26,12 @@ class NBC_RunData : Thinker
 
 	// the raid planned on the deploy screen (READY), waiting on the pilot; -1: none
 	int readyDistrict;
+	// the hour picked on the roll-out screen (NBC_Clock.W_*), and today's event (clock.zs): what, where, when;
+	// missedUrgent: the last day ended with a pinned-down unit left there (a strike)
+	int planWindow;
+	int evKind, evDistrict, evWindow;
+	bool missedUrgent;
+	int evDistrictWas;                   // where yesterday's event was (for the missed-urgent line)
 
 	// the current raid
 	bool raidActive, leaderDown, officerDown;
@@ -54,6 +60,8 @@ class NBC_RunData : Thinker
 	Array<int> raidVehicles;
 	int crashWave, crashNext;
 	bool crashClear;
+	// the hour the raid went in at, and the day's event if it's in this district (NBC_Clock.EV_NONE otherwise)
+	int raidWindow, raidEvent;
 
 	static NBC_RunData Get()
 	{
@@ -64,6 +72,8 @@ class NBC_RunData : Thinker
 			rd = new("NBC_RunData");
 			rd.ChangeStatNum(STAT_STATIC);
 			rd.readyDistrict = -1;
+			rd.evDistrict = -1;
+			rd.planWindow = NBC_Clock.W_AFTERNOON;
 		}
 		return rd;
 	}
@@ -102,6 +112,9 @@ class NBC_RunData : Thinker
 		strikes = 0;
 		cash = 0;
 		raidActive = false;
+		evKind = NBC_Clock.EV_NONE;
+		evDistrict = -1;
+		missedUrgent = false;
 
 		gangToppled.Clear(); gangAlert.Clear();
 		for (int i = 0; i < gangCount; i++) { gangToppled.Push(false); gangAlert.Push(0); }
@@ -157,6 +170,39 @@ class NBC_RunData : Thinker
 		raidMode = NBC_Motor.MODE_STREET;
 		raidVehicles.Clear();
 		crashWave = 0; crashNext = 0; crashClear = false;
+		raidEvent = EventIn(district) ? evKind : NBC_Clock.EV_NONE;
+		raidWindow = raidEvent != NBC_Clock.EV_NONE ? evWindow : planWindow;
+	}
+
+	// today's event, if it's in this district
+	clearscope bool EventIn(int district) const
+	{
+		return evKind != NBC_Clock.EV_NONE && district >= 0 && district == evDistrict;
+	}
+
+	// the hour a raid on this district goes in at: the event's, or the one picked
+	clearscope int WindowFor(int district) const
+	{
+		return EventIn(district) ? evWindow : clamp(planWindow, 0, NBC_Clock.W_COUNT - 1);
+	}
+
+	// Each morning, maybe something's going down somewhere (from day 2; only where a gang still stands)
+	void RollEvent()
+	{
+		evKind = NBC_Clock.EV_NONE;
+		evDistrict = -1;
+		if (day < 2 || Rand(0, 99) >= NBC_Clock.EVENT_CHANCE) return;
+		Array<int> open;
+		for (int d = 0; d < districtGang.Size(); d++)
+		{
+			int gi = districtGang[d];
+			if (gi >= 0 && gi < gangToppled.Size() && !gangToppled[gi]) open.Push(d);
+		}
+		if (!open.Size()) return;
+		int r = Rand(0, 99);
+		evKind = r < 25 ? NBC_Clock.EV_WAR : (r < 45 ? NBC_Clock.EV_CROWD : (r < 70 ? NBC_Clock.EV_DEAL : (r < 85 ? NBC_Clock.EV_BLACKOUT : NBC_Clock.EV_PINNED)));
+		evDistrict = open[Rand(0, open.Size() - 1)];
+		evWindow = NBC_Clock.EventWindow(evKind, self);
 	}
 
 	clearscope int TeamOfSlot(int slot) const
@@ -171,8 +217,12 @@ class NBC_RunData : Thinker
 	}
 
 	// One day passes (the department heals its officers: NBC_Department.NewDay): alert decays for gangs you left alone, the case may end.
-	void EndDay(int hitGang)
+	// raided: the district raided today (-1: none); a pinned-down unit left where it was is a strike.
+	void EndDay(int hitGang, int raided = -1)
 	{
+		missedUrgent = evKind == NBC_Clock.EV_PINNED && evDistrict >= 0 && raided != evDistrict;
+		evDistrictWas = evDistrict;
+		if (missedUrgent) strikes++;
 		day++;
 		readyDistrict = -1;
 		for (int i = 0; i < gangAlert.Size(); i++)
@@ -186,5 +236,6 @@ class NBC_RunData : Thinker
 			caseActive = false;
 			if (caseResult == NBC_CASE_WON) casesClosed++;
 		}
+		RollEvent();
 	}
 }
