@@ -24,6 +24,33 @@ In the GUI just pick the **New Bricks City** theme; its module switches itself o
 .\uzdoom.exe -iwad freedoom-0.13.0\freedoom2.wad -file nbc +map NBC_CT01
 ```
 
+## Environments
+Every environment is its own Obsidian level theme with its own room themes, styles, hallways, fences, facades,
+prefab boosts and level titles (`NBC_BRICKS.envs`):
+
+| theme | what it builds |
+|---|---|
+| `nbc_streets` | city blocks in Streets Mode: tenements, flats, shops, yards |
+| `nbc_towers` | inside the housing towers: flats along wide corridors, lobbies, few outdoors; concrete-slab facades |
+| `nbc_rooftops` | open tar-and-gravel roofs, stair huts, parapet fences, water towers, AC units and vents |
+| `nbc_industrial` | warehouses in corrugated sheet, factories, big yards, forklifts, crates, corrugated fences |
+| `nbc_parks` | parks with lawns, park railings, benches, a basketball court, fountains, picnic tables, dead trees |
+| `nbc_underground` | basements and boiler rooms, sewers and storm drains, sewer halls, no outdoors, low light |
+| `nbc_subway` | white-tiled stations, track tunnels (rails on the floor), subway and metro halls, waiting benches |
+
+`nbc_bricks` (the default) deals them across the levels like a deck: eight levels get every environment, streets
+twice, before any repeats. `--theme nbc_rooftops` (`-Theme` in PowerShell) builds just one. Every map gets
+Obsidian's 3D city skybox (`zdoom_skybox = themed`), so the skyline stands round the edges.
+
+**Facades per building.** Obsidian gives each zone two facades, so a whole level had two or three building faces.
+Now every building facing the outside picks its own from the environment's set (`facade_sets`): 30 lit-window
+facades in red and brown brick, tan stone with arched windows, grey stone, concrete slabs and dark modern
+blocks, plus corrugated sheet and block for the industrial park.
+
+**The district pool.** `export_maps.py` writes each map's environment as the third column of
+`nbc/districts.txt` (`NBC_CT01 "Pike Water Towers" rooftops`). `--limit 8` exports the first eight maps of a
+longer build: `make_bricks.sh --length episode --limit 8`.
+
 ## What the addon does (`modules/new_bricks_city.lua`)
 - **Theme `nbc_bricks`**: a copy of Obsidian's Urban theme with Bricks facades, fences, asphalt
   streets with a paving-slab kerb, trash fires and lamps, a street-crew monster mix, and a style

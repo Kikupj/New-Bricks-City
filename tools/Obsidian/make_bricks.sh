@@ -3,6 +3,7 @@
 #
 #   tools/Obsidian/make_bricks.sh                          # 4 maps ("few") -> nbc/maps/NBC_CT01-04.wad
 #   tools/Obsidian/make_bricks.sh --name test --length single --seed 42 --no-export
+#   tools/Obsidian/make_bricks.sh --theme nbc_rooftops --length single --no-export   # one environment
 #
 # Obsidian: $OBSIDIAN (a source checkout with the binary built into its root), default /home/user/obsidian-src.
 # Build it once (console-only, no GUI needed):
@@ -17,13 +18,16 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
 obs="${OBSIDIAN:-/home/user/obsidian-src}"
-name=bricks; length=few; seed=0; export=1
+name=bricks; length=few; seed=0; export=1; theme=nbc_bricks; limit=0
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--name) name=$2; shift 2 ;;
 		--length) length=$2; shift 2 ;;
 		--seed) seed=$2; shift 2 ;;
+		--theme) theme=$2; shift 2 ;;     # nbc_bricks (a mix) or one environment: nbc_streets, nbc_towers, nbc_rooftops,
+		                                  # nbc_industrial, nbc_parks, nbc_underground, nbc_subway
 		--no-export) export=0; shift ;;
+		--limit) limit=$2; shift 2 ;;     # export only the first N maps
 		*) echo "make_bricks: unknown option $1"; exit 2 ;;
 	esac
 done
@@ -39,12 +43,12 @@ if [ ! -f "$base" ]; then
 fi
 [ -f "$base" ] || { echo "make_bricks: no CONFIG.txt to start from"; exit 2; }
 
-python3 - "$base" "$out/$name.settings.txt" "$length" "$seed" <<'EOF'
+python3 - "$base" "$out/$name.settings.txt" "$length" "$seed" "$theme" <<'EOF'
 import sys
-base, dest, length, seed = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
+base, dest, length, seed, theme = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5]
 # the same overrides as make_bricks.ps1
 settings = {
-    "game": "doom2", "port": "zdoom", "theme": "nbc_bricks", "length": length,
+    "game": "doom2", "port": "zdoom", "theme": theme, "length": length,
     "@new_bricks_city": "1",
     "@armaetus_epic_textures": "0",    # injects its own textures and Urban room themes
     "@sky_generator": "0",             # paints its own sky graphics
@@ -55,6 +59,7 @@ settings = {
     "steepness": "mixed", "parks": "mixed", "park_detail": "mixed", "porches": "mixed", "cages": "mixed",
     "natural_parks": "none", "traps": "none", "room_heights": "tall-ish", "float_mons": "0.6",
     "bool_allow_teleporter_emergency_breaks": "0",   # no teleporters in the Bricks, not even to mend a layout
+    "zdoom_skybox": "themed",        # the 3D city skybox (the theme's skyboxes) round every map
 }
 lines, seen = [], set()
 for line in open(base, encoding="latin-1").read().splitlines():
@@ -84,4 +89,4 @@ if grep -qE "ERROR OCCURRED|ERROR MESSAGE|Script Error|ERROR: FAILED|Unable to l
 fi
 echo "Built tools/Obsidian/out/$name.wad ($(du -h "$out/$name.wad" | cut -f1))"
 grep -E "^Theme for level|Streets Mode activated|New Bricks City:" "$log" | sed 's/^/  /' || true
-if [ "$export" = 1 ]; then python3 "$here/export_maps.py" "$out/$name.wad"; fi
+if [ "$export" = 1 ]; then python3 "$here/export_maps.py" "$out/$name.wad" --limit "$limit"; fi

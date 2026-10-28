@@ -144,6 +144,27 @@ NBC_BRICKS.MATERIALS =
   -- Freedoom's animated water
   FWATER1  = { f="FWATER1",  t="CWSEAWAL" },
 
+  -- the 30 lit-window facades (256 x 512): brick, stone, concrete and modern blocks
+  CWUDA = { t="CWUDA", f="CWPAVE" }, CWUDB = { t="CWUDB", f="CWPAVE" }, CWUDD = { t="CWUDD", f="CWPAVE" },
+  CWUDE = { t="CWUDE", f="CWPAVE" }, CWUDF = { t="CWUDF", f="CWPAVE" }, CWUEA = { t="CWUEA", f="CWPAVE" },
+  CWUEB = { t="CWUEB", f="CWPAVE" }, CWUEC = { t="CWUEC", f="CWPAVE" }, CWUED = { t="CWUED", f="CWPAVE" },
+  CWUEF = { t="CWUEF", f="CWPAVE" }, CWUGA = { t="CWUGA", f="CWPAVE" }, CWUGB = { t="CWUGB", f="CWPAVE" },
+  CWUGC = { t="CWUGC", f="CWPAVE" }, CWUGD = { t="CWUGD", f="CWPAVE" }, CWUGE = { t="CWUGE", f="CWPAVE" },
+  CWUGF = { t="CWUGF", f="CWPAVE" }, CWUHA = { t="CWUHA", f="CWPAVE" }, CWUHB = { t="CWUHB", f="CWPAVE" },
+  CWUHC = { t="CWUHC", f="CWPAVE" }, CWUHD = { t="CWUHD", f="CWPAVE" }, CWUHE = { t="CWUHE", f="CWPAVE" },
+  CWUHF = { t="CWUHF", f="CWPAVE" }, CWUQA = { t="CWUQA", f="CWPAVE" }, CWUQD = { t="CWUQD", f="CWPAVE" },
+  CWUQE = { t="CWUQE", f="CWPAVE" },
+
+  -- subway: tile, track, a train
+  CWTRAIN  = { t="CWTRAIN",  f="CWCONCF" },
+  CWRAILA  = { f="CWRAILA",  t="CWRETAIN" },
+  CWRAILB  = { f="CWRAILB",  t="CWRETAIN" },
+  AXF27    = { f="AXF27",    t="CWTILEW" },
+  -- industrial: grating, plate, a green shutter
+  AXF40    = { f="AXF40",    t="AXW01" },
+  AXF44    = { f="AXF44",    t="AXW44" },
+  AXW29    = { t="AXW29",    f="CWCONCF" },
+
   -- streets (128 x 128): asphalt road, paving-slab sidewalk
   CWASPH   = { f="CWASPH",   t="CWRETAIN" },
   CWPAVE   = { f="CWPAVE",   t="CWRETAIN" },
@@ -237,6 +258,85 @@ NBC_BRICKS.rooms =
   Cave_rubble = { base = "urban_Cave_generic", env = "cave", prob = 50,
     walls    = { ADCONC1=50, AXW23=40, CWRETAIN=30 },
     floors   = { CWCONCF=50, AXF06B=40, AXF05=30 } },
+
+  -- roofs: a stair hut or the lift machine room on top of a tower
+  StairHut = { base = "urban_Cement", env = "building", prob = 50,
+    walls    = { CWCONCW=40, ADBRICK=30, AXW24=30, CWWALLD=20 },
+    floors   = { CWCONCF=50, AXF02=30 },
+    ceilings = { CWCEILD=50, AXF16=20 },
+    wall_groups = { nbc_utility=40, nbc_storage=30, nbc_camp=20 } },
+
+  -- tar and gravel roofs
+  Roof_top = { base = "urban_Outdoors_generic", env = "outdoor", prob = 100,
+    floors   = { CWASPH=40, AXF01=30, CWCONCF=30, AXF02=20 },
+    naturals = { AXF01=40, CWCONCF=30, AXF06B=20 } },
+
+  -- basements: old brick and poured concrete, low light
+  Basement = { base = "urban_Cement", env = "building", prob = 100,
+    walls    = { CWCONCW=40, ADBRICK=30, AXW24=30, CWWALLD=20, AXW43C=10 },
+    floors   = { CWCONCF=50, AXF05=30, AXF02=20 },
+    ceilings = { CWCEILD=50, AXF16=20 },
+    light_adjusts = { -32, -16, -16, 0 },
+    wall_groups = { nbc_utility=30, nbc_storage=25, nbc_den=20, nbc_lab=15, nbc_grow=15, nbc_camp=15 } },
+
+  -- sewers and storm drains
+  Sewer = { base = "urban_Cement", env = "building", prob = 50,
+    walls    = { CWSEAWAL=40, CWRETAIN=30, CWWALLD=30, AXW14=15, AXW12=15 },
+    floors   = { AXF05=40, CWCONCF=40 },
+    ceilings = { CWCEILD=60 },
+    light_adjusts = { -32, -32, -16 },
+    wall_groups = { nbc_camp=40, nbc_utility=30 } },
+
+  sewers_Hallway = { base = "urban_metro_Hallway", env = "hallway", group = "sewers", prob = 50,
+    walls    = { CWSEAWAL=40, CWRETAIN=30, CWWALLD=30 },
+    floors   = { AXF05=50, CWCONCF=30 },
+    ceilings = { CWCEILD=50 } },
+
+  pipeline_Hallway = { base = "urban_metro_Hallway", env = "hallway", group = "pipeline", prob = 50,
+    walls    = { AXW14=30, AXW43C=30, CWCONCW=30 },
+    floors   = { AXF40=40, CWCONCF=40 },
+    ceilings = { CWCEILD=50 } },
+
+  -- subway: tiled stations, the track tunnels
+  Station = { base = "urban_Brick", env = "building", prob = 100,
+    walls    = { CWTILEW=60, ADGREYW=25, CWWALL2=15, CWCONCW=15 },
+    floors   = { CWTILEF=40, AXF27=30, CWCONCF=20 },
+    ceilings = { ADCTILE=40, CWCEILT=40 },
+    wall_groups = { nbc_lobby=30, nbc_shop=20, nbc_camp=15, nbc_utility=15 } },
+
+  Tunnel = { base = "urban_Cement", env = "building", prob = 60,
+    walls    = { CWWALLD=40, CWCONCW=30, CWRETAIN=30, CWTRAIN=6 },
+    floors   = { CWRAILA=40, CWRAILB=20, CWCONCF=30 },
+    ceilings = { CWCEILD=60 },
+    light_adjusts = { -32, -16, 0 },
+    wall_groups = { nbc_utility=30, nbc_camp=30 } },
+
+  subway_Hallway = { base = "urban_metro_Hallway", env = "hallway", group = "subway", prob = 50,
+    walls    = { CWTILEW=50, ADGREYW=30, CWWALLD=20 },
+    floors   = { CWTILEF=40, CWCONCF=40 },
+    ceilings = { ADCTILE=40, CWCEILT=40 } },
+
+  -- industrial park: warehouses, workshops, yards
+  Warehouse = { base = "urban_Cement", env = "building", prob = 100,
+    walls    = { AXW86=40, AXW87=30, CWCONCW=30, AXW28=15, AXW29=10 },
+    floors   = { CWCONCF=50, AXF02=30, AXF44=10 },
+    ceilings = { AXF16=40, CWCEILD=40 },
+    wall_groups = { nbc_storage=40, nbc_garage=30, nbc_workshop=30 } },
+
+  Factory = { base = "urban_Cement", env = "building", prob = 60,
+    walls    = { ADCONC1=40, AXW24=30, AXW89=30, AXW01=20, AXW43C=15 },
+    floors   = { AXF02=40, AXF40=20, CWCONCF=30 },
+    ceilings = { CWCEILD=50, AXF16=30 },
+    wall_groups = { nbc_workshop=40, nbc_utility=30, nbc_lab=10, nbc_lockers=15 } },
+
+  Yard_industrial = { base = "urban_Outdoors_generic", env = "outdoor", prob = 100,
+    floors   = { CWASPH=40, CWCONCF=30, AXF05=20, AXF01=20 },
+    naturals = { AXF06B=40, AXF05=30, CWCONCF=20 } },
+
+  -- parks: paths, lawns, the court
+  Park = { base = "urban_Outdoors_generic", env = "outdoor", prob = 100,
+    floors   = { CWPAVE=40, AXF01=20, CWCONCF=20, CWASPH=10 },
+    naturals = { GRASS1=50, GRASS2=40, AXF06B=20 } },
 
   -- courtyards, lots and sidewalks between the towers
   Outdoors_yard = { base = "urban_Outdoors_generic", env = "outdoor", prob = 60,
@@ -370,6 +470,204 @@ NBC_BRICKS.theme_overrides =
 
 -- (Urban's wall_groups are replaced by a city list above; nothing to drop.)
 NBC_BRICKS.drop_wall_groups = {}
+
+
+------------------------------------------------------------------------
+--  Environments
+------------------------------------------------------------------------
+--
+-- Each environment is its own level theme, nbc_<env>: the shared overrides above, then the environment's
+-- own (styles, halls, fences, facades...), its own room themes (picked from NBC_BRICKS.rooms by weight), a
+-- prefab boost list, and its level titles. The theme "nbc_bricks" deals environments across the levels
+-- (env_mix); "nbc_rooftops" and the rest build one environment.
+
+-- building faces by kind of block (each building picks one; see Junction_calc_wall_tex below)
+NBC_BRICKS.facade_sets =
+{
+  -- tenements and walk-ups: red and brown brick, stone with arched windows, the odd painted or grey one
+  residential =
+  {
+    CWUDC = 30, CWUEE = 30, CWUQC = 30, CWUEC = 25, CWUGC = 25, CWUQB = 25, CWUQD = 20, CWUQF = 20,
+    CWUDE = 20, CWUQE = 20, CWUEB = 15, CWUGE = 15, CWUHE = 15, CWUDB = 12, CWUED = 12, CWUEF = 10,
+    CWUHC = 10, CWUHD = 10, CWUDD = 8, CWUGB = 8, CWUGD = 8, CWUHF = 8, ADBRICK = 15, AXCITY08 = 6,
+  },
+  -- the housing towers: concrete slabs and dark modern blocks, some brick
+  towers =
+  {
+    CWUDB = 25, CWUED = 25, CWUEF = 25, CWUHC = 25, CWUHD = 25, CWUDA = 20, CWUDF = 20, CWUGA = 15,
+    CWUGF = 15, CWUHA = 15, CWUHB = 15, CWUEA = 15, CWUDC = 10, CWUQC = 10, CWUGC = 10,
+  },
+  -- warehouses and works: corrugated sheet, block, concrete, old brick factories
+  industrial =
+  {
+    AXW86 = 40, AXW87 = 30, CWCONCW = 30, ADCONC1 = 25, CWRETAIN = 20, AXW24 = 15, ADBRICK = 20,
+    CWUHC = 12, CWUHD = 12, CWUDC = 12, AXW29 = 8,
+  },
+  -- what stands on a roof: stair huts, machine rooms, the next tower up
+  rooftops =
+  {
+    CWCONCW = 30, ADBRICK = 30, ADCONC1 = 20, AXW24 = 20, AXW86 = 10,
+    CWUDC = 10, CWUQB = 10, CWUHC = 10, CWUED = 10,
+  },
+  underground = { CWCONCW = 40, ADCONC1 = 30, CWSEAWAL = 30, CWRETAIN = 30, ADBRICK = 20 },
+  subway = { CWTILEW = 40, CWCONCW = 30, CWRETAIN = 30, ADBRICK = 20 },
+}
+
+NBC_BRICKS.envs =
+{
+  streets =
+  {
+    label = "Streets", streets = true, facades = "residential",
+    rooms = { Tenement = 100, Flat = 70, Derelict = 50, Concrete = 40, Lobby = 30, Outdoors_yard = 60,
+              Cave_rubble = 50, deuce_Hallway = 50, metro_Hallway = 50 },
+    titles = { "Street", "Avenue", "Row", "Block", "Alley", "Plaza", "Walk-ups" },
+  },
+
+  towers =
+  {
+    label = "Towers", facades = "towers",
+    rooms = { Flat = 100, Tenement = 70, Derelict = 40, Lobby = 30, Concrete = 20, Outdoors_yard = 50,
+              Cave_rubble = 50, deuce_Hallway = 60, metro_Hallway = 20 },
+    overrides =
+    {
+      -- narrow halls are 1 seed wide (vent, access), wide ones 2 (deuce, metro, subway, sewers, pipeline)
+      narrow_halls = { access = 40, vent = 30 },
+      wide_halls = { deuce = 60, metro = 20 },
+      style_list =
+      {
+        outdoors = { few = 70, some = 30 }, big_outdoor_rooms = { none = 60, few = 40 },
+        hallways = { some = 50, heaps = 50 }, big_rooms = { none = 40, few = 60 },
+        windows = { some = 30, heaps = 70 }, parks = { none = 80, few = 20 },
+      },
+    },
+    titles = { "Towers", "Houses", "Projects", "Courts", "Heights", "Stacks" },
+  },
+
+  rooftops =
+  {
+    label = "Rooftops", facades = "rooftops",
+    rooms = { Roof_top = 100, StairHut = 60, Concrete = 40, Tenement = 30, Cave_rubble = 50,
+              metro_Hallway = 50, deuce_Hallway = 30 },
+    overrides =
+    {
+      narrow_halls = { access = 50, vent = 50 },
+      fence_groups = { PLAIN = 60, gappy = 40, fence_corrugated_steel = 30, fence_highway_bars = 30 },
+      style_list =
+      {
+        outdoors = { heaps = 100 }, big_outdoor_rooms = { some = 50, heaps = 50 },
+        hallways = { none = 40, few = 60 }, parks = { none = 100 }, porches = { heaps = 100 },
+        fences = { some = 40, heaps = 60 }, windows = { few = 40, some = 60 },
+        steepness = { some = 50, heaps = 50 }, big_rooms = { none = 70, few = 30 },
+      },
+    },
+    fab_boost = { Decor_water_tower = 8, Decor_nbc_cw_ac_unit = 6, Decor_air_vent = 6, Pic_HVAC_unit_outdoor = 6 },
+    titles = { "Rooftops", "Roofs", "Skyline", "Tar Beach", "Water Towers" },
+  },
+
+  industrial =
+  {
+    label = "Industrial Park", facades = "industrial",
+    rooms = { Warehouse = 100, Factory = 60, Concrete = 40, Lobby = 10, Yard_industrial = 100, Cave_rubble = 50,
+              metro_Hallway = 50, pipeline_Hallway = 40 },
+    overrides =
+    {
+      narrow_halls = { access = 50, vent = 50 },
+      wide_halls = { metro = 50, deuce = 30 },
+      fence_groups = { fence_corrugated_steel = 80, fence_highway_bars = 50, gappy = 30, PLAIN = 20 },
+      style_list =
+      {
+        outdoors = { some = 50, heaps = 50 }, big_outdoor_rooms = { some = 40, heaps = 60 },
+        big_rooms = { some = 50, heaps = 50 }, hallways = { few = 70, some = 30 },
+        parks = { none = 100 }, fences = { some = 40, heaps = 60 }, windows = { few = 50, some = 50 },
+      },
+    },
+    fab_boost = { Decor_forklift = 4, Decor_road_clutter = 3, Crate_ = 3, Decor_nbc_cw_pallets = 3,
+                  Pic_industrial_storage = 6, Decor_bunchy_pipe = 3 },
+    fab_allow = { "Decor_forklift" },
+    titles = { "Yards", "Works", "Industrial Park", "Depot", "Terminal", "Docks" },
+  },
+
+  parks =
+  {
+    label = "Parks", streets = true, facades = "residential",
+    rooms = { Park = 100, Outdoors_yard = 40, Tenement = 50, Lobby = 30, Concrete = 20, Cave_rubble = 50,
+              deuce_Hallway = 50, metro_Hallway = 30 },
+    overrides =
+    {
+      fence_groups = { fence_park_bars = 60, fence_park_bars_round = 30, PLAIN = 30, fence_planters = 40, gappy = 20 },
+      -- a run-down park keeps its trees (dead ones and stumps)
+      trees = { burnt_tree = 30, brown_stub = 20, nbc_lamppost = 30 },
+      park_decor = { nbc_lamppost = 40, burnt_tree = 20, brown_stub = 15, burning_barrel = 10 },
+      style_list =
+      {
+        outdoors = { heaps = 100 }, big_outdoor_rooms = { some = 30, heaps = 70 },
+        parks = { some = 40, heaps = 60 }, park_detail = { heaps = 100 }, hallways = { none = 50, few = 50 },
+      },
+    },
+    entity_remap_drop = { "burnt_tree", "brown_stub" },
+    fab_boost = { Decor_bench_n_trashcan = 6, Decor_basketball_hoop = 8, Decor_water_fountain = 6,
+                  Decor_cafeteria_picnic_table = 6, Decor_round_planter = 3, Decor_urban_lightpost = 3 },
+    titles = { "Park", "Playground", "Gardens", "Commons", "Green", "Square" },
+  },
+
+  underground =
+  {
+    label = "Underground", facades = "underground",
+    rooms = { Basement = 100, Sewer = 50, Concrete = 50, Derelict = 30, Outdoors_yard = 20, Cave_rubble = 50,
+              sewers_Hallway = 60, pipeline_Hallway = 40, metro_Hallway = 30 },
+    overrides =
+    {
+      narrow_halls = { access = 50, vent = 50 },
+      wide_halls = { sewers = 70, metro = 30 },
+      liquids = { water = 100 },
+      style_list =
+      {
+        outdoors = { none = 100 }, hallways = { some = 50, heaps = 50 }, liquids = { few = 60, some = 40 },
+        windows = { none = 70, few = 30 }, big_rooms = { none = 30, few = 70 }, parks = { none = 100 },
+        steepness = { few = 30, some = 70 },
+      },
+      wall_groups_add = { gtd_wall_sewer = 30, gtd_sewer_set_2 = 30, gtd_sewer_set_3 = 30 },
+    },
+    fab_boost = { Decor_gtd_sewer_3 = 5, Decor_open_pipe_sewer_group = 5, Decor_bunchy_pipe = 4,
+                  Pic_industrial_sewer = 6 },
+    titles = { "Basements", "Sewers", "Cellars", "Boiler Rooms", "Storm Drains" },
+  },
+
+  subway =
+  {
+    label = "Subway", facades = "subway",
+    rooms = { Station = 100, Tunnel = 70, Concrete = 40, Basement = 20, Outdoors_yard = 30, Cave_rubble = 50,
+              subway_Hallway = 60, metro_Hallway = 50 },
+    overrides =
+    {
+      narrow_halls = { access = 50, vent = 50 },
+      wide_halls = { subway = 60, metro = 40 },
+      style_list =
+      {
+        outdoors = { none = 60, few = 40 }, hallways = { some = 40, heaps = 60 }, big_rooms = { few = 50, some = 50 },
+        windows = { none = 60, few = 40 }, parks = { none = 100 }, liquids = { none = 100 },
+      },
+    },
+    fab_boost = { Decor_gtd_DMV_double_bench = 6, Decor_gtd_DMV_multi_bench = 6,
+                  Pic_industrial_cafeteria_vending_machines = 8, Decor_bench_n_trashcan = 3 },
+    titles = { "Station", "Line", "Platforms", "Tunnels", "Junction" },
+  },
+}
+
+-- how "nbc_bricks" deals environments across the levels: like a deck, so a set of eight levels has every
+-- environment (streets twice) before any repeats; the deck is reshuffled when it runs out
+NBC_BRICKS.env_deck = { "streets", "streets", "towers", "rooftops", "industrial", "parks", "underground", "subway" }
+
+function NBC_BRICKS.is_nbc(name)
+  return type(name) == "string" and string.sub(name, 1, 4) == "nbc_"
+end
+
+function NBC_BRICKS.env_of(theme_name)
+  if not NBC_BRICKS.is_nbc(theme_name) then return nil end
+  local key = string.sub(theme_name, 5)
+  if key == "bricks" then key = "streets" end
+  return NBC_BRICKS.envs[key], key
+end
 
 
 ------------------------------------------------------------------------
@@ -593,40 +891,62 @@ function NBC_BRICKS.setup(self)
   local urban = GAME.THEMES["urban"]
   if not urban then return end
 
-  -- the level theme: a deep copy of Urban with our overrides
-  local T = table.deep_copy(urban)
-  for k, v in pairs(NBC_BRICKS.theme_overrides) do
-    T[k] = table.deep_copy(v)
-  end
-  if T.wall_groups then
-    for _, name in ipairs(NBC_BRICKS.drop_wall_groups) do
-      T.wall_groups[name] = nil
-    end
-  end
-  T.prefab_remap = nil   -- Urban's remaps point at Doom textures; the remap below does the job
-
   -- New Bricks City things the theme places (nbc/MAPINFO.txt, nbc/mapinfo/cw_props.txt)
   for name, ent in pairs(NBC_BRICKS.entities) do
     if not GAME.ENTITIES[name] then GAME.ENTITIES[name] = table.copy(ent) end
   end
-  T.post_mat = "AXW85" -- corner posts otherwise default to METAL
-  GAME.THEMES["nbc_bricks"] = T
+
+  -- the shared base: a deep copy of Urban with our overrides
+  local base = table.deep_copy(urban)
+  for k, v in pairs(NBC_BRICKS.theme_overrides) do
+    base[k] = table.deep_copy(v)
+  end
+  base.prefab_remap = nil   -- Urban's remaps point at Doom textures; the remap below does the job
+  base.post_mat = "AXW85"   -- corner posts otherwise default to METAL
+
+  -- one level theme per environment; nbc_bricks is the streets theme (levels left on it get dealt one)
+  for key, E in pairs(NBC_BRICKS.envs) do
+    local T = table.deep_copy(base)
+    for k, v in pairs(E.overrides or {}) do
+      if k == "style_list" then
+        for sk, sv in pairs(v) do T.style_list[sk] = table.deep_copy(sv) end
+      elseif k == "wall_groups_add" then
+        for wk, wv in pairs(v) do T.wall_groups[wk] = wv end
+      else
+        T[k] = table.deep_copy(v)
+      end
+    end
+    for _, name in ipairs(E.entity_remap_drop or {}) do T.entity_remap[name] = nil end
+    T.facades = table.deep_copy(NBC_BRICKS.facade_sets[E.facades or "residential"])
+    T.nbc_env = key
+    GAME.THEMES["nbc_" .. key] = T
+    if key == "streets" then GAME.THEMES["nbc_bricks"] = table.deep_copy(T) end
+  end
 
   -- Obsidian reads the error/default fill (METAL, FLAT5_1) before begin_level,
   -- so set it here when this build is a Bricks build.
-  if OB_CONFIG.theme == "nbc_bricks" then
+  if NBC_BRICKS.is_nbc(OB_CONFIG.theme) then
     GAME.MATERIALS["_ERROR"] = { t = "AXW85", f = "CWCONCF" }
     GAME.MATERIALS["_DEFAULT"] = { t = "ADCONC1", f = "AXF02" }
   end
 
-  -- room themes: copy the Urban base, replace the textures
-  for name, def in pairs(NBC_BRICKS.rooms) do
-    local base = GAME.ROOM_THEMES[def.base]
-    local R = base and table.deep_copy(base) or {}
+  -- room themes: copy the Urban base, replace the textures; each environment gets its own list
+  local function add_room(theme_name, name, prob)
+    local def = NBC_BRICKS.rooms[name]
+    if not def then error("New Bricks City: no room theme " .. name) end
+    local basedef = GAME.ROOM_THEMES[def.base]
+    local R = basedef and table.deep_copy(basedef) or {}
     for k, v in pairs(def) do
       if k ~= "base" then R[k] = table.deep_copy(v) end
     end
-    GAME.ROOM_THEMES["nbc_bricks_" .. name] = R
+    R.prob = prob
+    GAME.ROOM_THEMES[theme_name .. "_" .. name] = R
+  end
+  for key, E in pairs(NBC_BRICKS.envs) do
+    for name, prob in pairs(E.rooms) do
+      add_room("nbc_" .. key, name, prob)
+      if key == "streets" then add_room("nbc_bricks", name, prob) end
+    end
   end
 end
 
@@ -638,7 +958,14 @@ if ob_match_level_theme and not NBC_BRICKS.orig_match then
   NBC_BRICKS.orig_match = ob_match_level_theme
 
   ob_match_level_theme = function(LEVEL, T, override)
-    if not override and LEVEL and LEVEL.theme_name == "nbc_bricks" then
+    if not override and LEVEL and NBC_BRICKS.is_nbc(LEVEL.theme_name) then
+      -- the environment's own picks are allowed whatever theme they were made for
+      local E = NBC_BRICKS.env_of(LEVEL.theme_name)
+      if E and E.fab_allow and T and T.name then
+        for _, pat in ipairs(E.fab_allow) do
+          if string.find(T.name, pat, 1, true) then return true end
+        end
+      end
       override = "urban"
     end
     return NBC_BRICKS.orig_match(LEVEL, T, override)
@@ -672,10 +999,26 @@ wrap_lookup("Mat_lookup_flat")
 
 
 function NBC_BRICKS.get_levels_after_themes(self)
-  -- every Bricks level is a city-block level
-  for _, LEV in pairs(GAME.levels) do
-    if LEV.theme_name == "nbc_bricks" and not LEV.prebuilt then
-      LEV.has_streets = true
+  -- "nbc_bricks" levels each get an environment (not the same one twice running); Streets Mode for the
+  -- environments that have streets
+  local last, deck = nil, {}
+  for _, LEV in ipairs(GAME.levels) do
+    if NBC_BRICKS.is_nbc(LEV.theme_name) and not LEV.prebuilt then
+      if LEV.theme_name == "nbc_bricks" then
+        if #deck == 0 then
+          deck = table.copy(NBC_BRICKS.env_deck)
+          rand.shuffle(deck)
+          if deck[1] == last and #deck > 1 then deck[1], deck[#deck] = deck[#deck], deck[1] end
+        end
+        local key = table.remove(deck, 1)
+        LEV.theme_name = "nbc_" .. key
+        LEV.theme = GAME.THEMES[LEV.theme_name]
+        gui.printf("New Bricks City: %s is %s\n", LEV.name, NBC_BRICKS.envs[key].label)
+      end
+      local E, key = NBC_BRICKS.env_of(LEV.theme_name)
+      last = key
+      LEV.nbc_env = key
+      LEV.has_streets = (E and E.streets) or nil
       LEV.is_nature = false
     end
   end
@@ -684,7 +1027,7 @@ end
 
 function NBC_BRICKS.begin_level(self, LEVEL)
   -- the Corpo Wars room sets place New Bricks City things: Bricks levels only
-  local bricks = LEVEL and LEVEL.theme_name == "nbc_bricks"
+  local bricks = LEVEL and NBC_BRICKS.is_nbc(LEVEL.theme_name)
   for _, def in pairs(PREFABS) do
     if def.nbc_only then
       if def.nbc_prob == nil then def.nbc_prob = def.use_prob or 0 end
@@ -724,7 +1067,19 @@ function NBC_BRICKS.begin_level(self, LEVEL)
   end
   gui.printf("New Bricks City: %d Doom/hell prefabs switched off\n", count)
 
-  -- 3. per-prefab texture fixes (tex_ fields; put back at end_level)
+  -- 3. this environment's prefabs come up more often (name substrings, multipliers; put back at end_level)
+  NBC_BRICKS.saved_boosts = {}
+  local E = NBC_BRICKS.env_of(LEVEL.theme_name)
+  for pat, mult in pairs((E and E.fab_boost) or {}) do
+    for name, def in pairs(PREFABS) do
+      if def.use_prob and def.use_prob > 0 and string.find(name, pat, 1, true) then
+        if NBC_BRICKS.saved_boosts[name] == nil then NBC_BRICKS.saved_boosts[name] = def.use_prob end
+        def.use_prob = def.use_prob * mult
+      end
+    end
+  end
+
+  -- 4. per-prefab texture fixes (tex_ fields; put back at end_level)
   NBC_BRICKS.saved_fab_fields = {}
   for name, fields in pairs(NBC_BRICKS.fab_fields) do
     local def = PREFABS[name]
@@ -752,6 +1107,20 @@ if Fab_pick and not NBC_BRICKS.orig_fab_pick then
 
     local res = NBC_BRICKS.orig_fab_pick(LEVEL, reqs, true)
     if res ~= nil then return res end
+
+    -- a hallway group short of dead-end pieces (subway, sewers): cap it with a metro, access or vent one
+    if reqs and reqs.kind == "terminator" and reqs.group then
+      local group = reqs.group
+      for _, g in ipairs({ "metro", "access", "vent" }) do
+        reqs.group = g
+        res = NBC_BRICKS.orig_fab_pick(LEVEL, reqs, true)
+        if res then
+          gui.printf("New Bricks City: %s hallway capped with a %s terminator\n", group, g)
+          return res
+        end
+      end
+      reqs.group = group
+    end
 
     -- this one slot only: let the blocked prefabs of its kind back in, pick, block them again
     local list = reqs and NBC_BRICKS.blocked_by_kind and NBC_BRICKS.blocked_by_kind[reqs.kind]
@@ -808,11 +1177,30 @@ if Level_choose_darkness and not NBC_BRICKS.orig_choose_darkness then
 
   Level_choose_darkness = function(LEVEL, ...)
     local res = NBC_BRICKS.orig_choose_darkness(LEVEL, ...)
-    if LEVEL and LEVEL.theme_name == "nbc_bricks" then
+    if LEVEL and NBC_BRICKS.is_nbc(LEVEL.theme_name) then
       LEVEL.sky_light = LEVEL.is_dark and NBC_BRICKS.sky_light_dark or rand.pick(NBC_BRICKS.sky_light)
       LEVEL.sky_shadow = 24
     end
     return res
+  end
+end
+
+
+-- One facade per building. Obsidian gives each zone two facades (and a level has one to three zones), so a
+-- whole level shares two or three building faces. On a Bricks level every building (room) facing the outside
+-- picks its own from the environment's facade set, so a street is a row of different buildings.
+if Junction_calc_wall_tex and not NBC_BRICKS.orig_wall_tex then
+  NBC_BRICKS.orig_wall_tex = Junction_calc_wall_tex
+
+  Junction_calc_wall_tex = function(A1, A2)
+    local mat = NBC_BRICKS.orig_wall_tex(A1, A2)
+    if not NBC_BRICKS.active or type(A1) ~= "table" or type(A2) ~= "table" then return mat end
+    if not A1.is_outdoor or not A1.zone or not A2.is_indoor or not A2:is_indoor() then return mat end
+    if mat ~= A1.zone.facade_mat and mat ~= A1.zone.other_facade and mat ~= A2.facade_crap then return mat end
+    local R = A2.room
+    if not R or R.is_outdoor or not THEME or not THEME.facades then return mat end
+    if not R.nbc_facade then R.nbc_facade = rand.key_by_probs(THEME.facades) end
+    return R.nbc_facade
   end
 end
 
@@ -907,10 +1295,11 @@ NBC_BRICKS.title_a = { "Fulton", "Marlow", "Kessler", "Halsey", "Cypress", "Unio
 NBC_BRICKS.title_b = { "Courts", "Towers", "Houses", "Block", "Avenue", "Street", "Projects", "Yards",
   "Terrace", "Walk-ups", "Row", "Plaza", "Gardens", "Heights", "Stacks", "Alley" }
 
-function NBC_BRICKS.title_for(i)
+function NBC_BRICKS.title_for(i, env)
   local seed = math.floor(tonumber(OB_CONFIG.seed) or 0)
+  local list = (NBC_BRICKS.envs[env or ""] or {}).titles or NBC_BRICKS.title_b
   local a = NBC_BRICKS.title_a[(i * 7 + seed) % #NBC_BRICKS.title_a + 1]
-  local b = NBC_BRICKS.title_b[(i * 5 + math.floor(seed / 7)) % #NBC_BRICKS.title_b + 1]
+  local b = list[(i * 5 + math.floor(seed / 7)) % #list + 1]
   return a .. " " .. b
 end
 
@@ -922,13 +1311,15 @@ NBC_BRICKS.sky = "CITYSKY"
 function NBC_BRICKS.all_done(self)
   local levels = {}
   for _, L in ipairs(GAME.levels) do
-    if L.theme_name == "nbc_bricks" then table.insert(levels, L) end
+    if NBC_BRICKS.is_nbc(L.theme_name) then table.insert(levels, L) end
   end
   if #levels == 0 then return end
 
   local lines = { "// Written by the New Bricks City Obsidian addon\n\n" }
   for i, L in ipairs(levels) do
-    local title = NBC_BRICKS.title_for(i)
+    local title = NBC_BRICKS.title_for(i, L.nbc_env)
+    -- the environment, for export_maps.py (district pool) and the game
+    table.insert(lines, string.format("// nbc_env %s %s\n", L.name, L.nbc_env or "streets"))
     table.insert(lines, string.format("map %s \"%s\"\n{\n", L.name, title))
     table.insert(lines, string.format("  sky1 = \"%s\", 0\n", NBC_BRICKS.sky))
     if levels[i + 1] then
@@ -961,6 +1352,11 @@ function NBC_BRICKS.end_level(self, LEVEL)
     NBC_BRICKS.saved_mats = nil
   end
 
+  for name, prob in pairs(NBC_BRICKS.saved_boosts or {}) do
+    if PREFABS[name] then PREFABS[name].use_prob = prob end
+  end
+  NBC_BRICKS.saved_boosts = nil
+
   if NBC_BRICKS.saved_fab_probs then
     for name, prob in pairs(NBC_BRICKS.saved_fab_probs) do
       if PREFABS[name] then PREFABS[name].use_prob = prob end
@@ -987,6 +1383,21 @@ OB_THEMES["nbc_bricks"] =
   mixed_prob = 0,
 }
 
+-- one environment for every level
+do
+  local order = { "streets", "towers", "rooftops", "industrial", "parks", "underground", "subway" }
+  for i, key in ipairs(order) do
+    OB_THEMES["nbc_" .. key] =
+    {
+      label = _("New Bricks City: " .. NBC_BRICKS.envs[key].label),
+      game = "doom2",
+      priority = 28.9 - i * 0.01,
+      name_class = "URBAN",
+      mixed_prob = 0,
+    }
+  end
+end
+
 
 -- Picking the theme in the GUI is enough: if "New Bricks City" is the theme,
 -- this module joins the build even when its checkbox is off (otherwise the
@@ -996,7 +1407,7 @@ if ob_sort_modules and not NBC_BRICKS.orig_sort_modules then
 
   ob_sort_modules = function(...)
     local mod = OB_MODULES["new_bricks_city"]
-    if mod and OB_CONFIG and OB_CONFIG.theme == "nbc_bricks" then
+    if mod and OB_CONFIG and NBC_BRICKS.is_nbc(OB_CONFIG.theme) then
       mod.enabled = true
       mod.shown = true
     end

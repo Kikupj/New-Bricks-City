@@ -671,6 +671,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 2. **Raids run on Obsidian districts again:** restore the M2 district pool (`nbc/districts.txt` lists NBC_CT maps; the RunManager replaces Obsidian's monsters with the gang). The kits leave the raid pool but stay loadable.
 3. **Finish the theme:** find every Doom prefab and texture still reaching the maps (screenshots and `inspect_udmf.py`) and swap it for a New Bricks City one: wall and floor textures, doors, wall decor and light fixtures, techbase and hell props, liquids, skies.
 4. **Settings:** start from the Urban settings the owner found good, then tune for city blocks.
+5. **Environments** (owner, 2026-10-28): the theme supports streets, housing towers, rooftops, an industrial park, parks, underground (basements and sewers) and the subway as separate Obsidian level themes, dealt across a build; buildings vary their facades. ✅ First pass built; see STATUS.
 
 ### M3 — The case and raid loop (the heart of the roguelite)
 *Note (2026-10-27): M2's vertical slice already delivers the core of this (RunData, the RunManager, gangs.txt, Officer Down, the case ending), and M2b moves it onto the kits. What remains: the full multi-block raid on the kits (approach → staging flat → 2 floors → leader's floor), Cash, the results screen, Backing's strike, debug commands and save/load checks. Reuse the slice's code rather than rewriting it.*

@@ -18,7 +18,10 @@ param(
     [string]$Name = "bricks",
     [ValidateSet("single", "few", "episode", "game")] [string]$Length = "few",
     [int]$Seed = 0,
-    [switch]$NoExport    # keep the build in out\ only; don't replace the maps in nbc\maps
+    [string]$Theme = "nbc_bricks",   # a mix of environments, or one: nbc_streets, nbc_towers, nbc_rooftops,
+                                     # nbc_industrial, nbc_parks, nbc_underground, nbc_subway
+    [switch]$NoExport,   # keep the build in out\ only; don't replace the maps in nbc\maps
+    [int]$Limit = 0      # export only the first N maps (0 = all)
 )
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
@@ -27,7 +30,7 @@ New-Item -ItemType Directory -Force $out | Out-Null
 
 # setting -> value, applied to the matching "key = value" lines of CONFIG.txt
 $set = [ordered]@{
-    "game" = "doom2"; "port" = "zdoom"; "theme" = "nbc_bricks"; "length" = $Length
+    "game" = "doom2"; "port" = "zdoom"; "theme" = $Theme; "length" = $Length
     "@new_bricks_city" = "1"
     "@armaetus_epic_textures" = "0"   # injects its own textures and Urban room themes
     "@sky_generator" = "0"            # paints its own sky graphics
@@ -39,6 +42,7 @@ $set = [ordered]@{
     "steepness" = "mixed"; "parks" = "mixed"; "park_detail" = "mixed"; "porches" = "mixed"; "cages" = "mixed"
     "natural_parks" = "none"          # nature parks are caves with trees, not city parks
     "bool_allow_teleporter_emergency_breaks" = "0"   # no teleporters in the Bricks, not even to mend a layout
+    "zdoom_skybox" = "themed"         # the 3D city skybox (the theme's skyboxes) round every map
     "traps" = "none"                  # monster closets: the game places its own gangs
     "room_heights" = "tall-ish"       # room for split levels, balconies and stair runs
     "float_mons" = "0.6"              # a light layer: the game replaces it with the gang (only its spots count)
@@ -93,6 +97,6 @@ $log | Select-String -Pattern "^Theme for level|Streets Mode activated|New Brick
 
 if (-not $NoExport) {
     # one WAD per map in nbc\maps (NBC_CT01...), their MAPINFO in nbc\mapinfo\city_maps.txt
-    python (Join-Path $here "export_maps.py") $wad
+    python (Join-Path $here "export_maps.py") $wad --limit $Limit
     if ($LASTEXITCODE) { Write-Host "EXPORT FAILED" -ForegroundColor Red; exit 1 }
 }
