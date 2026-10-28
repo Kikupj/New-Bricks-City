@@ -362,8 +362,8 @@ The weapon roster is only the packs in `Weapons/`, ported to ZScript with magazi
 | 1 | Fists of Fury, Combat Knife, Machete | — |
 | 2 | Colt .45, Dual Berettas (Dual 92s) | light rounds |
 | 3 | Pump-action shotgun | shells |
-| 4 | Micro-Uzi | light rounds |
-| 5 | AK-47 | rifle rounds |
+| 4 | Micro-Uzi, MP5K-SD (suppressed; altfire cycles auto / burst / semi) | light rounds |
+| 5 | AK-47, M16 (3-round bursts) | rifle rounds |
 | 6 | Molotov cocktail | bottles (max 5) |
 
 Also in the game:
@@ -493,7 +493,7 @@ textures carry no formal licence.
 
 - **Enemies:** DeePayback Enemies by DeeDeeOZ, and the many sprite and sound authors listed in its credits.
 - **Weapons:** the AK47, Colt45, CombatKnife, DualBerettas, FistsOfFury, Flashlight, Machete, MicroUzi,
-  Molotov, PumpActionShotgun and FragGrenade packs, each with its authors' credits.
+  MP5kSD, Molotov, PumpActionShotgun, Vanilla M16 and FragGrenade packs, each with its authors' credits.
 - **Corpo Wars** (the project owner's earlier mod): props, furniture, textures, the kit generator and the
   navigation graph, plus the packs it credits. Universal Enhanced AI is MIT
   (`reference/corpowars/LICENSE-UEAI.txt`).

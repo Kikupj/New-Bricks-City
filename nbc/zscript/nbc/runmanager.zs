@@ -56,6 +56,10 @@ class NBC_RunManager : EventHandler
 		NBC_Gangs.LoadGangs(gangs);
 		NBC_Gangs.LoadDistricts(districtMaps, districtTitles, districtEnvs);
 		NBC_Gangs.LoadRooftops(districtMaps, roofMaps);
+		let saved = NBC_Department.Find();
+		if (saved) saved.PadLocker();
+		let rdSaved = NBC_RunData.Find();
+		if (rdSaved) while (rdSaved.raidIssued.Size() < NBC_Cat.IT_COUNT) rdSaved.raidIssued.Push(0);
 		if (e.IsSaveGame) return;
 
 		let rd = NBC_RunData.Get();
@@ -203,7 +207,8 @@ class NBC_RunManager : EventHandler
 
 	// ------------------------------------------------------------ the player's kit
 
-	static const String MAGAZINES[] = { "NBC_ColtMagazine", "NBC_Dual92Magazine", "NBC_PumpMagazine", "NBC_UziMagazine", "NBC_AKMagazine" };
+	static const String MAGAZINES[] = { "NBC_ColtMagazine", "NBC_Dual92Magazine", "NBC_PumpMagazine", "NBC_UziMagazine", "NBC_AKMagazine",
+		"NBC_MP5Magazine", "NBC_M16Magazine" };
 
 	// everything the catalog knows about out of the player's hands (fists, debris and the quick throw stay)
 	static void StripKit(Actor p)

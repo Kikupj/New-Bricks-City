@@ -1382,3 +1382,15 @@ nbc_debris_glass MOLTVXP1
 cw/breach/arm   SMNSET1
 cw/breach/beep  SMNSET2
 cw/breach/boom  SPRNMNXP
+
+// ===== MP5kSD (Weapons/MP5kSD.zip) =====
+MP5kSD/Fire		MP5FIRE
+MP5kSD/Mode		MP5CLIC
+MP5kSD/MagOut		MP5OPEN
+MP5kSD/MagIn		MP5CLOS
+MP5kSD/Cock		MP5COCK
+MP5kSD/Slap		MP5SLAP
+
+// ===== Vanilla M16 (Weapons/VanillaM16.zip) =====
+VM16/Fire		M16FIRE
+VM16/FireB		M16FIREB

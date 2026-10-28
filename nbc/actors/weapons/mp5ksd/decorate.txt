@@ -1,0 +1,151 @@
+// NBC: the MP5kSD pack's original DECORATE (Weapons/MP5kSD.zip), kept as an unused reference: the game uses NBC_MP5kSD (zscript/nbc/weapons/firearms.zs). Not included from DECORATE.
+ACTOR MP5kSD : Weapon 
+{
+   Weapon.SelectionOrder 700
+   Weapon.SlotNumber 4
+   Weapon.AmmoUse1 1
+   Weapon.AmmoUse2 1
+   Weapon.AmmoGive2 30
+   Weapon.AmmoType1 "MP5Loaded"
+   Weapon.AmmoType2 "Clip"
+   Inventory.PickupMessage "You got the MP5kSD"
+   Obituary "%o was mowed down by %k's MP5kSD."
+   Tag "MP5kSD"
+   +AMMO_CHECKBOTH
+   +NOAUTOFIRE
+   +WEAPON.NOALERT
+   States
+   {
+   Ready:
+     MP5A A 1 A_WeaponReady(WRF_ALLOWRELOAD)
+     Loop
+   Deselect:
+     MP5A A 1 A_Lower
+	 MP5A AA 0 A_Lower
+     Loop
+   Select:
+     MP5A A 1 A_Raise
+	 MP5A AA 0 A_Raise
+     Loop
+   Fire:
+    TNT1 A 0 A_JumpIf(CountInv("MP5Loaded") == 0,"Reload")
+  	 MP5A E 0 A_JumpIfInventory("SemiFire",1,"Fire3")
+  	 MP5A E 0 A_JumpIfInventory("BurstFire",1,"Fire2")
+	 MP5A E 0 A_PlaySound("MP5FIRE", CHAN_WEAPON)
+	 MP5A B 1 Bright A_FireBullets(3.5, 3.5, -1, 4, "MP5Puff")
+	 MP5A CD 1
+	 MP5A A 1 A_ReFire
+	goto ready
+   Fire2:
+	 MP5A E 0 A_PlaySound("MP5FIRE", CHAN_WEAPON)
+	 MP5A B 1 Bright A_FireBullets(1, 1, -1, 4, "MP5Puff")
+	 MP5A C 1
+     TNT1 A 0 A_JumpIf(CountInv("MP5Loaded") == 0,"Reload")
+	 MP5A E 0 A_PlaySound("MP5FIRE", CHAN_WEAPON)
+	 MP5A B 1 Bright A_FireBullets(1, 1, -1, 4, "MP5Puff")
+	 MP5A C 1
+	 TNT1 A 0 A_JumpIf(CountInv("MP5Loaded") == 0,"Reload")
+	 MP5A E 0 A_PlaySound("MP5FIRE", CHAN_WEAPON)
+	 MP5A B 1 Bright A_FireBullets(1, 1, -1, 4, "MP5Puff")
+	 MP5A C 1
+	 MP5A D 1
+	 MP5A A 3
+	goto ready
+   Fire3:
+	 MP5A E 0 A_PlaySound("MP5FIRE", CHAN_WEAPON)
+	 MP5A B 1 Bright A_FireBullets(0.5, 0.5, 1, 4, "MP5Puff")
+	 MP5A CD 1
+	 MP5A A 1
+	goto ready
+	AltFire:
+	MP5A E 0 A_JumpIfInventory("SemiFire",1,"AltFire3")
+	MP5A E 0 A_JumpIfInventory("BurstFire",1,"AltFire2")
+	MSBG G 0 A_PlayWeaponSound ("MP5CLIC")
+	MSBG G 0 A_Print("Burst Mode",3)
+	MP5A D 1 A_GiveInventory("BurstFire",1)
+	MP5A A 4
+	Goto Ready
+	AltFire2:
+	MSBG G 0 A_PlayWeaponSound ("MP5CLIC")
+	MSBG G 0 A_Print("Semi Mode",3)
+	MP5A D 0 A_GiveInventory("SemiFire",1)
+	MP5A D 1 A_TakeInventory("BurstFire",99)
+	MP5A A 4
+	Goto Ready
+	AltFire3:
+	MSBG G 0 A_PlayWeaponSound ("MP5CLIC")
+	MSBG G 0 A_Print("Auto Mode",3)
+	MP5A D 1 A_TakeInventory("SemiFire",99)
+	MP5A A 4
+	Goto Ready
+Reload:
+TNT1 A 0 A_JumpIfInventory("MP5Loaded", 30, 2)
+TNT1 A 0 A_JumpIfInventory("Clip", 1, "ReloadWork")
+MP5A A 1 A_WeaponReady
+Goto Ready
+ReloadWork:
+TNT1 A 0 A_JumpIf(CountInv("MP5Loaded") == 0,"ReloadWorkSlap")
+MP5A A 2
+MP5R A 2
+MP5R B 2
+MP5R C 2
+TNT1 A 0 A_PlaySoundEX("MP5OPEN",CHAN_6)
+MP5R DEF 1
+MP5R G 8
+MP5R HIJ 1
+TNT1 A 0 A_PlaySoundEX("MP5CLOS",CHAN_6)
+MP5R C 5
+Goto ReloadLoop
+ReloadWorkSlap:
+MP5A A 2
+MPCO AB 2
+TNT1 A 0 A_PlaySoundEX("MP5COCK",CHAN_7)
+MPCO CDEF 2
+MPCO G 6
+MPCO H 1
+MPER C 1
+TNT1 A 0 A_PlaySoundEX("MP5OPEN",CHAN_6)
+MPER DEF 1
+MPER G 8
+MPER HIJ 1
+TNT1 A 0 A_PlaySoundEX("MP5CLOS",CHAN_6)
+MPCO H 1
+MPCO G 2
+MPSL AB 2
+MPSL C 3
+MPSL D 4
+TNT1 A 0 A_PlaySoundEX("MP5SLAP",CHAN_7)
+MPSL EF 1
+MPCO G 7
+Goto ReloadLoop
+ReloadLoop:
+TNT1 A 0 A_TakeInventory("Clip", 1)
+TNT1 A 0 A_GiveInventory("MP5Loaded", 1)
+TNT1 A 0 A_JumpIfInventory("MP5Loaded", 30, "ReloadFinish")
+TNT1 A 0 A_JumpIfInventory("Clip", 1, "ReloadLoop")
+Goto ReloadFinish
+ReloadFinish:
+MP5R BA 2
+MP5A A 1
+TNT1 A 0 A_Refire("Fire")
+Goto Ready
+   Spawn:
+     MP5G A -1
+     Stop
+   }
+}
+
+ACTOR MP5Loaded : Ammo
+{
+   +IGNORESKILL
+   Inventory.Amount 0
+   Inventory.MaxAmount 30
+   Ammo.BackpackAmount 0
+   Ammo.BackpackMaxAmount 30
+}
+
+ACTOR BurstFire : Inventory { Inventory.MaxAmount 1 }
+ACTOR SemiFire : Inventory { Inventory.MaxAmount 1 }
+
+ACTOR MP5Puff : BulletPuff
+{ +NOEXTREMEDEATH DamageType "Bullet" Decal "BulletChip" }

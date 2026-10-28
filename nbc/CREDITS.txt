@@ -405,6 +405,19 @@ SpriteEdit: Captain Toenail
 Sounds: Freedoom
 GLDEFs: RichardDS90 (Brightmaps)
 
+// ===== MP5kSD (weapon pack, Weapons/MP5kSD.zip) =====
+Code: LossForWords (ported to ZScript for New Bricks City)
+Sounds: Magmacow, Remedy
+Sprites: City Interactive, JoeyTD, id Software, Monolith, 3D Realms, Joblez
+Sprite Edit: LossForWords
+
+// ===== Vanilla M16 (weapon pack, Weapons/VanillaM16.zip) =====
+Submitted: Okgo5555
+Code: Okgo5555 (ported to ZScript for New Bricks City)
+Sounds: Okgo5555
+Sprites: id Software, Luchador (model), adapted by Sgt_Mark_IV
+Sprite Edit: Okgo5555
+
 // ===== Molotov (weapon pack, Weapons/Molotov.zip) =====
 Code: Scientist, Gothic
 GLDefs: Keksdose, Gothic

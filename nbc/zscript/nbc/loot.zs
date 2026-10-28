@@ -92,8 +92,9 @@ class NBC_Loot : EventHandler
 		if (e.Replacee == "Fist") replacement = "FistsOfFury";
 		else if (e.Replacee == "Pistol") replacement = "NBC_Colt45";
 		else if (e.Replacee == "Shotgun" || e.Replacee == "SuperShotgun") replacement = "NBC_PumpShotgun";
-		else if (e.Replacee == "Chaingun") replacement = "NBC_MicroUzi";
-		else if (e.Replacee == "PlasmaRifle") replacement = "NBC_AK47";
+		// the SMGs and rifles drop either way (the MP5kSD and M16 packs joined the roster later)
+		else if (e.Replacee == "Chaingun") { if (random[nbcloot](0, 2)) replacement = "NBC_MicroUzi"; else replacement = "NBC_MP5kSD"; }
+		else if (e.Replacee == "PlasmaRifle") { if (random[nbcloot](0, 2)) replacement = "NBC_AK47"; else replacement = "NBC_M16"; }
 		else if (e.Replacee == "RocketLauncher" || e.Replacee == "BFG9000") replacement = "MolotovCocktail";
 		else if (e.Replacee == "Chainsaw") replacement = "Machete";
 

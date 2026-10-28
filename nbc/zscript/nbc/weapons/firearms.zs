@@ -475,3 +475,241 @@ Flash:
 	Stop;
 }
 }
+
+// The MP5kSD pack (Weapons/MP5kSD.zip; original DECORATE kept unused in actors/weapons/mp5ksd/): a suppressed
+// machine pistol. Light rounds, 30 in the magazine. Altfire cycles auto, three-round burst and semi (tighter each
+// step). Suppressed: its shots raise no alarm (off-guard gang members, clock.zs, don't hear it). The pack's own
+// reloads: a tactical swap, and from empty the cocking handle and the slap.
+class NBC_MP5Burst : Inventory { Default { Inventory.MaxAmount 1; +INVENTORY.UNDROPPABLE; +INVENTORY.UNTOSSABLE; } }
+class NBC_MP5Semi : Inventory { Default { Inventory.MaxAmount 1; +INVENTORY.UNDROPPABLE; +INVENTORY.UNTOSSABLE; } }
+
+class NBC_MP5kSD : NBC_ReloadWeapon
+{
+	override int NBC_BaseMagazineSize() { return 30; }
+
+Default
+{
+	Weapon.SlotNumber 4;
+	Weapon.SelectionOrder 1150;
+	Weapon.Kickback 60;
+	Weapon.AmmoType1 "NBC_MP5Magazine";
+	Weapon.AmmoType2 "NBC_LightAmmo";
+	Weapon.AmmoUse1 1;
+	Weapon.AmmoUse2 0;
+	Weapon.AmmoGive1 30;
+	Weapon.AmmoGive2 12;
+	Inventory.PickupMessage "You got the MP5K-SD!";
+	Obituary "%o was mowed down by %k's MP5K-SD.";
+	Tag "MP5K-SD";
+	Decal "BulletChip";
+	+WEAPON.NOALERT;
+	+WEAPON.NOAUTOFIRE;
+}
+
+States
+{
+Spawn:
+	MP5G A -1;
+	Stop;
+Ready:
+	MP5A A 1 A_WeaponReady(WRF_ALLOWRELOAD);
+	Loop;
+Deselect:
+	TNT1 A 0 NBC_CancelMagazineReload;
+	MP5A A 1 A_Lower;
+	MP5A AA 0 A_Lower;
+	Loop;
+Select:
+	MP5A A 1 A_Raise;
+	MP5A AA 0 A_Raise;
+	Loop;
+Fire:
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Magazine", 1, "FireMode");
+	TNT1 A 0 A_JumpIfInventory("NBC_LightAmmo", 1, "Reload");
+	TNT1 A 0 NBC_DryClick;
+	Goto Ready;
+FireMode:
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Semi", 1, "FireSemi");
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Burst", 1, "FireBurst");
+FireAuto:
+	MP5A B 1 bright { A_StartSound("MP5kSD/Fire", CHAN_WEAPON); A_FireBullets(3.5, 3.5, -1, 4, "NBC_LightPuff"); }
+	MP5A CD 1;
+	MP5A A 1 A_ReFire;
+	Goto Ready;
+FireBurst:
+	MP5A B 1 bright { A_StartSound("MP5kSD/Fire", CHAN_WEAPON); A_FireBullets(1, 1, -1, 4, "NBC_LightPuff"); }
+	MP5A C 1;
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Magazine", 1, 1);
+	Goto BurstEnd;
+	MP5A B 1 bright { A_StartSound("MP5kSD/Fire", CHAN_WEAPON); A_FireBullets(1, 1, -1, 4, "NBC_LightPuff"); }
+	MP5A C 1;
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Magazine", 1, 1);
+	Goto BurstEnd;
+	MP5A B 1 bright { A_StartSound("MP5kSD/Fire", CHAN_WEAPON); A_FireBullets(1, 1, -1, 4, "NBC_LightPuff"); }
+	MP5A C 1;
+BurstEnd:
+	MP5A D 1;
+	MP5A A 3;
+	Goto Ready;
+FireSemi:
+	MP5A B 1 bright { A_StartSound("MP5kSD/Fire", CHAN_WEAPON); A_FireBullets(0.5, 0.5, 1, 4, "NBC_LightPuff"); }
+	MP5A CD 1;
+	MP5A A 1;
+	Goto Ready;
+AltFire:
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Semi", 1, "ToAuto");
+	TNT1 A 0 A_JumpIfInventory("NBC_MP5Burst", 1, "ToSemi");
+	MP5A D 1 { A_StartSound("MP5kSD/Mode", CHAN_WEAPON); A_Print("Burst"); A_GiveInventory("NBC_MP5Burst", 1); }
+	MP5A A 4;
+	Goto Ready;
+ToSemi:
+	MP5A D 1 { A_StartSound("MP5kSD/Mode", CHAN_WEAPON); A_Print("Semi"); A_TakeInventory("NBC_MP5Burst", 1); A_GiveInventory("NBC_MP5Semi", 1); }
+	MP5A A 4;
+	Goto Ready;
+ToAuto:
+	MP5A D 1 { A_StartSound("MP5kSD/Mode", CHAN_WEAPON); A_Print("Auto"); A_TakeInventory("NBC_MP5Semi", 1); }
+	MP5A A 4;
+	Goto Ready;
+Reload:
+	TNT1 A 0 A_JumpIf(invoker.NBC_CanReload(), "ReloadBegin");
+	TNT1 A 0 NBC_ReloadReject;
+	Goto Ready;
+ReloadBegin:
+	TNT1 A 0 NBC_BeginMagazineReload;
+	TNT1 A 0 A_JumpIf(invoker.nbcReloadWasEmpty, "ReloadEmpty");
+	// the tactical swap: the old magazine out, the new one in
+	MP5A A 2 NBC_AdjustReloadTics(2);
+	MP5R ABC 2 NBC_AdjustReloadTics(2);
+	TNT1 A 0 A_StartSound("MP5kSD/MagOut", CHAN_6);
+	MP5R DEF 1;
+	MP5R G 8 NBC_AdjustReloadTics(8);
+	MP5R HIJ 1;
+	TNT1 A 0 A_StartSound("MP5kSD/MagIn", CHAN_6);
+	TNT1 A 0 NBC_CommitMagazineReload;
+	MP5R C 5 NBC_AdjustReloadTics(5);
+	Goto ReloadFinish;
+ReloadEmpty:
+	// from empty: the cocking handle back, the magazine, the slap
+	MP5A A 2 NBC_AdjustReloadTics(2);
+	MPCO AB 2 NBC_AdjustReloadTics(2);
+	TNT1 A 0 A_StartSound("MP5kSD/Cock", CHAN_7);
+	MPCO CDEF 2 NBC_AdjustReloadTics(2);
+	MPCO G 6 NBC_AdjustReloadTics(6);
+	MPCO H 1;
+	MPER C 1;
+	TNT1 A 0 A_StartSound("MP5kSD/MagOut", CHAN_6);
+	MPER DEF 1;
+	MPER G 8 NBC_AdjustReloadTics(8);
+	MPER HIJ 1;
+	TNT1 A 0 A_StartSound("MP5kSD/MagIn", CHAN_6);
+	TNT1 A 0 NBC_CommitMagazineReload;
+	MPCO H 1;
+	MPCO G 2 NBC_AdjustReloadTics(2);
+	MPSL AB 2 NBC_AdjustReloadTics(2);
+	MPSL C 3 NBC_AdjustReloadTics(3);
+	MPSL D 4 NBC_AdjustReloadTics(4);
+	TNT1 A 0 A_StartSound("MP5kSD/Slap", CHAN_7);
+	MPSL EF 1;
+	MPCO G 7 NBC_AdjustReloadTics(7);
+ReloadFinish:
+	MP5R BA 2 NBC_AdjustReloadTics(2);
+	MP5A A 1;
+	TNT1 A 0 NBC_EndMagazineReload;
+	Goto Ready;
+}
+}
+
+// The Vanilla M16 pack (Weapons/VanillaM16.zip; original DECORATE kept unused in actors/weapons/m16/): three-round
+// bursts, fully automatic while the trigger's held. Rifle rounds, 30 in the magazine. The pack has no reload frames:
+// the in-engine dip reload. The pack's 20-damage rounds are brought into line with the AK (rifle rounds, 5 x 1d3).
+class NBC_M16 : NBC_ReloadWeapon
+{
+	override int NBC_BaseMagazineSize() { return 30; }
+
+	action void NBC_M16Round()
+	{
+		NBC_ReloadWeapon weapon = NBC_ReloadWeapon(invoker);
+		if (!weapon || weapon.NBC_MagazineAmount() <= 0) return;
+		A_StartSound("VM16/Fire", CHAN_WEAPON);
+		A_GunFlash();
+		A_FireBullets(2, 2, 1, 5, "NBC_RiflePuff");
+		A_AlertMonsters();
+	}
+
+Default
+{
+	Weapon.SlotNumber 5;
+	Weapon.SelectionOrder 1050;
+	Weapon.Kickback 100;
+	Weapon.AmmoType1 "NBC_M16Magazine";
+	Weapon.AmmoType2 "NBC_RifleAmmo";
+	Weapon.AmmoUse1 1;
+	Weapon.AmmoUse2 0;
+	Weapon.AmmoGive1 30;
+	Weapon.AmmoGive2 12;
+	Inventory.PickupMessage "You got the M16 assault rifle!";
+	Obituary "%o was mowed down by %k's M16.";
+	Tag "M16";
+	Decal "BulletChip";
+}
+
+States
+{
+Spawn:
+	M16V A -1;
+	Stop;
+Ready:
+	M16A A 1 A_WeaponReady(WRF_ALLOWRELOAD);
+	Loop;
+Deselect:
+	TNT1 A 0 NBC_CancelMagazineReload;
+	M16A A 1 A_Lower;
+	Loop;
+Select:
+	M16A A 1 A_Raise;
+	Loop;
+Fire:
+	TNT1 A 0 A_JumpIfInventory("NBC_M16Magazine", 1, "Burst");
+	TNT1 A 0 A_JumpIfInventory("NBC_RifleAmmo", 1, "Reload");
+	TNT1 A 0 NBC_DryClick;
+	Goto Ready;
+Burst:
+	M16A B 3 bright NBC_M16Round;
+	M16A C 3 bright NBC_M16Round;
+	M16A D 3 bright NBC_M16Round;
+	M16A E 1 A_ReFire;
+	M16A A 4;
+	Goto Ready;
+Reload:
+	TNT1 A 0 A_JumpIf(invoker.NBC_CanReload(), "ReloadBegin");
+	TNT1 A 0 NBC_ReloadReject;
+	Goto Ready;
+ReloadBegin:
+	TNT1 A 0 NBC_BeginMagazineReload;
+ReloadDip:
+	M16A A 6 Offset(0, 44) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 6 Offset(0, 56) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 6 Offset(0, 68) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 6 Offset(0, 80) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 18 Offset(0, 92) { NBC_AdjustReloadTics(18); A_StartSound("B92REL1", CHAN_7); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	TNT1 A 0 A_JumpIf(invoker.nbcReloadWasEmpty, "ReloadRack");
+	Goto ReloadCommit;
+ReloadRack:
+	M16A A 15 Offset(0, 92) { NBC_AdjustReloadTics(15); A_StartSound("en/mgCOCK", CHAN_7); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	Goto ReloadCommit;
+ReloadCommit:
+	TNT1 A 0 A_StartSound("B92REL2", CHAN_7);
+	TNT1 A 0 NBC_CommitMagazineReload;
+ReloadFinish:
+	M16A A 6 Offset(0, 80) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 6 Offset(0, 68) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 6 Offset(0, 56) { NBC_AdjustReloadTics(6); A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY); }
+	M16A A 3 Offset(0, 32) A_WeaponReady(WRF_NOFIRE|WRF_NOSECONDARY);
+	TNT1 A 0 NBC_EndMagazineReload;
+	Goto Ready;
+Flash:
+	TNT1 A 2 bright A_Light1;
+	TNT1 A 0 bright A_Light0;
+	Stop;
+}
+}

@@ -15,7 +15,9 @@ class NBC_Cat
 	enum EItem
 	{
 		IT_COLT, IT_DUAL92, IT_PUMP, IT_UZI, IT_AK, IT_MACHETE, IT_KNIFE,
-		IT_LIGHT, IT_SHELL, IT_RIFLE, IT_MOLOTOV, IT_MEDKIT, IT_VEST, IT_COUNT
+		IT_LIGHT, IT_SHELL, IT_RIFLE, IT_MOLOTOV, IT_MEDKIT, IT_VEST,
+		// added later, at the end so the numbers saved in rosters and games keep their meaning
+		IT_MP5, IT_M16, IT_COUNT
 	}
 	enum EKind { K_SIDEARM, K_PRIMARY, K_MELEE, K_AMMO, K_POUCH, K_VEST }
 	enum EClass { C_PATROL, C_BREACHER, C_MARKSMAN, C_MEDIC, C_COUNT }
@@ -31,18 +33,18 @@ class NBC_Cat
 	const PLAYER_POUCHES = 4;
 
 	static const String ITEM_NAME[] = { "Colt .45", "Dual 92s", "Pump Shotgun", "Micro-Uzi", "AK-47", "Machete", "Combat Knife",
-		"Light Rounds", "Shotgun Shells", "Rifle Rounds", "Molotov", "Medkit", "Kevlar Vest" };
+		"Light Rounds", "Shotgun Shells", "Rifle Rounds", "Molotov", "Medkit", "Kevlar Vest", "MP5K-SD", "M16" };
 	static const String ITEM_CLASS[] = { "NBC_Colt45", "NBC_Dual92", "NBC_PumpShotgun", "NBC_MicroUzi", "NBC_AK47", "Machete", "CombatKnife",
-		"NBC_LightAmmo", "Shell", "NBC_RifleAmmo", "MolotovAmmo", "NBC_Medkit", "GreenArmor" };
+		"NBC_LightAmmo", "Shell", "NBC_RifleAmmo", "MolotovAmmo", "NBC_Medkit", "GreenArmor", "NBC_MP5kSD", "NBC_M16" };
 	static const int ITEM_KIND[] = { K_SIDEARM, K_SIDEARM, K_PRIMARY, K_PRIMARY, K_PRIMARY, K_MELEE, K_MELEE,
-		K_AMMO, K_AMMO, K_AMMO, K_POUCH, K_POUCH, K_VEST };
+		K_AMMO, K_AMMO, K_AMMO, K_POUCH, K_POUCH, K_VEST, K_PRIMARY, K_PRIMARY };
 	static const String ITEM_ICON[] = { "COLTP0", "B92GA0", "XSOTA0", "MUZPA0", "AK4IA0", "MHTEA0", "KNFPA0",
-		"CLIPA0", "SHELA0", "ROCKA0", "MOLPA0", "MEDIA0", "ARM1A0" };
+		"CLIPA0", "SHELA0", "ROCKA0", "MOLPA0", "MEDIA0", "ARM1A0", "MP5GA0", "M16VA0" };
 	// what one comes in for at the counter (ammo: per 10 rounds); 0 = not on the requisition list
-	static const int ITEM_SELL[] = { 40, 70, 90, 100, 150, 20, 15, 2, 4, 5, 10, 15, 30 };
-	static const int ITEM_BUY[] = { 0, 0, 0, 0, 0, 0, 0, 6, 10, 12, 30, 40, 90 };
-	static const int ITEM_UNIT[] = { 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1 };
-	static const int ITEM_AMMO[] = { IT_LIGHT, IT_LIGHT, IT_SHELL, IT_LIGHT, IT_RIFLE, -1, -1, -1, -1, -1, -1, -1, -1 };
+	static const int ITEM_SELL[] = { 40, 70, 90, 100, 150, 20, 15, 2, 4, 5, 10, 15, 30, 120, 160 };
+	static const int ITEM_BUY[] = { 0, 0, 0, 0, 0, 0, 0, 6, 10, 12, 30, 40, 90, 0, 0 };
+	static const int ITEM_UNIT[] = { 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1 };
+	static const int ITEM_AMMO[] = { IT_LIGHT, IT_LIGHT, IT_SHELL, IT_LIGHT, IT_RIFLE, -1, -1, -1, -1, -1, -1, -1, -1, IT_LIGHT, IT_RIFLE };
 	static const String ITEM_DESC[] = {
 		"Department issue .45. Eight rounds, light ammo.",
 		"A pair of 9mm pistols. Fast and loud, light ammo.",
@@ -56,7 +58,9 @@ class NBC_Cat
 		"7.62 for the AK.",
 		"A bottle of fuel and a rag. Fire won't touch officers.",
 		"Patches 40 health. Officers use theirs below a third.",
-		"Soaks up a share of every hit. One per officer." };
+		"Soaks up a share of every hit. One per officer.",
+		"Seized suppressed machine pistol. Light ammo; auto, burst or semi. Its shots raise no alarm.",
+		"Seized assault rifle. Rifle ammo in three-round bursts." };
 
 	static const String CLASS_NAME[] = { "Patrol", "Breacher", "Marksman", "Paramedic" };
 	static const String CLASS_ROLE[] = {
@@ -110,10 +114,10 @@ class NBC_Cat
 	{
 		switch (cls)
 		{
-		case C_PATROL: return item == IT_UZI || item == IT_AK;
+		case C_PATROL: return item == IT_UZI || item == IT_AK || item == IT_MP5 || item == IT_M16;
 		case C_BREACHER: return item == IT_PUMP;
-		case C_MARKSMAN: return item == IT_AK;
-		case C_MEDIC: return item == IT_UZI || item == IT_COLT || item == IT_DUAL92;
+		case C_MARKSMAN: return item == IT_AK || item == IT_M16;
+		case C_MEDIC: return item == IT_UZI || item == IT_COLT || item == IT_DUAL92 || item == IT_MP5;
 		}
 		return false;
 	}
@@ -271,6 +275,12 @@ class NBC_Department : Thinker
 	{
 		let it = ThinkerIterator.Create("NBC_Department", STAT_STATIC);
 		return NBC_Department(it.Next());
+	}
+
+	// a game saved before the catalog grew: room in the locker for the new items
+	void PadLocker()
+	{
+		while (locker.Size() < NBC_Cat.IT_COUNT) locker.Push(0);
 	}
 
 	void Setup()
@@ -734,7 +744,7 @@ class NBC_Department : Thinker
 	// to the front of the stack
 	void AutoKit()
 	{
-		static const int prefer[] = { NBC_Cat.IT_AK, NBC_Cat.IT_PUMP, NBC_Cat.IT_UZI, NBC_Cat.IT_DUAL92, NBC_Cat.IT_COLT };
+		static const int prefer[] = { NBC_Cat.IT_M16, NBC_Cat.IT_AK, NBC_Cat.IT_PUMP, NBC_Cat.IT_MP5, NBC_Cat.IT_UZI, NBC_Cat.IT_DUAL92, NBC_Cat.IT_COLT };
 		for (int s = 0; s < squad.Size(); s++)
 		{
 			let o = OfficerById(squad[s]);

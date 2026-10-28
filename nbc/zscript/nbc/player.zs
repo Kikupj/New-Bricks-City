@@ -32,8 +32,8 @@ Default
 	Player.WeaponSlot 1, "FistsOfFury", "CombatKnife", "Machete";
 	Player.WeaponSlot 2, "NBC_Colt45", "NBC_Dual92";
 	Player.WeaponSlot 3, "NBC_PumpShotgun";
-	Player.WeaponSlot 4, "NBC_MicroUzi";
-	Player.WeaponSlot 5, "NBC_AK47";
+	Player.WeaponSlot 4, "NBC_MicroUzi", "NBC_MP5kSD";
+	Player.WeaponSlot 5, "NBC_AK47", "NBC_M16";
 	Player.WeaponSlot 6, "MolotovCocktail";
 }
 

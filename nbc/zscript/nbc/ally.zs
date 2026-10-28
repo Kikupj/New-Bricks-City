@@ -108,6 +108,8 @@ class NBC_Ally : Actor
 		switch (item)
 		{
 		case NBC_Cat.IT_UZI:    burst = 6; dmgMin = 6;  dmgMax = 9;  magazine = 32; reloadTics = 45; dmgType = 'NBC_Light'; fireSound = "MicroUzi/Fire"; refireTics = 2; return;
+		case NBC_Cat.IT_MP5:    burst = 4; dmgMin = 7;  dmgMax = 10; magazine = 30; reloadTics = 45; dmgType = 'NBC_Light'; fireSound = "MP5kSD/Fire"; refireTics = 2; return;
+		case NBC_Cat.IT_M16:    burst = 3; dmgMin = 13; dmgMax = 18; magazine = 30; reloadTics = 55; dmgType = 'NBC_Rifle'; fireSound = "VM16/Fire"; return;
 		case NBC_Cat.IT_AK:     burst = 3; dmgMin = 12; dmgMax = 18; magazine = 30; reloadTics = 55; dmgType = 'NBC_Rifle'; fireSound = "Weapons/AK47FIR"; return;
 		case NBC_Cat.IT_PUMP:   burst = 1; pellets = 8; dmgMin = 5; dmgMax = 8; magazine = 6; reloadTics = 70; dmgType = 'NBC_Shell'; fireSound = "weapons/Xshotgf"; refireTics = 20; return;
 		case NBC_Cat.IT_COLT:   burst = 2; dmgMin = 10; dmgMax = 15; magazine = 8;  reloadTics = 35; dmgType = 'NBC_Light'; fireSound = "Weapon/COLTFIRE"; refireTics = 8; return;

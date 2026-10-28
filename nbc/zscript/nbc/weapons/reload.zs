@@ -74,6 +74,36 @@ Default
 States { Spawn: TNT1 A -1; Stop; }
 }
 
+class NBC_MP5Magazine : Ammo
+{
+Default
+{
+	Inventory.Amount 0;
+	Inventory.MaxAmount 30;
+	Inventory.InterHubAmount 30;
+	Ammo.BackpackAmount 0;
+	Ammo.BackpackMaxAmount 30;
+	+INVENTORY.UNDROPPABLE;
+	+INVENTORY.UNTOSSABLE;
+}
+States { Spawn: TNT1 A -1; Stop; }
+}
+
+class NBC_M16Magazine : Ammo
+{
+Default
+{
+	Inventory.Amount 0;
+	Inventory.MaxAmount 30;
+	Inventory.InterHubAmount 30;
+	Ammo.BackpackAmount 0;
+	Ammo.BackpackMaxAmount 30;
+	+INVENTORY.UNDROPPABLE;
+	+INVENTORY.UNTOSSABLE;
+}
+States { Spawn: TNT1 A -1; Stop; }
+}
+
 class NBC_ReloadWeapon : Weapon
 {
 	bool nbcReloading;
@@ -222,6 +252,17 @@ class NBC_ReloadWeapon : Weapon
 		if (weapon && weapon.NBC_MagazineAmount() == 0 && weapon.NBC_ReserveAmount() == 0)
 			A_StartSound("nbc_dryclick", CHAN_WEAPON);
 		if (weapon) weapon.nbcReloading = false;
+	}
+
+	// An empty magazine with rounds in the reserve isn't "out of ammo": the trigger reaches the Fire state, which
+	// reloads. Without this the engine switched weapons whenever a magazine ran dry. Magazine and reserve both
+	// empty: the engine's own check (and its switch).
+	override bool CheckAmmo(int fireMode, bool autoSwitch, bool requireAmmo, int ammocount)
+	{
+		if ((fireMode == PrimaryFire || fireMode == EitherFire) && Owner && AmmoType1 && AmmoType2
+			&& (NBC_MagazineAmount() > 0 || NBC_ReserveAmount() > 0))
+			return true;
+		return Super.CheckAmmo(fireMode, autoSwitch, requireAmmo, ammocount);
 	}
 
 	override void AttachToOwner(Actor other)

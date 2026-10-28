@@ -17,3 +17,4 @@ sndinfo:sndinfo:jap3pan
 sprite:sprite:null   # CombatKnife Select/Deselect
 sprite:sprite:mgnf   # CombatKnife A_Recoil frames
 sprite:sprite:d9ra   # DualBeretta fire-swap frame
+sprite:sprite:msbg   # MP5kSD altfire mode-switch frames (the pack never shipped MSBG; the reference DECORATE is not loaded)
