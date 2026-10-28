@@ -11,6 +11,12 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - **Obsidian in the cloud:** a console-only source build of Obsidian 20 from github.com/obsidian-level-maker/Obsidian (`/home/user/obsidian-src`, build steps at the top of `tools/Obsidian/make_bricks.sh`). `tools/Obsidian/make_bricks.sh` is the Linux twin of `make_bricks.ps1` (same overrides; starts from `tools/Obsidian/CONFIG.txt` if present, else Obsidian's defaults). The addon loads unchanged on Obsidian 20: a single level builds in about 4 s, all wall textures and 99% of flats from `nbc/textures`.
 - **Viewing builds:** load the build WAD after `nbc` and `+map MAP01`. Under xvfb, **use the GL renderer** (`+vid_rendermode 4`): the software renderer crashed (signal 11) a few seconds into an Obsidian map.
 - **Seen in a first build (seed 42 and an unseeded one):** streets with brick facades and lit windows, voxel cars, Corpo Wars room sets. Doom leftovers still visible: marble-and-wood wall panels with torch sconces, a red Doom-style door, techbase computer columns, grey techbase halls.
+- **Theme pass (2026-10-28):** audited 24 levels (which prefabs each level used, which textures every map uses, screenshots) and fixed what read as Doom:
+  - textures: ADSCONC (a marble wall with a lit torch sconce) was the fallback for every stair, step, stone and default wall, which made the torch-lined marble halls; ADMETL3 (a sci-fi blue light panel) stood in for every support and silver texture; AXW84 is square flagstones, not brick, yet faced whole streets; Obsidian's dark window glass (MODWALL3/4) came out as blank white plaster. All remapped to concrete, step risers, steel, trusses, dark glass, corrugated shutters, crates and full-height doors; key-door trims keep their red, blue and yellow.
+  - prefabs: city-only fence, post, beam, hall and window groups; per-kind name blocks (tech, gothic, castle, mine, gore); teleporters and rock parks off; the "allow blocked prefabs" fallback now covers one slot, not the rest of the level.
+  - light: the 1.3 multiplier put nearly every sector at 255 (no shading). Now night streets at 160-192 and rooms at Obsidian's levels times 1.1.
+  - decor: loose bricks, bottles and concrete instead of blood pools; the mod's lamp posts outside; corrugated roll-up shutters and weathered street doors.
+  - a fresh district set was exported (seed 2026): NBC_CT01 "Pike Projects", NBC_CT02 "Fulton Plaza", NBC_CT03 "Mercer Courts", NBC_CT04 "Wexford Street". `check_lumps` 0 new problems; the smoke test passes on NBC_CT01-04, NBC_TEST and NBC_HUB.
 - **Last kit work (committed before the switch, `3819f07`):** sliding panel doors, a street-plan generator on an even grid, roomier towers, low roof huts, animated canal water, and `nbc_kitsweep N` (regenerate a test floor N times, one summary line each).
 
 
@@ -160,6 +166,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `python tools\build_pk3.py` → `dist\NewBricksCity.pk3`, 9,103 files, 41.5 MB. It boots and loads NBC_TEST with no errors.
 
 ## Needs playtest (owner)
+- **M2d Obsidian districts** (`+map NBC_CT01` ... `NBC_CT04`): do they read as the Bricks at night (brick blocks, alleys, courtyards, lit windows, street lamps)? Anything still Doom-looking (tech panels, gothic pieces, odd prefabs)? Is the lighting right on a real GPU (streets darker than the rooms, nothing pitch black)? Locked doors still show their key colour?
 - **M2c kits:**
   - In the console: `nbc_kittest 1 0 3` (tower, occupied), `nbc_kittest 1 1 10` (gallery), `nbc_kittest 1 2 17` (gang floor), `nbc_kittest 1 3 24` (burned-out), `nbc_kittest 1 4 31` (penthouse); `nbc_kittest 2 <0-3> 5` (street); `nbc_kittest 3 <0-4> 7` (basement); `nbc_kittest 4 <0-2> 9` (roof). Do they read as a housing tower, a city street, a basement, a roof, at the right size next to you and the gang?
   - The flats' windows (CWWINDO) look like windows onto the city, not a painted wall; the boarded ones read as boarded.

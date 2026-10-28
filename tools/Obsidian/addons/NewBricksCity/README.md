@@ -39,6 +39,21 @@ In the GUI just pick the **New Bricks City** theme; its module switches itself o
     slot would be left with nothing, that kind's prefabs come back for that slot rather than
     failing the level
   - hell decorations and Freedoom's leafy trees become lamps, trash fires or nothing
+- **City pieces only** (2026-10-28): Urban's groups are replaced by city lists: fences (plain, gappy,
+  corrugated steel, highway bars, planters), metal fence posts, plain/lit/wood/textured beams, vent and access
+  halls (no mineshafts), and windows (barred, tall, square, grates, open, bay, metal and construction frames,
+  no gothic, caged, octagon or arched ones). Per kind, prefabs whose names read as tech, gothic, castle, mine or
+  gore are switched off (`fab_kind_words`): tech lights, gallows, the crack of doom, tentacle pillars, blob lamps,
+  the confession booth, the portable-nuke exit, teleporters. If a slot has no clean prefab, one blocked prefab is
+  let back in for that slot only, and the log says which (`New Bricks City: fallback ...`).
+- **No teleporters, no rock parks**: the build turns off Obsidian's emergency teleporters, and natural (rock-walled)
+  parks are off in the theme's style list.
+- **Night lighting**: the sky light over the streets is 160-192 (144 on a dark level); rooms keep Obsidian's
+  levels times 1.1, so lit interiors stand out from the streets. (1.3 used to push nearly everything to 255.)
+- **Debris and lamps**: floor decor is the quick-throw's loose bricks, half-bricks, concrete and bottles
+  (26000-26003) with the odd bloodstain; outdoor lights are the mod's lamp posts (26233).
+- **Prefab texture fixes** (`fab_fields`): roll-up shutters get a corrugated shutter instead of a step riser, and
+  fake street doors get weathered wooden and steel doors.
 - **Voxel cars**: Obsidian's car prefabs (sedans, hatchbacks, minitrucks, minibuses, and their
   wrecks) become one parked voxel car each, at the same spot and angle, from the mod's Voxel
   Vehicles Pack: sedans, wagons, vans, pickups, SUVs, taxis, now and then a parked police car,
@@ -73,6 +88,9 @@ swaps for a random poster, sign or bit of clutter; none reach a map. To give a r
 sets, edit its `wall_groups` in the module. `wall_group_prob` (85) is how often an area gets one.
 
 ## Check a build
+The build log lists every prefab each level used (`NBC prefab <kind>:<name> x<count>`) and every Doom texture
+that no remap rule caught (`NBC default <name> -> <texture>`): grep them to spot anything out of place.
+
 `python tools\Obsidian\inspect_udmf.py tools\Obsidian\out\bricks.wad` prints how much texturing
 comes from `nbc/textures` per map and writes a top-down PNG per map next to the WAD.
 `powershell -File tools\smoke_test.ps1 -Map NBC_CT01` checks a map boots cleanly.

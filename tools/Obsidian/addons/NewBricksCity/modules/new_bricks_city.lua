@@ -47,14 +47,19 @@ NBC_BRICKS.MATERIALS =
   CWWALL2  = { t="CWWALL2",  f="CWCARP1" },
   AXCITY08 = { t="AXCITY08", f="AXDU02" },
   AXCITY09 = { t="AXCITY09", f="AXDU02" },
-  AXDW04   = { t="AXDW04",   f="AXDU02" },
   ADGREYW  = { t="ADGREYW",  f="CWTILEF" },
   ADGREY2  = { t="ADGREY2",  f="CWTILEF" },
   CWTILEW  = { t="CWTILEW",  f="CWTILEF" },
   CWWOOD1  = { t="CWWOOD1",  f="ADFWOOD" },
+  AXHW09   = { t="AXHW09",   f="CWCARP1" },
+  AXDW06A  = { t="AXDW06A",  f="ADFWOOD" },
 
   -- grime and concrete
   CWWALLD  = { t="CWWALLD",  f="CWCONCF" },
+  AXW24    = { t="AXW24",    f="AXF02" },
+  AXW27    = { t="AXW27",    f="AXF02" },
+  AXW89    = { t="AXW89",    f="AXF02" },
+  AXSTEP23 = { t="AXSTEP23", f="CWSTAIF" },
   AXW12    = { t="AXW12",    f="AXF05" },
   AXW14    = { t="AXW14",    f="AXF05" },
   AXW23    = { t="AXW23",    f="AXF05" },
@@ -63,9 +68,9 @@ NBC_BRICKS.MATERIALS =
   AXW43B   = { t="AXW43B",   f="AXF02" },
   AXW43C   = { t="AXW43C",   f="AXF02" },
   ADCONC1  = { t="ADCONC1",  f="AXF02" },
-  ADSCONC  = { t="ADSCONC",  f="AXF02" },
   CWCONCW  = { t="CWCONCW",  f="CWCONCF" },
   CWRETAIN = { t="CWRETAIN", f="CWCONCF" },
+  CWSEAWAL = { t="CWSEAWAL", f="CWCONCF" },
 
   -- lobby
   ADMARBG  = { t="ADMARBG",  f="ADFMARG" },
@@ -74,7 +79,6 @@ NBC_BRICKS.MATERIALS =
   -- metal, doors, signs, switches, railings
   ADMETL1  = { t="ADMETL1",  f="AXF16" },
   ADMETL2  = { t="ADMETL2",  f="AXF16" },
-  ADMETL3  = { t="ADMETL3",  f="AXF16" },
   ADDOOR1  = { t="ADDOOR1",  f="AXF16" },
   ADDOOR2  = { t="ADDOOR2",  f="AXF16" },
   CWDOOR1  = { t="CWDOOR1",  f="AXF16" },
@@ -85,15 +89,43 @@ NBC_BRICKS.MATERIALS =
   ADEXIT   = { t="ADEXIT",   f="AXF16" },
   ADCOMP1  = { t="ADCOMP1",  f="AXF16" },
   CWFENCE  = { t="CWFENCE",  f="CWPAVE" },
+  CWDOORWL = { t="CWDOORWL", f="AXF16" },
+  ADDOOR2  = { t="ADDOOR2",  f="AXF16" },
+  ADDOOR3  = { t="ADDOOR3",  f="AXF16" },
+  ADDOOR1  = { t="ADDOOR1",  f="AXF16" },
+  ADDOORS  = { t="ADDOORS",  f="AXF16" },
+  ADDOORT  = { t="ADDOORT",  f="AXF16" },
+  AXB21B   = { t="AXB21B",   f="AXF16" },
+  AXB27    = { t="AXB27",    f="AXF16" },
+  AXW56    = { t="AXW56",    f="AXF16" },
+
+  -- steel, corrugated sheet, an electrical box (the switches)
+  AXW01    = { t="AXW01",    f="AXF16" },
+  AXW44    = { t="AXW44",    f="AXF16" },
+  AXW72    = { t="AXW72",    f="AXF16" },
+  AXW30    = { t="AXW30",    f="AXF16" },
+  AXW86    = { t="AXW86",    f="CWCONCF" },
+  AXW87    = { t="AXW87",    f="CWCONCF" },
+  AXW38    = { t="AXW38",    f="CWCONCF" },
+  AXW28    = { t="AXW28",    f="CWCONCF" },
+  ADGLASSB = { t="ADGLASSB", f="AXF16" },
+
+  -- crates: wooden, labelled, a blue steel one
+  AXB03    = { t="AXB03",    f="ADFWOOD" },
+  AXB04    = { t="AXB04",    f="ADFWOOD" },
+  AXB09    = { t="AXB09",    f="ADFWOOD" },
+  AXB10    = { t="AXB10",    f="ADFWOOD" },
+  AXB12    = { t="AXB12",    f="ADFWOOD" },
+  AXB14    = { t="AXB14",    f="AXF16" },
 
   -- floors
   CWCARP1  = { f="CWCARP1",  t="CWWALL1" },
   CWCARP2  = { f="CWCARP2",  t="CWWALL2" },
   CWCARP3  = { f="CWCARP3",  t="CWWALL1" },
-  ADFWOOD  = { f="ADFWOOD",  t="AXDW04" },
-  ADFWOD2  = { f="ADFWOD2",  t="AXDW04" },
-  AXHF07A  = { f="AXHF07A",  t="AXDW04" },
-  AXHW07A  = { f="AXHW07A",  t="AXDW04" },
+  ADFWOOD  = { f="ADFWOOD",  t="AXDW06A" },
+  ADFWOD2  = { f="ADFWOD2",  t="AXDW06A" },
+  AXHF07A  = { f="AXHF07A",  t="AXDW06A" },
+  AXHW07A  = { f="AXHW07A",  t="AXDW06A" },
   AXDU02   = { f="AXDU02",   t="AXCITY08" },
   CWTILEF  = { f="CWTILEF",  t="CWTILEW" },
   AXF39    = { f="AXF39",    t="ADCONC1" },
@@ -107,8 +139,10 @@ NBC_BRICKS.MATERIALS =
   ADFDARK  = { f="ADFDARK",  t="ADGREY2" },
   ADFMARB  = { f="ADFMARB",  t="ADMARBL" },
   ADFMARG  = { f="ADFMARG",  t="ADMARBG" },
-  CWSTAIF  = { f="CWSTAIF",  t="ADSCONC" },
-  CWWATER  = { f="CWWATER",  t="ADSCONC" },
+  CWSTAIF  = { f="CWSTAIF",  t="AXSTEP23" },
+  CWWATER  = { f="CWWATER",  t="CWSEAWAL" },
+  -- Freedoom's animated water
+  FWATER1  = { f="FWATER1",  t="CWSEAWAL" },
 
   -- streets (128 x 128): asphalt road, paving-slab sidewalk
   CWASPH   = { f="CWASPH",   t="CWRETAIN" },
@@ -152,7 +186,7 @@ NBC_BRICKS.rooms =
 {
   -- bare brick inside and out: the default Bricks interior
   Tenement = { base = "urban_Brick", env = "building", prob = 100,
-    walls    = { ADBRICK=60, AXW85=50, AXW84=40 },
+    walls    = { ADBRICK=60, AXW85=50, CWWALLD=15 },
     floors   = { AXHF07A=40, AXHW07A=30, ADFWOOD=30, CWCARP3=20, AXF39=20 },
     ceilings = { AXDU03=50, CWCEILD=40 },
     wall_groups = { nbc_living=30, nbc_bedroom=25, nbc_kitchen=25, nbc_bath=10, nbc_den=15, nbc_camp=10,
@@ -160,21 +194,21 @@ NBC_BRICKS.rooms =
 
   -- the flats: paint, plaster, carpet
   Flat = { base = "urban_Brick", env = "building", prob = 80,
-    walls    = { CWWALL1=40, CWWALL2=40, AXCITY08=30, AXCITY09=30, AXDW04=20, CWWOOD1=10 },
+    walls    = { CWWALL1=40, CWWALL2=40, AXCITY08=30, AXCITY09=30, AXHW09=25, CWWOOD1=10 },
     floors   = { CWCARP1=40, CWCARP2=30, CWCARP3=30, AXDU02=30, ADFWOD2=20, CWTILEF=10 },
     ceilings = { AXDU03=70, CWCEILD=10 },
     wall_groups = { nbc_living=30, nbc_bedroom=30, nbc_kitchen=25, nbc_bath=15, nbc_office=5 } },
 
   -- abandoned floors: water-stained concrete, scorched paint
   Derelict = { base = "urban_Cement", env = "building", prob = 60,
-    walls    = { AXW23=40, AXW25=40, AXW12=25, AXW14=25, CWWALLD=30 },
+    walls    = { AXW23=40, AXW25=40, AXW12=8, AXW14=8, CWWALLD=30, ADCONC1=20 },
     floors   = { CWCONCF=50, AXF05=40, AXF06B=20, AXF01=20 },
     ceilings = { CWCEILD=60, AXF16=20 },
     wall_groups = { nbc_camp=40, nbc_den=20, nbc_lab=20, nbc_grow=15, nbc_storage=15 } },
 
   -- stairwells, laundry rooms, basements
   Concrete = { base = "urban_Cement", env = "building", prob = 50,
-    walls    = { ADCONC1=40, ADSCONC=30, CWCONCW=30, AXW43A=20, AXW43C=20 },
+    walls    = { ADCONC1=40, AXW24=30, CWCONCW=30, AXW89=25, AXW27=20 },
     floors   = { AXF02=40, AXF03=30, CWCONCF=30, AXF39B=20 },
     ceilings = { CWCEILT=40, CWCEILD=30 },
     wall_groups = { nbc_utility=30, nbc_storage=25, nbc_workshop=20, nbc_garage=20, nbc_laundry=15,
@@ -189,26 +223,26 @@ NBC_BRICKS.rooms =
 
   -- corridors between the flats
   deuce_Hallway = { base = "urban_deuce_Hallway", env = "hallway", group = "deuce", prob = 50,
-    walls    = { CWWALLD=40, AXW84=40, AXW23=30, AXCITY09=30, AXW25=20 },
+    walls    = { CWWALLD=40, ADBRICK=30, AXW23=30, AXCITY09=30, AXW25=20 },
     floors   = { AXF39=40, CWCONCF=40, AXF05=20 },
     ceilings = { CWCEILD=50, AXDU03=30 } },
 
   -- service tunnels and basement runs
   metro_Hallway = { base = "urban_metro_Hallway", env = "hallway", group = "metro", prob = 50,
-    walls    = { ADCONC1=40, CWCONCW=40, AXW43C=30, AXW23=20 },
+    walls    = { ADCONC1=40, CWCONCW=40, AXW27=30, AXW23=20 },
     floors   = { AXF02=40, CWCONCF=40, AXF05=20 },
     ceilings = { CWCEILT=50, CWCEILD=30 } },
 
   -- rubble and broken foundations (only if caves get switched on)
   Cave_rubble = { base = "urban_Cave_generic", env = "cave", prob = 50,
-    walls    = { ADSCONC=50, AXW23=40, CWRETAIN=30 },
+    walls    = { ADCONC1=50, AXW23=40, CWRETAIN=30 },
     floors   = { CWCONCF=50, AXF06B=40, AXF05=30 } },
 
   -- courtyards, lots and sidewalks between the towers
   Outdoors_yard = { base = "urban_Outdoors_generic", env = "outdoor", prob = 60,
     floors   = { CWPAVE=50, CWASPH=30, AXF01=20, CWCONCF=20 },
     -- park ground: worn grass, dirt and broken concrete
-    naturals = { GRASS1=40, GRASS2=20, AXF06B=30, CWCONCF=15 } },
+    naturals = { GRASS1=15, GRASS2=10, AXF06B=40, CWCONCF=30, AXF01=20 } },
 }
 
 
@@ -221,7 +255,7 @@ NBC_BRICKS.theme_overrides =
   facades =
   {
     CWUQB = 40, CWUQC = 40, CWUQF = 30, CWUEE = 30, CWUDC = 20,
-    ADBRICK = 30, AXW85 = 30, AXW84 = 20,
+    ADBRICK = 30, AXW85 = 30,
   },
 
   -- low walls round courtyards and lots
@@ -231,14 +265,15 @@ NBC_BRICKS.theme_overrides =
 
   street_sinks = { nbc_street = 1 },
 
-  -- trash fires and street lamps; dead trees in the yards
-  outdoor_torches = { burning_barrel = 60, lamp = 30 },
+  -- trash fires and the mod's street lamps outside
+  outdoor_torches = { burning_barrel = 50, nbc_lamppost = 50 },
   cave_torches = { burning_barrel = 50, lamp = 20 },
-  passable_decor = { pool_blood_1 = 10, pool_blood_2 = 10 },
+  -- loose debris on the floor (the quick-throw's bricks and bottles), the odd bloodstain
+  passable_decor = { nbc_brick = 20, nbc_halfbrick = 15, nbc_concrete = 15, nbc_bottle = 15, pool_blood_2 = 4 },
   -- Freedoom draws Doom's trees as leafy green trees: none in the Bricks
-  park_decor = { burning_barrel = 30, lamp = 30 },
-  trees = { burning_barrel = 30, lamp = 30 },
-  cliff_trees = { burning_barrel = 30, lamp = 30 },
+  park_decor = { burning_barrel = 30, nbc_lamppost = 30, nbc_rubble = 20 },
+  trees = { burning_barrel = 30, nbc_lamppost = 30 },
+  cliff_trees = { burning_barrel = 30, nbc_lamppost = 30 },
 
   -- hell and Doom decorations: lamps, trash fires, or an invisible marker
   entity_remap =
@@ -256,7 +291,7 @@ NBC_BRICKS.theme_overrides =
     gutted_torso3 = "dummy", gutted_torso4 = "dummy",
     hang_arm_pair = "dummy", hang_leg_gone = "dummy", hang_torso = "dummy", hang_leg = "dummy",
     hang_twitching = "dummy", pool_brains = "pool_blood_1", gibbed_player = "pool_blood_2",
-    dead_player = "dummy", dead_demon = "dummy", dead_caco = "dummy", dead_skull = "dummy",
+    gibs = "dummy", dead_player = "dummy", dead_demon = "dummy", dead_caco = "dummy", dead_skull = "dummy",
     keen = "dummy", burnt_tree = "dummy", brown_stub = "dummy", big_tree = "dummy",
   },
 
@@ -285,12 +320,14 @@ NBC_BRICKS.theme_overrides =
     steepness = { some = 40, heaps = 60 },   -- split-level floors, stairs and lifts everywhere
     symmetry = { none = 40, few = 40, some = 20 },
     keys = { none = 20, few = 60, some = 20 },
+    barrels = { few = 70, some = 30 },   -- Doom's exploding drums: a few, not a dump
     scenics = { none = 100 },   -- vistas are built like caves: cliffs, not city
-    parks = { few = 30, some = 50, heaps = 20 },
+    parks = { few = 60, some = 35, heaps = 5 },
     park_detail = { some = 50, heaps = 50 },
     fences = { few = 30, some = 70 },
     porches = { some = 30, heaps = 70 },
     pictures = { none = 70, few = 30 },
+    natural_parks = { none = 100 },   -- rock-walled nature parks: not in the Bricks
   },
 
   -- the city-skyline skybox only
@@ -298,20 +335,41 @@ NBC_BRICKS.theme_overrides =
 
   streets_friendly = true,
 
+  -- Urban's groups, cut down to what a city block has (no gothic, tech-lit, castle or mine pieces)
+  narrow_halls = { vent = 50, access = 25 },
+  beam_groups = { beam_lights = 25, beam_lights_white = 40, beam_wood = 30, beam_textured = 50 },
+  fence_groups = { PLAIN = 50, gappy = 50, fence_corrugated_steel = 60, fence_highway_bars = 25, fence_planters = 40 },
+  fence_posts = { Post_metal = 50 },
+  window_groups =
+  {
+    barred = 30, barred_2 = 20, tall = 95, square = 20, grate = 40, supertall = 30,
+    gtd_window_full_open = 70, gtd_window_full_open_tall = 65, gtd_window_bay = 30, gtd_window_low = 25,
+    gtd_window_metal_frames = 70, gtd_window_construction_frames = 65, gtd_window_slump_tall = 65,
+    gtd_window_absurdly_open = 20,
+  },
+  -- wall sets for rooms that don't get a Bricks room set (halls, lobbies of other themes)
+  wall_groups =
+  {
+    torches9 = 6,   -- a burning barrel
+    gtd_wall_urban_storage = 50, gtd_full_storage = 50, gtd_door_storage = 30, gtd_toilet_gallery = 15,
+    gtd_drywall = 50, gtd_library = 15, gtd_DMV_set = 30, gtd_craneo_bank_set = 20, cran_bunkbeds = 30,
+    gtd_generic_beamed_inset = 25, gtd_generic_beamed_brown_inset = 25,
+    gtd_wall_high_gap_set = 25, gtd_wall_high_gap_alt_set = 25,
+    gtd_generic_half_floor = 16, gtd_generic_half_floor_no_trim = 16,
+    gtd_woodframe = 15, gtd_woodframe_alt = 15, gtd_wall_urban_cement_frame = 25,
+    gtd_generic_ceilwall = 30, gtd_generic_ceilwall_2 = 30, gtd_generic_ceilwall_3 = 30,
+    gtd_ind_modwall_1 = 20, gtd_ind_modwall_2 = 20, gtd_ind_modwall_3 = 20,
+    gtd_greywall_1 = 25, gtd_greytall_trim = 25,
+    gtd_wall_lamp_stubby = 7, gtd_wall_lamp_thin = 7, gtd_wall_lamp_thicc = 7,
+    gtd_wall_lit_h_window_tall_gray = 25, gtd_wall_lit_h_window_tall_brown = 50,
+  },
+
   -- most building areas get one of their room theme's room sets (make_cw_fabs.py)
   wall_group_prob = 85,
 }
 
--- Urban wall decorations that read as sci-fi or hell.
-NBC_BRICKS.drop_wall_groups =
-{
-  "torches1", "torches2", "torches3", "torches6", "torches10",
-  "gtd_computers", "gtd_computers_lite5", "gtd_computers_blue_shawn",
-  "gtd_writhing_mass", "gtd_nukage_aquarium", "gtd_water_purifier",
-  "gtd_wall_quakish_insets", "gtd_wall_quakish_insets_2",
-  "gtd_ribbed_lights_tekmachine", "gtd_ribbed_lights_tekmachine_alt", "gtd_ribbed_lights_very_blue",
-  "gtd_wall_tech_top_corner_light_set", "gtd_wall_sewer", "gtd_sewer_set_2", "gtd_sewer_set_3",
-}
+-- (Urban's wall_groups are replaced by a city list above; nothing to drop.)
+NBC_BRICKS.drop_wall_groups = {}
 
 
 ------------------------------------------------------------------------
@@ -341,6 +399,48 @@ NBC_BRICKS.fab_hell_words =
   "gargoyle", "crypt", "tomb", "altar", "candle", "wolf", "nazi",
 }
 
+-- Per kind: prefabs that read as sci-fi, gothic, castle, mine or gore in a city block, by name. These
+-- apply to every kind listed, structural or not (the fallback in Fab_pick covers a slot left empty).
+NBC_BRICKS.fab_kind_words =
+{
+  light      = { "tech", "sticks", "_red", "_blue", "quad_tight" },
+  beam       = { "quakeish", "tech", "gothic" },
+  fence      = { "tech", "gothic", "jurassic", "crenel", "silver" },
+  post       = { "tech", "gothic" },
+  pillar     = { "gothic", "tech" },
+  window     = { "gothic", "cage", "octagon", "plut", "lite_cross", "arched", "quakeish", "hexagon", "arrowslit",
+                 "bunker", "weabdows", "pencil" },
+  hall       = { "mineshaft", "tech", "tek", "comp" },
+  arch       = { "tech" },
+  door       = { "tech" },
+  terminator = { "mineshaft" },
+  stairs     = { "techy", "teleporter", "fancy" },
+  joiner     = { "tech", "quakeish", "cageish", "alternating_lights", "bombed" },
+  exit       = { "nuke", "tech", "tp_closet" },
+  start      = { "tech", "fireblu" },
+  item       = { "confession", "oh_he_ded", "drown", "gameshow", "wallmachines", "tech", "cage", "pedestal" },
+  decor      = { "crackofdoom", "gallows", "tentacle", "blob_lamp", "grimmoire", "infestation", "mogwaltz" },
+  picture    = { "future", "big_faces" },
+  wall       = { "infestation", "natural" },
+  switch     = { "tech" },
+  teleporter = { "" },        -- no teleporters in the Bricks
+}
+
+-- Texture fixes inside particular prefabs (tex_ fields override the prefab's own random picks):
+--   * Urban's roll-up shutters draw their slats with a random Doom STEP texture, which the remap turns into a
+--     concrete step riser (a grey block with a brown band): give them a corrugated shutter
+--   * the fake street doors pick Doom's grey DOOR1/DOOR3: weathered wooden and steel doors instead
+NBC_BRICKS.door_mix = { ADDOOR3 = 50, ADDOOR1 = 25, ADDOORS = 25 }
+NBC_BRICKS.fab_fields =
+{
+  Wall_modern_shutter            = { tex_STEP4 = "AXW28" },
+  Wall_modern_shutter_braceless  = { tex_STEP4 = "AXW28" },
+  Item_closet_urban_fake_shutter = { tex_STEP4 = "AXW28" },
+  Wall_fake_door                 = { tex_DOOR3 = NBC_BRICKS.door_mix },
+  Wall_fake_door_braceless       = { tex_DOOR3 = NBC_BRICKS.door_mix },
+  Item_closet_urban_fake_door    = { tex_DOOR3 = NBC_BRICKS.door_mix },
+}
+
 NBC_BRICKS.decor_kinds =
 {
   decor = true, cage = true, picture = true, trap = true, wall = true,
@@ -359,6 +459,8 @@ local function fab_is_blocked(name, def)
   if def.nbc_only then return false end   -- our own room sets
   local words = NBC_BRICKS.decor_kinds[def.kind or ""] and NBC_BRICKS.fab_block_words
                 or NBC_BRICKS.fab_hell_words
+  local kw = NBC_BRICKS.fab_kind_words[def.kind or ""]
+  if kw and has_word(name, kw) then return true end
   return has_word(name, words) or (def.file and has_word(def.file, words))
 end
 
@@ -370,49 +472,59 @@ end
 -- Explicit picks first, then name rules, then a default.
 NBC_BRICKS.wall_swap =
 {
-  METAL = "AXW85", METAL1 = "ADMETL1", METAL2 = "ADMETL1", METAL3 = "ADMETL3", METAL4 = "ADMETL3",
-  SUPPORT2 = "ADMETL3", SUPPORT3 = "ADMETL3", DOORTRAK = "ADMETL1", DOORSTOP = "ADMETL1",
+  METAL = "AXW01", METAL1 = "AXW44", METAL2 = "AXW44", METAL3 = "AXW43C", METAL4 = "AXW43C",
+  SUPPORT2 = "AXW30", SUPPORT3 = "AXW30", DOORTRAK = "ADMETL1", DOORSTOP = "ADMETL1",
+  CRATE1 = "AXB10", CRATE2 = "AXB03", CRATE3 = "AXB14", CRATINY = "AXB09", CRATWIDE = "AXB04",
+  CRATELIT = "AXB12", CRATLITE = "AXB12",
   STARTAN1 = "CWWALL1", STARTAN2 = "CWWALL1", STARTAN3 = "CWWALL2", STARG1 = "CWWALL2", STARG2 = "CWWALL2",
   STARG3 = "CWWALL2", STARGR1 = "CWWALL1", STARGR2 = "CWWALL1", STARBR2 = "AXCITY08",
+  -- Obsidian's facade and storefront prefabs use these as window glass and shop screens
+  BRWINDOW = "ADGLASSB", PANBOOK = "CWWOOD1",
+  MODWALL3 = "ADGLASSB", MODWALL4 = "ADGLASSB", COMPBLUE = "ADGLASSB", COMPBLU2 = "ADGLASSB",
+  SHAWN1 = "AXW28", SHAWN2 = "AXW28", SHAWN3 = "AXW28", SILVER1 = "AXW72", BROWN96 = "AXW87",
   BLAKWAL1 = "CWWALLD", BLAKWAL2 = "CWWALLD", ICKWALL1 = "AXW23", ICKWALL3 = "AXW23",
   BROWN1 = "AXW85", BROWN96 = "AXW85", BROWNGRN = "AXW85", BROWNHUG = "AXW85", REDWALL = "AXW85",
   BIGBRIK1 = "ADBRICK", BIGBRIK2 = "AXW85", BIGBRIK3 = "AXW84",
   MARBGRAY = "AXCITY08", MARBLE1 = "ADMARBL", MARBLE2 = "ADMARBL", MARBLE3 = "ADMARBL",
-  DOOR1 = "CWDOORF", DOOR3 = "CWDOORF", BIGDOOR1 = "CWDOOR2", BIGDOOR2 = "CWDOOR2",
-  BIGDOOR3 = "CWDOOR2", BIGDOOR4 = "CWDOOR2", BIGDOOR5 = "CWDOOR1", BIGDOOR6 = "CWDOOR1",
-  BIGDOOR7 = "CWDOOR1", SPCDOOR1 = "CWDOORS", SPCDOOR2 = "CWDOORS", EXITDOOR = "CWFIRED",
+  -- full-height door art (the CWDOOR* set has plaster over the door, which turns short doors into white boxes)
+  DOOR1 = "ADDOORT", DOOR3 = "ADDOORS", BIGDOOR1 = "CWDOORWL", BIGDOOR2 = "CWDOORWL",
+  BIGDOOR3 = "CWDOORWL", BIGDOOR4 = "CWDOORWL", BIGDOOR5 = "ADDOOR2", BIGDOOR6 = "ADDOOR3",
+  BIGDOOR7 = "ADDOOR3", SPCDOOR1 = "ADDOORS", SPCDOOR2 = "ADDOORS", SPCDOOR3 = "ADDOORS", EXITDOOR = "CWFIRED",
   EXITSIGN = "ADEXIT", EXITSTON = "ADEXIT",
-  DOORRED = "CWDOORF", DOORBLU = "CWDOORS", DOORYEL = "CWDOOR2",
-  DOORRED2 = "CWDOORF", DOORBLU2 = "CWDOORS", DOORYEL2 = "CWDOOR2",
+  -- key-door trims keep their colour: red and blue painted sheet, yellow hazard stripes
+  DOORRED = "AXB21B", DOORBLU = "AXB27", DOORYEL = "AXW56",
+  DOORRED2 = "AXB21B", DOORBLU2 = "AXB27", DOORYEL2 = "AXW56",
 }
 
 -- {lua pattern, replacement}, tried in order on the upper-case name
 NBC_BRICKS.wall_rules =
 {
-  { "^SW[12]", "ADCOMP1" },
+  { "^SW[12]", "AXW38" },
+  { "CRAT", "AXB03" },
   { "^MID", "CWFENCE" }, { "BRNSMAL", "CWFENCE" }, { "BRNBIG", "CWFENCE" },
   { "EXIT", "ADEXIT" },
-  { "DOOR", "CWDOORF" },
+  { "DOOR", "ADDOOR3" },
   { "BRIK", "AXW85" }, { "BRICK", "ADBRICK" },
   { "WOOD", "CWWOOD1" }, { "CRAT", "CWWOOD1" }, { "PLANK", "CWWOOD1" },
-  { "STEP", "ADSCONC" }, { "STAIR", "ADSCONC" },
+  { "STEP", "AXSTEP23" }, { "STAIR", "AXSTEP23" },
   -- hell, gore, gothic, natural rock: grimy concrete
   { "SKULL", "AXW23" }, { "SKIN", "AXW25" }, { "SK", "AXW23" }, { "FIRE", "AXW23" },
   { "BLOD", "AXW23" }, { "BLOOD", "AXW23" }, { "LAVA", "AXW23" }, { "GST", "AXW14" },
   { "MARBFAC", "ADMARBL" }, { "MARB", "AXCITY08" }, { "SP_", "AXW23" }, { "ZZ", "AXW23" },
   { "ZIMMER", "AXW23" }, { "SLOP", "AXW23" }, { "CRACK", "AXW23" }, { "FLESH", "AXW23" },
-  { "HELL", "AXW23" }, { "NUKE", "AXW43C" }, { "ROCK", "ADSCONC" }, { "ASH", "AXW23" },
+  { "HELL", "AXW23" }, { "NUKE", "AXW43C" }, { "ROCK", "CWCONCW" }, { "ASH", "AXW23" },
   { "ICK", "AXW23" }, { "VINE", "AXW25" }, { "SATYR", "AXW14" }, { "LION", "AXW14" },
-  { "GARG", "AXW14" }, { "FACE", "AXW14" }, { "WOLF", "ADGREY2" }, { "ZELDOOR", "CWDOORF" },
+  { "GARG", "AXW14" }, { "FACE", "AXW14" }, { "WOLF", "ADGREY2" }, { "ZELDOOR", "ADDOOR3" },
   -- techbase: industrial panels and metal
-  { "COMP", "AXW43A" }, { "TEK", "AXW43B" }, { "SPACE", "ADMETL1" }, { "SHAWN", "ADMETL2" },
-  { "PANEL", "AXW43A" }, { "PANCASE", "AXW43A" }, { "LITE", "CWWALLD" }, { "PIPE", "AXW43C" },
-  { "SILVER", "ADMETL3" }, { "METAL", "AXW85" }, { "SUPPORT", "ADMETL3" }, { "PLAT", "ADMETL1" },
+  { "COMP", "AXW89" }, { "TEK", "AXW89" }, { "SPACE", "AXW43C" }, { "SHAWN", "AXW28" },
+  { "PANCASE", "AXW89" }, { "PANEL", "AXDW06A" }, { "^PAN", "AXDW06A" },
+  { "FALL", "CWWALLD" }, { "NUKAGE", "AXW43C" }, { "SLAD", "AXW23" }, { "POIS", "AXW23" }, { "DBRAIN", "AXW23" }, { "LITE", "CWWALLD" }, { "PIPE", "AXW43C" },
+  { "SILVER", "AXW72" }, { "METAL", "AXW01" }, { "SUPPORT", "AXW30" }, { "PLAT", "AXW01" },
   -- plain walls
-  { "CEMENT", "ADCONC1" }, { "CONC", "ADCONC1" }, { "BSTONE", "ADSCONC" }, { "STONE", "ADSCONC" },
+  { "CEMENT", "ADCONC1" }, { "CONC", "ADCONC1" }, { "BSTONE", "CWCONCW" }, { "STONE", "CWCONCW" },
   { "GRAY", "CWWALLD" }, { "GREY", "CWWALLD" }, { "STAR", "CWWALL1" }, { "STUCCO", "AXCITY08" },
-  { "MODWALL", "CWWALL2" }, { "BROWN", "AXW85" }, { "TAN", "AXCITY09" }, { "BRONZE", "ADMETL3" },
-  { "BLAK", "CWWALLD" }, { "CEIL", "ADSCONC" },
+  { "MODWALL", "CWWALL2" }, { "BROWN", "AXW85" }, { "TAN", "AXCITY09" }, { "BRONZE", "AXW87" },
+  { "BLAK", "CWWALLD" }, { "CEIL", "CWWALLD" },
 }
 NBC_BRICKS.wall_default = "ADCONC1"
 
@@ -425,7 +537,7 @@ NBC_BRICKS.flat_swap =
 
 NBC_BRICKS.flat_rules =
 {
-  { "WATER", "CWWATER" },
+  { "WATER", "FWATER1" },
   { "NUKAGE", "CWCONCF" }, { "SLIME", "CWCONCF" }, { "LAVA", "CWCONCF" }, { "BLOOD", "CWCONCF" },
   { "TLITE", "ADCLITE" }, { "LITE", "ADCLITE" }, { "CEIL1_2", "ADCLITE" }, { "CEIL1_3", "ADCLITE" },
   { "CEIL", "CWCEILD" },
@@ -443,11 +555,14 @@ local function remap(name, swap, rules, default)
   if string.sub(name, 1, 1) == "_" then return name end          -- Obsidian placeholders
   local up = string.upper(name)
   if up == "F_SKY1" or string.match(up, "^SKY") then return name end
+  if up == "O_INVIST" then return name end                         -- Obsidian's invisible barrier (export_maps.py ships it)
   if NBC_BRICKS.MATERIALS[up] then return name end               -- already ours
   if swap[up] then return swap[up] end
   for _, r in ipairs(rules) do
     if string.find(up, r[1]) then return r[2] end
   end
+  NBC_BRICKS.misses = NBC_BRICKS.misses or {}
+  NBC_BRICKS.misses[up] = default
   return default
 end
 
@@ -464,6 +579,16 @@ end
 --  Hooks
 ------------------------------------------------------------------------
 
+NBC_BRICKS.entities =
+{
+  nbc_brick     = { id = 26000, r = 8,  h = 8,   pass = true },
+  nbc_halfbrick = { id = 26001, r = 8,  h = 8,   pass = true },
+  nbc_concrete  = { id = 26002, r = 8,  h = 8,   pass = true },
+  nbc_bottle    = { id = 26003, r = 6,  h = 12,  pass = true },
+  nbc_rubble    = { id = 26004, r = 24, h = 16,  pass = true },
+  nbc_lamppost  = { id = 26233, r = 12, h = 128, light = 255 },
+}
+
 function NBC_BRICKS.setup(self)
   local urban = GAME.THEMES["urban"]
   if not urban then return end
@@ -479,6 +604,11 @@ function NBC_BRICKS.setup(self)
     end
   end
   T.prefab_remap = nil   -- Urban's remaps point at Doom textures; the remap below does the job
+
+  -- New Bricks City things the theme places (nbc/MAPINFO.txt, nbc/mapinfo/cw_props.txt)
+  for name, ent in pairs(NBC_BRICKS.entities) do
+    if not GAME.ENTITIES[name] then GAME.ENTITIES[name] = table.copy(ent) end
+  end
   T.post_mat = "AXW85" -- corner posts otherwise default to METAL
   GAME.THEMES["nbc_bricks"] = T
 
@@ -486,7 +616,7 @@ function NBC_BRICKS.setup(self)
   -- so set it here when this build is a Bricks build.
   if OB_CONFIG.theme == "nbc_bricks" then
     GAME.MATERIALS["_ERROR"] = { t = "AXW85", f = "CWCONCF" }
-    GAME.MATERIALS["_DEFAULT"] = { t = "ADSCONC", f = "AXF02" }
+    GAME.MATERIALS["_DEFAULT"] = { t = "ADCONC1", f = "AXF02" }
   end
 
   -- room themes: copy the Urban base, replace the textures
@@ -593,6 +723,19 @@ function NBC_BRICKS.begin_level(self, LEVEL)
     end
   end
   gui.printf("New Bricks City: %d Doom/hell prefabs switched off\n", count)
+
+  -- 3. per-prefab texture fixes (tex_ fields; put back at end_level)
+  NBC_BRICKS.saved_fab_fields = {}
+  for name, fields in pairs(NBC_BRICKS.fab_fields) do
+    local def = PREFABS[name]
+    if def then
+      NBC_BRICKS.saved_fab_fields[name] = {}
+      for k, v in pairs(fields) do
+        NBC_BRICKS.saved_fab_fields[name][k] = def[k] or false
+        def[k] = v
+      end
+    end
+  end
   NBC_BRICKS.cars = 0
 end
 
@@ -610,17 +753,24 @@ if Fab_pick and not NBC_BRICKS.orig_fab_pick then
     local res = NBC_BRICKS.orig_fab_pick(LEVEL, reqs, true)
     if res ~= nil then return res end
 
+    -- this one slot only: let the blocked prefabs of its kind back in, pick, block them again
     local list = reqs and NBC_BRICKS.blocked_by_kind and NBC_BRICKS.blocked_by_kind[reqs.kind]
     if list then
-      gui.printf("New Bricks City: no clean '%s' prefab fits here, allowing blocked ones\n", tostring(reqs.kind))
+      gui.printf("New Bricks City: no clean '%s' prefab fits here, allowing a blocked one\n", tostring(reqs.kind))
       for _, name in ipairs(list) do
         if PREFABS[name] and NBC_BRICKS.saved_fab_probs[name] then
           PREFABS[name].use_prob = NBC_BRICKS.saved_fab_probs[name]
         end
       end
-      NBC_BRICKS.blocked_by_kind[reqs.kind] = nil
     end
-    return NBC_BRICKS.orig_fab_pick(LEVEL, reqs, allow_none)
+    res = NBC_BRICKS.orig_fab_pick(LEVEL, reqs, allow_none)
+    if list then
+      for _, name in ipairs(list) do
+        if PREFABS[name] then PREFABS[name].use_prob = 0 end
+      end
+      if res and res.name then gui.printf("New Bricks City: fallback %s:%s\n", tostring(reqs.kind), res.name) end
+    end
+    return res
   end
 end
 
@@ -644,6 +794,25 @@ if Layout_decorate_rooms and not NBC_BRICKS.orig_decorate_rooms then
       gui.printf("New Bricks City: %d rooms use the Corpo Wars room sets\n", sets)
     end
     return NBC_BRICKS.orig_decorate_rooms(LEVEL, pass, ...)
+  end
+end
+
+
+-- Night in the Bricks: the streets under the sky are dimmer than the lit rooms inside. Obsidian picks the
+-- sky light (176-240, times the lighting multiplier) before any module hook, so it's set here instead.
+NBC_BRICKS.sky_light = { 160, 176, 176, 192 }
+NBC_BRICKS.sky_light_dark = 144
+
+if Level_choose_darkness and not NBC_BRICKS.orig_choose_darkness then
+  NBC_BRICKS.orig_choose_darkness = Level_choose_darkness
+
+  Level_choose_darkness = function(LEVEL, ...)
+    local res = NBC_BRICKS.orig_choose_darkness(LEVEL, ...)
+    if LEVEL and LEVEL.theme_name == "nbc_bricks" then
+      LEVEL.sky_light = LEVEL.is_dark and NBC_BRICKS.sky_light_dark or rand.pick(NBC_BRICKS.sky_light)
+      LEVEL.sky_shadow = 24
+    end
+    return res
   end
 end
 
@@ -706,6 +875,12 @@ if Fabricate and not NBC_BRICKS.orig_fabricate then
   NBC_BRICKS.orig_fabricate = Fabricate
 
   Fabricate = function(LEVEL, room, def, T, skins)
+    if NBC_BRICKS.active and def and def.name then
+      -- tally for the log (end_level): which prefabs this level used, by kind
+      local key = (def.kind or "?") .. ":" .. def.name
+      NBC_BRICKS.used = NBC_BRICKS.used or {}
+      NBC_BRICKS.used[key] = (NBC_BRICKS.used[key] or 0) + 1
+    end
     if NBC_BRICKS.active and def and def.name and T and T.add_x then
       local pool = car_pool(def.name)
       if pool == false then return end
@@ -768,7 +943,15 @@ end
 function NBC_BRICKS.end_level(self, LEVEL)
   if NBC_BRICKS.active then
     gui.printf("New Bricks City: %d voxel cars parked\n", NBC_BRICKS.cars or 0)
+    -- every prefab the level used, for checking builds (inspect the log)
+    local keys = {}
+    for k, _ in pairs(NBC_BRICKS.used or {}) do table.insert(keys, k) end
+    table.sort(keys)
+    for _, k in ipairs(keys) do gui.printf("NBC prefab %s x%d\n", k, NBC_BRICKS.used[k]) end
+    -- texture names no rule caught (they got the default)
+    for k, v in pairs(NBC_BRICKS.misses or {}) do gui.printf("NBC default %s -> %s\n", k, v) end
   end
+  NBC_BRICKS.used = nil
   NBC_BRICKS.active = false
 
   if NBC_BRICKS.saved_mats then
@@ -785,6 +968,13 @@ function NBC_BRICKS.end_level(self, LEVEL)
     NBC_BRICKS.saved_fab_probs = nil
   end
   NBC_BRICKS.blocked_by_kind = nil
+
+  for name, fields in pairs(NBC_BRICKS.saved_fab_fields or {}) do
+    for k, v in pairs(fields) do
+      if PREFABS[name] then PREFABS[name][k] = v or nil end
+    end
+  end
+  NBC_BRICKS.saved_fab_fields = nil
 end
 
 

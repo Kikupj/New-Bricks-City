@@ -50,10 +50,11 @@ settings = {
     "@sky_generator": "0",             # paints its own sky graphics
     "@procedural_gotcha": "0", "@procedural_gotcha_zdoom": "0", "@iwad_mode": "0",
     "@compress_output": "0",           # plain WAD, not a zip
-    "float_overall_lighting_mult": "1.3",
+    "float_overall_lighting_mult": "1.1",   # interiors: 1.0 is gloomy, 1.3 washes everything out at 255
     "outdoors": "mixed", "caves": "mixed", "liquids": "mixed", "hallways": "mixed", "teleporters": "mixed",
     "steepness": "mixed", "parks": "mixed", "park_detail": "mixed", "porches": "mixed", "cages": "mixed",
     "natural_parks": "none", "traps": "none", "room_heights": "tall-ish", "float_mons": "0.6",
+    "bool_allow_teleporter_emergency_breaks": "0",   # no teleporters in the Bricks, not even to mend a layout
 }
 lines, seen = [], set()
 for line in open(base, encoding="latin-1").read().splitlines():

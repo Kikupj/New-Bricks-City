@@ -33,11 +33,12 @@ $set = [ordered]@{
     "@sky_generator" = "0"            # paints its own sky graphics
     "@procedural_gotcha" = "0"; "@procedural_gotcha_zdoom" = "0"; "@iwad_mode" = "0"
     "@compress_output" = "0"          # plain WAD, not a zip
-    "float_overall_lighting_mult" = "1.3"   # Obsidian's interiors are very dark at 1.0
+    "float_overall_lighting_mult" = "1.1"   # interiors: 1.0 is gloomy, 1.3 washes everything out at 255
     # The GUI saves fixed choices (steepness = none ...) that override the theme: hand them back to it.
     "outdoors" = "mixed"; "caves" = "mixed"; "liquids" = "mixed"; "hallways" = "mixed"; "teleporters" = "mixed"
     "steepness" = "mixed"; "parks" = "mixed"; "park_detail" = "mixed"; "porches" = "mixed"; "cages" = "mixed"
     "natural_parks" = "none"          # nature parks are caves with trees, not city parks
+    "bool_allow_teleporter_emergency_breaks" = "0"   # no teleporters in the Bricks, not even to mend a layout
     "traps" = "none"                  # monster closets: the game places its own gangs
     "room_heights" = "tall-ish"       # room for split levels, balconies and stair runs
     "float_mons" = "0.6"              # a light layer: the game replaces it with the gang (only its spots count)
