@@ -28,6 +28,8 @@ class NBC_CommandMap : NBC_UI
 	int downX, downY;
 	double downCamX, downCamY;
 
+	override bool HoverFocuses() { return true; }
+
 	override void Init(Menu parent)
 	{
 		Super.Init(parent);

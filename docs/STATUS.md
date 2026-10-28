@@ -6,6 +6,10 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Fix — hovering no longer selects (2026-10-28, by Claude)
+- **Owner report:** in the GUI, hovering selected things, so moving the pointer to a button could change the selection on the way. `NBC_UI` keeps the pointer's control apart from the focus: hovering only highlights it; a click selects or uses; the arrow keys move the focus as before. On the raid board a click picks a district and a second click (or Enter) plans the raid. The command map keeps hover focus (the map under the pointer is where it plots).
+- **Verified (scripted):** on the raid board, hovering Sutter Storm Drains left Pike Water Towers in the dossier; a click on Mercer Block selected it; moving to PLAN RAID highlighted the button and kept Mercer Block.
+
 ### Playtest fixes — squad fire, a smaller start, map size and pacing, keys and switches, HUD panels (2026-10-28, by Claude)
 - **Owner playtest:** the squad shot at enemies through walls and obstacles; start with just you and two random squad mates (no specialists); the maps were large and quiet until the leader, then crowded; switches and key doors were hard to tell apart (bring back Doom's colour coding in our look); the in-game text should sit on semi-transparent panels.
 - **Squad fire** (`ally.zs`): sight passes through fences, railings, gaps and furniture that bullets don't. Officers now need a clear shot, a trace from the gun to the target's middle that reaches it (or another gang member), to pick a target, and again before each burst. Suppressing fire needs a clear line to where the enemy went to ground.

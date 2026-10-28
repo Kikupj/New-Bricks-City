@@ -4,7 +4,9 @@
 //
 // Everything is laid out on a 960x600 canvas, scaled and centered on the real screen. Each frame a screen
 // draws itself and registers its controls (Button / Region); input then works on those:
-//   mouse      hover to select, click to use, wheel to scroll, right click to go back
+//   mouse      hover to highlight, click to select or use, wheel to scroll, right click to go back (hovering
+//              never selects anything: owner playtest, the pointer crossing a list on its way to a button
+//              picked whatever it passed over)
 //   keyboard   arrows move to the nearest control that way, Enter uses it, Esc goes back,
 //              Q / E (or Tab) switch tabs where there are tabs
 // Screens only read the case state; every change goes out as a netevent (Send), so the menus never pause the
@@ -41,6 +43,7 @@ class NBC_UI : GenericMenu
 	int wantId, wantArg;      // focus this control once it shows up (after a netevent has run)
 	int mouseX, mouseY;
 	bool mouseOn;
+	int hoverId, hoverArg;    // what's under the pointer (highlighted only)
 	int ticks;
 
 	override void Init(Menu parent)
@@ -244,7 +247,15 @@ class NBC_UI : GenericMenu
 
 	void FocusLater(int id, int arg) { wantId = id; wantArg = arg; }
 
-	bool IsFocus(int id, int arg) { return focusSet && focusId == id && focusArg == arg; }
+	// highlighted: under the pointer while the mouse is in use, else the keyboard's focus
+	bool IsFocus(int id, int arg)
+	{
+		if (mouseOn && !HoverFocuses()) return hoverId == id && hoverArg == arg;
+		return focusSet && focusId == id && focusArg == arg;
+	}
+
+	// true: the pointer moves the focus as it hovers (the command map: the map under the pointer is what it plots on)
+	virtual bool HoverFocuses() { return false; }
 
 	// the selection frame: amber, double
 	void FocusFrame(double x, double y, double w, double h)
@@ -425,7 +436,9 @@ class NBC_UI : GenericMenu
 		{
 			mouseX = ev.MouseX; mouseY = ev.MouseY; mouseOn = true;
 			int i = RegionAt(VX(mouseX), VY(mouseY));
-			if (i >= 0 && (rid[i] != focusId || rarg[i] != focusArg))
+			hoverId = i >= 0 ? rid[i] : 0;
+			hoverArg = i >= 0 ? rarg[i] : 0;
+			if (HoverFocuses() && i >= 0 && (rid[i] != focusId || rarg[i] != focusArg))
 			{
 				focusId = rid[i]; focusArg = rarg[i]; focusSet = true;
 			}

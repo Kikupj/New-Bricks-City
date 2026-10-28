@@ -92,7 +92,8 @@ class NBC_Terminal : NBC_UI
 		case ID_CLOSE: Leave(); return;
 		case ID_NO: popup = POP_NONE; return;
 		case ID_DISTRICT:
-			selDistrict = arg;
+			// a click picks the district; a second click (or Enter) plans the raid
+			if (arg != selDistrict) { selDistrict = arg; focusId = ID_DISTRICT; focusArg = arg; focusSet = true; return; }
 			Activate(ID_PLAN, 0);
 			return;
 		case ID_PLAN:
