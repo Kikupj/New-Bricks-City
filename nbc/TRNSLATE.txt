@@ -1,0 +1,12 @@
+// New Bricks City: the officers' clothes in the field (NBC_Ally.Equip). The ally sprites come from the enemy
+// pack's soldiers (green tops 112-127, blue trousers 192-207); these remap them to plain clothes so nobody looks
+// like a modern tactical unit. Outfit n matches the portraits drawn with outfit n (tools/art/make_portraits.py:
+// face f wears outfit (f * 3) % 8).
+NBC_Outfit0 = "112:127=[134,92,58]:[26,16,10]", "192:207=[88,102,130]:[14,18,26]"      // brown leather, jeans
+NBC_Outfit1 = "112:127=[160,160,164]:[26,26,28]", "192:207=[72,68,62]:[12,12,10]"      // grey hoodie, dark trousers
+NBC_Outfit2 = "112:127=[164,58,50]:[30,10,8]", "192:207=[88,102,130]:[14,18,26]"       // red flannel, jeans
+NBC_Outfit3 = "112:127=[130,130,86]:[22,22,14]", "192:207=[156,138,102]:[30,26,18]"    // olive field jacket, khakis
+NBC_Outfit4 = "112:127=[74,88,134]:[10,12,24]", "192:207=[64,62,60]:[10,10,10]"        // navy: an old uniform shirt, dark trousers
+NBC_Outfit5 = "112:127=[180,152,110]:[36,28,18]", "192:207=[62,74,98]:[10,12,18]"      // tan coat, dark jeans
+NBC_Outfit6 = "112:127=[84,82,86]:[10,10,12]", "192:207=[104,104,72]:[18,18,12]"       // black, olive trousers
+NBC_Outfit7 = "112:127=[104,124,156]:[16,20,30]", "192:207=[58,56,54]:[8,8,8]"         // denim jacket, black trousers
