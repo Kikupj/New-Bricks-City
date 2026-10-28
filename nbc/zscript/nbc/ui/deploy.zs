@@ -9,7 +9,7 @@ class NBC_DeployMenu : NBC_UI
 	enum EId
 	{
 		ID_BACK = 1, ID_ASSAULT, ID_ROSTER, ID_MEMBER, ID_YOU, ID_AUTO, ID_AUTOKIT, ID_SLOT, ID_BENCH,
-		ID_PICK, ID_UNEQUIP, ID_PICK_CLOSE
+		ID_PICK, ID_UNEQUIP, ID_PICK_CLOSE, ID_TEAM
 	}
 	// kit slots
 	enum ESlot { S_PRIMARY, S_SIDEARM, S_MELEE, S_VEST, S_POUCH }    // S_POUCH + n for pouch n
@@ -71,6 +71,7 @@ class NBC_DeployMenu : NBC_UI
 			return;
 		}
 		case ID_MEMBER: if (arg >= 0 && arg < dept.squad.Size()) kitWho = dept.squad[arg]; return;
+		case ID_TEAM: if (arg >= 0 && arg < dept.squad.Size()) Send(NBC_Department.OP_TEAM, dept.squad[arg]); return;
 		case ID_YOU: kitWho = 0; return;
 		case ID_AUTO: Send(NBC_Department.OP_SQUAD_AUTO); return;
 		case ID_AUTOKIT: Send(NBC_Department.OP_AUTO_KIT); return;
@@ -215,6 +216,9 @@ class NBC_DeployMenu : NBC_UI
 				continue;
 			}
 			OfficerCard(ID_MEMBER, s, cx, cy, 150, 120, o, kitWho == o.id);
+			// the fireteam (Ghost Recon's ALPHA / BRAVO): click to switch
+			bool alpha = o.team == NBC_Orders.TEAM_ALPHA;
+			Button(ID_TEAM, s, cx + 150 - 58, cy + 4, 54, 18, alpha ? "ALPHA" : "BRAVO", true, 9, NBC_Orders.TEAM_COLOR[alpha ? 0 : 1]);
 			Text(NewSmallFont, Font.CR_GRAY, cx + 75, cy + 124, String.Format("%s  -  %s", o.ClassName(), o.PrimaryName()), 9, 1);
 		}
 		Text(NewSmallFont, Font.CR_GRAY, x + 14, 520 - 30, String.Format("%d of %d in the squad", dept.squad.Size(), NBC_Cat.SQUAD_SLOTS), 10);

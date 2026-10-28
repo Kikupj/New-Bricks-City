@@ -798,6 +798,7 @@ class NBC_RunManager : EventHandler
 			rd.raidOffKills.Push(0);
 			let o = dept.OfficerById(dept.squad[s]);
 			rd.raidOffHealth.Push(o ? o.health : 0);
+			rd.raidOffTeam.Push(o ? o.team : 0);
 		}
 		level.ChangeLevel(rd.raidMap, 0, CHANGELEVEL_NOINTERMISSION);
 	}
@@ -849,6 +850,18 @@ class NBC_RunManager : EventHandler
 			String lk = "  locker:";
 			for (int i = 0; i < NBC_Cat.IT_COUNT; i++) if (dept.locker[i]) lk = lk .. String.Format(" %s %d,", NBC_Cat.ItemName(i), dept.locker[i]);
 			Console.Printf("%s", lk);
+		}
+		if (rd.raidActive && rd.teamOrder.Size() == NBC_Orders.TEAMS)
+		{
+			for (int t = 0; t < NBC_Orders.TEAMS; t++)
+				Console.Printf("  team %s: %s, %s, %d waypoints%s", NBC_Orders.TEAM_NAME[t], NBC_Orders.ORDER_NAME[rd.teamOrder[t]],
+					NBC_Orders.ROE_NAME[rd.teamROE[t]], NBC_Orders.WaypointCount(rd, t), rd.cmdTeam == 0 || rd.cmdTeam - 1 == t ? " (selected)" : "");
+			for (int i = 0; i < squad.Size(); i++)
+			{
+				let a = NBC_Ally(squad[i]);
+				if (a) Console.Printf("    slot %d %s team %s at (%d, %d) hp %d step %d%s", a.slot, a.GetTag(), NBC_Orders.TEAM_NAME[rd.TeamOfSlot(a.slot)],
+					int(a.pos.x), int(a.pos.y), a.health, a.wpStep, a.waitingGo ? " WAITING" : "");
+			}
 		}
 		if (rd.raidActive)
 			Console.Printf("  raid: turf %d gang %d on %s, crew %d/%d kills %d (you %d) leader %s", rd.raidDistrict,

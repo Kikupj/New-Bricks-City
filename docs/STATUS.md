@@ -2,9 +2,32 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Current milestone: M3 + M6 + M7c screens** (the case loop on the Obsidian districts, the squad as people, the Evidence Locker, the precinct screens). Raids run on the eight Obsidian districts again; the precinct terminal, the deploy screen and the after-action report are in. Next: playtest the loop (see "Needs playtest"), then the rest of M3 (case-end screens, Merit) and M7b (the city map and the daily gang tick). The kits (M2b/M2c) are test maps only.
+**Current milestone: M3 + M6 + M7c screens** (plus Ghost Recon squad orders) (the case loop on the Obsidian districts, the squad as people, the Evidence Locker, the precinct screens). Raids run on the eight Obsidian districts again; the precinct terminal, the deploy screen and the after-action report are in. Next: playtest the loop (see "Needs playtest"), then the rest of M3 (case-end screens, Merit) and M7b (the city map and the daily gang tick). The kits (M2b/M2c) are test maps only.
 
 ## Done
+
+### M6 (part) — Squad orders, Ghost Recon style — 🔧 BUILT, NEEDS PLAYTEST (2026-10-28, by Claude)
+- **Owner request:** "Add the Ghost Recon 1 squad command system so the player can control what their squad does on the map."
+- **Fireteams:** the squad splits into ALPHA and BRAVO. The deploy screen sets each officer's team (the badge on the squad card; AUTO and new picks put the first two in Alpha, the rest in Bravo).
+- **Keys** (KEYCONF, rebindable under Controls → New Bricks City):
+
+  | Key | Command |
+  |---|---|
+  | Q | talk to ALL / ALPHA / BRAVO (the ">" on the HUD marks who's listening) |
+  | Z | regroup on me (FOLLOW) |
+  | C | HOLD where they are |
+  | V | MOVE to the spot you're aiming at (a ring of light marks it) |
+  | N | ADVANCE along the team's waypoints |
+  | B | rules of engagement: RECON → ASSAULT → SUPPRESS |
+  | J / K / L | call go code X-RAY / YANKEE / ZULU |
+  | M | the command map |
+
+- **Rules of engagement:** RECON is weapons tight (they only shoot gang members already in the fight, after you, the squad or them), no Molotovs, 60% speed. ASSAULT is engage at will (the old behaviour). SUPPRESS adds three rounds to every burst, spreads them wider, keeps firing for two seconds where a target was last seen, and rounds snapping past make targets flinch (a 12% pain chance per round).
+- **The command map** (`ui/commandmap.zs`, `NBC_CommandMap`): a top-down view in real time (the raid goes on while you plan, as in Ghost Recon) with the walls, ledges, the exit, your officers by team, what the squad has spotted, and each team's waypoint path. Click to add a waypoint for the team you're plotting (Q/E switches team), drag to pan, the wheel zooms, right-click a waypoint to delete it. The panel sets who your keys talk to, the team's order and ROE, clears the path, puts a go code on the selected waypoint and calls go codes. Keyboard: select the map and the arrows pan, Enter drops a waypoint at the crosshair, Esc goes back to the panel.
+- **Go codes:** a team on ADVANCE stops at a waypoint carrying a go code ("BRAVO: At waypoint 2. Waiting on X-RAY.") until you call it (J / K / L or the map), then moves on ("BRAVO: Moving out.").
+- **Pathing:** the officers route over Corpo Wars' navigation graph (`zscript/cw/nav.zs`, ported; a binary-heap Dijkstra replaces the linear scan; built once per raid: 1,874 nodes in 152 ms on Sutter Walk-ups). Straight when the way is clear, node to node when not, re-planning when stuck. FOLLOW still chases you directly while you're in sight and uses the graph when you're not (the catch-up teleport stays as the last resort). A team at a point fans out round it.
+- **HUD:** an A/B badge on each squad portrait; a line per team (order, ROE, waypoints) with ">" on the ones listening; Ghost Recon's threat indicator, a ring at the bottom centre with a mark for every gang member the squad can see, in its direction from where you're looking (red: it's after one of you; bigger: closer); the squad's radio log bottom left.
+- **State:** orders, ROE, waypoints and go codes live in `NBC_RunData` (raid state, reset each raid); `NBC_Orders` (`orders.zs`) takes the `nbc_cmd.<op>` netevents, owns the graph, the log and the contacts. `nbc_debug_case` prints each team's orders and every officer's position. `nbc_navdebug 1` shows the graph's nodes.
 
 ### M3 / M6 / M7c (part) — The case loop on the Obsidian districts, the department, the precinct screens — 🔧 BUILT, NEEDS PLAYTEST (2026-10-28, by Claude)
 - **Owner request:** raids back on the Obsidian districts with the loop connected; an inventory where recovered weapons and resources go after missions for you and the squad; squad mates as individuals (Hamburger Hill), managed and upgraded like XCOM soldiers (police squad management, the original Rainbow Six); polished menus with clear controls, in the style of the Hamburger Hill video in `docs/`.
@@ -163,6 +186,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `tools/Obsidian/make_cw_fabs.py` remakes Corpo Wars' room recipes (kit_*.zs `Dress()`) as Obsidian prefabs: 18 room sets (living, kitchen, bedroom, bath, office, storage, utility, laundry, workshop, garage, lockers, lab, grow, den, camp, lobby, shop, bar) with furniture along the walls, free-standing groups, random wall sprites and clutter, and loose debris (26000–26004) in squats, dens, storage and on the street. Each Bricks room theme picks from its own list of room sets.
 
 ## Verified
+- **Squad orders (2026-10-28, cloud session, scripted):** `check_lumps` 0 new problems; `tools/smoke_test.sh` on NBC_TEST, NBC_HUB and NBC_CT01-08 → PASS on all ten. On NBC_CT05 with four officers: the graph built (1,874 nodes, 150-210 ms); V moved both teams to the aimed spot ("ALPHA: In position." on the radio log); B cycled the ROE; on the command map two waypoints were plotted for Alpha, X-RAY put on the second, ADVANCE ordered. Alpha walked to waypoint 1 and held (step 0 → 1 only after the call), J called X-RAY and they moved on toward waypoint 2 while Bravo kept following; the map showed X-RAY as called and the officers on the path. Screenshots of the HUD (team lines, A/B badges, radio log), the command map and the deploy screen's team badges.
 - **The case loop and screens (2026-10-28, cloud session, UZDoom 5.0.3 on Linux, scripted with xdotool, software renderer):**
   - `python tools/check_lumps.py` → `0 new problem(s), 13 known`. `tools/smoke_test.sh` on NBC_TEST, NBC_HUB and NBC_CT01-08 → PASS on all ten.
   - Screenshots of every terminal tab (no case, a case open, a gang toppled), the confirmations, the promotion and recruit popups, the deploy screen, the kit picker and the after-action report (taken and retreat).
@@ -196,6 +220,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `python tools\build_pk3.py` → `dist\NewBricksCity.pk3`, 9,103 files, 41.5 MB. It boots and loads NBC_TEST with no errors.
 
 ## Needs playtest (owner)
+- **Squad orders** (a raid with the squad): Q / Z / C / V / N / B / J-K-L / M as listed under "Done". Do they go where you send them through doors, stairs and lifts on every environment (the graph doesn't know about lifts or doors that need opening)? Does RECON keep them quiet until a fight starts, does SUPPRESS pin the gang? Is the command map readable and quick enough to use in real time, and should it pause instead? Do the threat ring and the radio log help?
 - **The squad's look:** do the portraits and the recolored sprites read as a ragtag plain-clothes department in a near-future Bricks, not a modern police or military unit? The sprites' builds still come from the pack (the specop's full-face mask and goggles, the sniper's one-colour coverall); say if any of them should be swapped or recolored further.
 - **The case loop and the precinct screens** (New Game starts at Checkpoint 9; Use the raid board):
   - The terminal, deploy screen and report on a real screen: is everything readable at your resolution, do the panels and the amber selection read clearly? Mouse: hover selects, click uses, wheel scrolls, right click backs out. Keyboard / pad: arrows go to the nearest control that way, Enter uses, Esc backs out, Q / E (or Tab) switch tabs.

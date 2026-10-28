@@ -36,6 +36,15 @@ class NBC_RunData : Thinker
 	int raidPlayerKills, raidHealthLost, raidTics;
 	// what the player was issued from the Evidence Locker (per NBC_Cat item), to tell loot from kit afterwards
 	Array<int> raidIssued;
+	// squad orders (Ghost Recon style, NBC_Orders): two fireteams, each with an order, rules of engagement, a goal
+	// and a waypoint path; a go code holds a team at a waypoint until you call it
+	Array<int> raidOffTeam;                 // per raid slot: NBC_Orders.TEAM_ALPHA / TEAM_BRAVO
+	int cmdTeam;                            // who your commands go to: NBC_Orders.CT_ALL / CT_ALPHA / CT_BRAVO
+	Array<int> teamOrder, teamROE, teamSerial;
+	Array<double> teamGX, teamGY, teamGZ;
+	Array<int> wpTeam, wpGo;
+	Array<double> wpX, wpY, wpZ;
+	Array<bool> goCalled;
 
 	static NBC_RunData Get()
 	{
@@ -132,6 +141,13 @@ class NBC_RunData : Thinker
 		raidHealthLost = 0;
 		raidTics = 0;
 		raidIssued.Clear();
+		raidOffTeam.Clear();
+		NBC_Orders.Reset(self);
+	}
+
+	clearscope int TeamOfSlot(int slot) const
+	{
+		return slot >= 0 && slot < raidOffTeam.Size() ? raidOffTeam[slot] : 0;
 	}
 
 	clearscope int RaidSlotOf(int officerId) const

@@ -1,7 +1,7 @@
 // New Bricks City — MAPINFO
 gameinfo
 {
-	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager"
+	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager", "NBC_Orders"
 	PlayerClasses = "NBC_Player"
 	StatusBarClass = "NBC_StatusBar"
 }

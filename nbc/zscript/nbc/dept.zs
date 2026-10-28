@@ -138,6 +138,7 @@ class NBC_Officer
 {
 	enum EState { ST_ACTIVE, ST_HOSPITAL, ST_KIA }
 	int id, cls, rank, xp, raids, kills, health, hospital, face, baseAim, tough, state;
+	int team;                   // fireteam on raids: NBC_Orders.TEAM_ALPHA / TEAM_BRAVO (the deploy screen sets it)
 	String initial, surname;
 	Array<int> perks;           // one per promotion, in order
 	int kitPrimary;             // a locker item, or -1 for the class's issue weapon
@@ -411,6 +412,7 @@ class NBC_Department : Thinker
 				if (!best) break;
 				classTaken[best.cls] = true;
 				squad.Push(best.id);
+				best.team = squad.Size() <= 2 ? NBC_Orders.TEAM_ALPHA : NBC_Orders.TEAM_BRAVO;
 			}
 		}
 	}
@@ -419,7 +421,7 @@ class NBC_Department : Thinker
 	enum EOp
 	{
 		OP_SQUAD_TOGGLE = 1, OP_SQUAD_AUTO, OP_PRIMARY, OP_POUCH, OP_VEST, OP_SIDEARM, OP_MELEE,
-		OP_PROMOTE, OP_RECRUIT, OP_SELL, OP_BUY, OP_DISMISS, OP_REPORT_SEEN, OP_AUTO_KIT
+		OP_PROMOTE, OP_RECRUIT, OP_SELL, OP_BUY, OP_DISMISS, OP_REPORT_SEEN, OP_AUTO_KIT, OP_TEAM
 	}
 
 	// a: officer id (0 = you) for kit ops; b/c: the value
@@ -433,7 +435,11 @@ class NBC_Department : Thinker
 			if (!o) return;
 			int at = squad.Find(a);
 			if (at != squad.Size()) squad.Delete(at);
-			else if (o.Available() && squad.Size() < NBC_Cat.SQUAD_SLOTS) squad.Push(a);
+			else if (o.Available() && squad.Size() < NBC_Cat.SQUAD_SLOTS)
+			{
+				squad.Push(a);
+				o.team = squad.Size() <= 2 ? NBC_Orders.TEAM_ALPHA : NBC_Orders.TEAM_BRAVO;
+			}
 			return;
 		}
 		case OP_SQUAD_AUTO: AutoSquad(); return;
@@ -485,6 +491,12 @@ class NBC_Department : Thinker
 		}
 		case OP_REPORT_SEEN: reportPending = false; return;
 		case OP_AUTO_KIT: AutoKit(); return;
+		case OP_TEAM:
+		{
+			let o = OfficerById(a);
+			if (o) o.team = o.team == NBC_Orders.TEAM_ALPHA ? NBC_Orders.TEAM_BRAVO : NBC_Orders.TEAM_ALPHA;
+			return;
+		}
 		}
 	}
 

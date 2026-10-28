@@ -7,3 +7,4 @@ server noarchive int nbc_kitsweep = 0;     // testing: regenerate this kit map N
 // Not "archive": an explicit archive keyword hangs UZDoom 5.0.3 at startup. Server CVars archive by default.
 server string nbc_roster = "";
 server string nbc_memorial = "";
+server noarchive bool nbc_navdebug = false;   // show the squad navigation graph (nodes) and its build time when a raid starts

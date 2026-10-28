@@ -12,6 +12,7 @@ version "4.10"
 #include "zscript/nbc/rundata.zs"
 #include "zscript/nbc/dept.zs"
 #include "zscript/nbc/ally.zs"
+#include "zscript/nbc/orders.zs"
 #include "zscript/nbc/runmanager.zs"
 #include "zscript/nbc/hub.zs"
 // the precinct screens: the terminal, the deploy screen, the after-action report (M7c)
@@ -19,6 +20,7 @@ version "4.10"
 #include "zscript/nbc/ui/terminal.zs"
 #include "zscript/nbc/ui/deploy.zs"
 #include "zscript/nbc/ui/results.zs"
+#include "zscript/nbc/ui/commandmap.zs"
 #include "zscript/nbc/kits.zs"
 
 // Corpo Wars props and decor, placeable map things (tools/import/port_cw_props.py)
@@ -28,6 +30,9 @@ version "4.10"
 #include "zscript/cw/decor_apartment.zs"
 #include "zscript/cw/decor_underground.zs"
 #include "zscript/cw/decor_industrial.zs"
+
+// Squad pathing: the navigation graph ported from Corpo Wars (orders, waypoints, catching up)
+#include "zscript/cw/nav.zs"
 
 // Our own level architecture (PLAN.md §4.4): the carving engine ported from Corpo Wars (M2b), and the Bricks
 // kits' layouts, written for New Bricks City (M2c)

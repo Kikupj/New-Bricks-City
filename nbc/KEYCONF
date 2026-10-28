@@ -11,3 +11,35 @@ defaultbind h "netevent nbc_debris_next"
 alias nbc_debug_weapon "event nbc_debug_weapon"
 alias nbc_kittest "netevent nbc_kittest %1 %2 %3"
 alias nbc_debug_kit "netevent nbc_debug_kit"
+
+// Squad orders, Ghost Recon style (NBC_Orders): the selected fireteam gets the order
+addmenukey "Squad: talk to all / Alpha / Bravo" nbc_cmd_team
+addmenukey "Squad: regroup on me" nbc_cmd_follow
+addmenukey "Squad: hold position" nbc_cmd_hold
+addmenukey "Squad: move there (where you aim)" nbc_cmd_move
+addmenukey "Squad: advance on the waypoints" nbc_cmd_advance
+addmenukey "Squad: rules of engagement (recon / assault / suppress)" nbc_cmd_roe
+addmenukey "Squad: go code X-Ray" nbc_cmd_go_x
+addmenukey "Squad: go code Yankee" nbc_cmd_go_y
+addmenukey "Squad: go code Zulu" nbc_cmd_go_z
+addmenukey "Squad: command map" nbc_cmd_map
+alias nbc_cmd_team "netevent nbc_cmd.1"
+alias nbc_cmd_follow "netevent nbc_cmd.2 -1"
+alias nbc_cmd_hold "netevent nbc_cmd.3 -1"
+alias nbc_cmd_move "netevent nbc_cmd.4 -1"
+alias nbc_cmd_roe "netevent nbc_cmd.5 -1 -1"
+alias nbc_cmd_advance "netevent nbc_cmd.6 -1"
+alias nbc_cmd_go_x "netevent nbc_cmd.7 -1 1"
+alias nbc_cmd_go_y "netevent nbc_cmd.7 -1 2"
+alias nbc_cmd_go_z "netevent nbc_cmd.7 -1 3"
+alias nbc_cmd_map "openmenu NBC_CommandMap"
+defaultbind q nbc_cmd_team
+defaultbind z nbc_cmd_follow
+defaultbind c nbc_cmd_hold
+defaultbind v nbc_cmd_move
+defaultbind n nbc_cmd_advance
+defaultbind b nbc_cmd_roe
+defaultbind j nbc_cmd_go_x
+defaultbind k nbc_cmd_go_y
+defaultbind l nbc_cmd_go_z
+defaultbind m nbc_cmd_map

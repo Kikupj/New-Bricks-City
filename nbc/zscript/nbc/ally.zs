@@ -6,6 +6,9 @@
 // They follow the player, shoot visible gang members with hitscan in the gun's damage type (never "Enemy"),
 // reload every magazine, use their pouches (medkits when hurt, Molotovs on a bunch of gang members), the
 // Paramedic patches the player up, and they never take damage from the player, each other or fire.
+// They take orders (NBC_Orders, Ghost Recon style): their fireteam's order (follow, hold, move, advance along
+// waypoints and wait on go codes) and rules of engagement (recon, assault, suppress). Places are reached over
+// the navigation graph (CW_NavGraph); the player is chased directly while in sight.
 
 class NBC_Ally : Actor
 {
@@ -26,6 +29,13 @@ class NBC_Ally : Actor
 
 	Actor enemy;
 	int roundsLeft, thinkCount, lostTics, burstLeft;
+	// orders: the team's order as last seen, where to hold, the route being walked, who last shot at us
+	int serialSeen, wpStep, stuckTics, repath, rtAt, suppressTics, lastHitTic;
+	bool waitingGo, arrivedSaid;
+	Vector3 holdPos, lastPos, navDest, suppressPos;
+	Array<double> rtx, rty;
+	Actor lastHitBy;
+	NBC_SteerPoint steer;
 
 	Default
 	{
@@ -116,6 +126,8 @@ class NBC_Ally : Actor
 		if (source && (source.player || source is "NBC_Ally")) return 0;
 		if (inflictor && inflictor.target && (inflictor.target.player || inflictor.target is "NBC_Ally")) return 0;
 		if (!(flags & DMG_FORCED) && damage < TELEFRAG_DAMAGE && takeMul > 0) damage = max(1, int(damage * takeMul));
+		// recon rules let an officer shoot back at whoever shot them
+		if (source && source.bIsMonster && !(source is "NBC_Ally")) { lastHitBy = source; lastHitTic = level.maptime; }
 		return Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
 	}
 
@@ -135,7 +147,9 @@ class NBC_Ally : Actor
 		return mo && mo.bIsMonster && mo.health > 0 && !(mo is "NBC_Ally") && !mo.bFriendly && mo.bShootable;
 	}
 
-	Actor FindEnemy()
+	// The nearest gang member in sight. Recon rules (weapons tight): only those already in the fight, after you,
+	// the squad or this officer.
+	Actor FindEnemy(int roe = NBC_Orders.ROE_ASSAULT)
 	{
 		Actor best = null;
 		double bestDist = range > 0 ? range : SIGHT_RANGE;
@@ -144,12 +158,19 @@ class NBC_Ally : Actor
 		{
 			Actor mo = it.thing;
 			if (!IsGangMember(mo)) continue;
+			if (roe == NBC_Orders.ROE_RECON && !InTheFight(mo)) continue;
 			double d = Distance3D(mo);
 			if (d >= bestDist || !CheckSight(mo, SF_IGNOREVISIBILITY)) continue;
 			best = mo;
 			bestDist = d;
 		}
 		return best;
+	}
+
+	bool InTheFight(Actor mo)
+	{
+		if (mo == lastHitBy && level.maptime - lastHitTic < 35 * 5) return true;
+		return mo.target && (mo.target.player || mo.target is "NBC_Ally") && mo.CheckSight(mo.target);
 	}
 
 	int PouchOf(int item)
@@ -186,38 +207,193 @@ class NBC_Ally : Actor
 		}
 		if (bottleTics > 0) bottleTics -= 4;
 
-		if (enemy && (!IsGangMember(enemy) || !CheckSight(enemy, SF_IGNOREVISIBILITY))) enemy = null;
-		if (++thinkCount % 3 == 0 || !enemy) enemy = FindEnemy();
+		// the team's orders (NBC_Orders); a new order resets where we hold and the path
+		let rd = NBC_RunData.Find();
+		int team = rd ? rd.TeamOfSlot(slot) : 0;
+		int order = rd && team < rd.teamOrder.Size() ? rd.teamOrder[team] : NBC_Orders.ORD_FOLLOW;
+		int roe = rd && team < rd.teamROE.Size() ? rd.teamROE[team] : NBC_Orders.ROE_ASSAULT;
+		if (rd && team < rd.teamSerial.Size() && serialSeen != rd.teamSerial[team])
+		{
+			serialSeen = rd.teamSerial[team];
+			holdPos = pos; wpStep = 0; repath = 0; rtx.Clear(); rty.Clear();
+			waitingGo = false; arrivedSaid = false;
+		}
 
+		// contact, by the rules of engagement
+		if (enemy && (!IsGangMember(enemy) || !CheckSight(enemy, SF_IGNOREVISIBILITY)))
+		{
+			if (IsGangMember(enemy)) { suppressPos = enemy.pos; suppressTics = 35 * 2; }   // last seen there
+			enemy = null;
+		}
+		if (++thinkCount % 3 == 0 || !enemy) enemy = FindEnemy(roe);
+		if (suppressTics > 0) suppressTics -= 4;
 		if (enemy)
 		{
 			angle = AngleTo(enemy);
-			if (TryBottle(p)) return;
-			burstLeft = burst;
+			if (roe != NBC_Orders.ROE_RECON && TryBottle(p)) return;
+			burstLeft = burst + (roe == NBC_Orders.ROE_SUPPRESS ? 3 : 0);
+			SetStateLabel("Missile");
+			return;
+		}
+		// suppress: keep rounds going where they went to ground
+		if (roe == NBC_Orders.ROE_SUPPRESS && suppressTics > 0 && roundsLeft > 0 && random(0, 99) < 60)
+		{
+			angle = VectorAngle(suppressPos.x - pos.x, suppressPos.y - pos.y);
+			burstLeft = burst + 2;
 			SetStateLabel("Missile");
 			return;
 		}
 
 		if (!p) return;
+		double mul = roe == NBC_Orders.ROE_RECON ? 0.6 : 1.0;     // recon: slow and quiet
+		switch (order)
+		{
+		case NBC_Orders.ORD_HOLD:
+			if (HeadFor(holdPos, mul)) Stand();
+			break;
+		case NBC_Orders.ORD_MOVE:
+			if (HeadFor(FormationSpot((rd.teamGX[team], rd.teamGY[team], rd.teamGZ[team]), team, rd), mul))
+			{
+				Stand();
+				if (!arrivedSaid) { arrivedSaid = true; NBC_Orders.Say(String.Format("%s: In position.", NBC_Orders.TEAM_NAME[team]), Font.CR_GREEN); }
+			}
+			break;
+		case NBC_Orders.ORD_ADVANCE:
+			Advance(rd, team, mul);
+			break;
+		default:
+			Follow(p, mul);
+			break;
+		}
+	}
+
+	void Stand()
+	{
+		frame = 0;
+		ClearRoute();
+	}
+	void ClearRoute() { rtx.Clear(); rty.Clear(); rtAt = 0; }
+
+	// regroup on the player: straight at them while in sight, over the graph when not, a quiet catch-up when lost
+	void Follow(Actor p, double mul)
+	{
 		double d = Distance2D(p);
-		if (d > LOST_DIST && !CheckSight(p))
+		bool see = CheckSight(p);
+		if (d > LOST_DIST && !see)
 		{
 			lostTics += 4;
-			if (lostTics >= 105) { CatchUp(p); lostTics = 0; }
+			if (lostTics >= 105) { CatchUp(p); lostTics = 0; return; }
 		}
 		else lostTics = 0;
 
-		if (d > FOLLOW_DIST)
+		if (d <= FOLLOW_DIST)
 		{
+			Stand();
+			if (d < 64) { target = p; A_FaceTarget(); target = null; }
+			return;
+		}
+		if (see)
+		{
+			ClearRoute();
+			double sp = speed;
+			speed *= mul;
 			target = p;
 			A_Chase(null, null, CHF_NOPLAYACTIVE);
 			target = null;
+			speed = sp;
+			return;
 		}
-		else
+		HeadFor(p.pos, mul);
+	}
+
+	// walk the team's waypoints; wait at one with a go code until it's called
+	void Advance(NBC_RunData rd, int team, double mul)
+	{
+		int n = NBC_Orders.WaypointCount(rd, team);
+		if (n == 0) { if (HeadFor(holdPos, mul)) Stand(); return; }
+		wpStep = clamp(wpStep, 0, n - 1);
+		int wi = NBC_Orders.WaypointIndex(rd, team, wpStep);
+		if (!HeadFor(FormationSpot((rd.wpX[wi], rd.wpY[wi], rd.wpZ[wi]), team, rd), mul)) return;
+		int g = rd.wpGo[wi];
+		if (g != NBC_Orders.GO_NONE && !rd.goCalled[g])
 		{
-			frame = 0;   // stand still
-			if (d < 64) A_FaceTarget();
+			Stand();
+			if (!waitingGo)
+			{
+				waitingGo = true;
+				NBC_Orders.Say(String.Format("%s: At waypoint %d. Waiting on %s.", NBC_Orders.TEAM_NAME[team], wpStep + 1, NBC_Orders.GO_NAME[g]), Font.CR_GOLD);
+			}
+			return;
 		}
+		if (waitingGo) { waitingGo = false; NBC_Orders.Say(String.Format("%s: Moving out.", NBC_Orders.TEAM_NAME[team]), Font.CR_GREEN); }
+		if (wpStep < n - 1) { wpStep++; repath = 0; return; }
+		Stand();
+		if (!arrivedSaid) { arrivedSaid = true; NBC_Orders.Say(String.Format("%s: Last waypoint. Holding.", NBC_Orders.TEAM_NAME[team]), Font.CR_GREEN); }
+	}
+
+	// a team spreads out round a point: the first member on it, the others a step to the sides and behind
+	Vector3 FormationSpot(Vector3 at, int team, NBC_RunData rd)
+	{
+		int k = 0;
+		for (int s = 0; s < slot; s++) if (rd.TeamOfSlot(s) == team) k++;
+		if (k == 0) return at;
+		static const double offx[] = { 0, -40, 40, 0 };
+		static const double offy[] = { 0, 40, 40, -48 };
+		Vector2 spot = at.xy + (offx[k & 3], offy[k & 3]);
+		let ord = NBC_Orders.Get();
+		let nav = ord ? ord.Nav() : null;
+		if (nav && !nav.Clear(at.xy, spot)) return at;
+		return (spot, level.PointInSector(spot).floorplane.ZAtPoint(spot));
+	}
+
+	// Head for a point: straight when the way is clear, else over the navigation graph. True when there.
+	bool HeadFor(Vector3 dest, double mul)
+	{
+		if ((dest.xy - pos.xy).Length() < 40) { ClearRoute(); return true; }
+		if ((pos.xy - lastPos.xy).Length() < 2) stuckTics += 4; else stuckTics = 0;
+		lastPos = pos;
+		let ord = NBC_Orders.Get();
+		let nav = ord ? ord.Nav() : null;
+		if (--repath <= 0 || stuckTics > 35 || (navDest.xy - dest.xy).Length() > 64)
+		{
+			// plan (again): every few seconds, when stuck, or when the goal moved
+			navDest = dest;
+			repath = 26;
+			stuckTics = 0;
+			ClearRoute();
+			if (nav && nav.Count() && !nav.Clear(pos.xy, dest.xy) && nav.Route(pos.xy, dest.xy))
+				for (int i = 0; i < nav.path.Size(); i++) { rtx.Push(nav.nx[nav.path[i]]); rty.Push(nav.ny[nav.path[i]]); }
+		}
+		Vector2 next = dest.xy;
+		while (rtAt < rtx.Size())
+		{
+			Vector2 node = (rtx[rtAt], rty[rtAt]);
+			// skip ahead to a later node once there's a clear line to it
+			if ((node - pos.xy).Length() < 40 || (rtAt + 1 < rtx.Size() && nav && nav.Clear(pos.xy, (rtx[rtAt + 1], rty[rtAt + 1])))) { rtAt++; continue; }
+			next = node;
+			break;
+		}
+		SteerTo(next, mul);
+		return false;
+	}
+
+	void SteerTo(Vector2 pt, double mul)
+	{
+		if (!steer) steer = NBC_SteerPoint(Spawn("NBC_SteerPoint", (pt, pos.z)));
+		if (!steer) return;
+		steer.SetOrigin((pt, level.PointInSector(pt).floorplane.ZAtPoint(pt)), false);
+		double sp = speed;
+		speed *= mul;
+		target = steer;
+		A_Chase(null, null, CHF_NOPLAYACTIVE);
+		target = null;
+		speed = sp;
+	}
+
+	override void OnDestroy()
+	{
+		if (steer) steer.Destroy();
+		Super.OnDestroy();
 	}
 
 	// A Molotov at two or more of them bunched up in throwing range, well clear of the player.
@@ -262,6 +438,14 @@ class NBC_Ally : Actor
 	void A_AllyAim()
 	{
 		if (enemy && IsGangMember(enemy)) angle = AngleTo(enemy);
+		else if (suppressTics > 0) angle = VectorAngle(suppressPos.x - pos.x, suppressPos.y - pos.y);
+	}
+
+	int TeamROE()
+	{
+		let rd = NBC_RunData.Find();
+		int team = rd ? rd.TeamOfSlot(slot) : 0;
+		return rd && team < rd.teamROE.Size() ? rd.teamROE[team] : NBC_Orders.ROE_ASSAULT;
 	}
 
 	// the aim time before the first shot (Hair Trigger shortens it)
@@ -273,19 +457,39 @@ class NBC_Ally : Actor
 
 	void A_AllyShoot()
 	{
-		if (!enemy || !IsGangMember(enemy)) { SetStateLabel("See"); return; }
+		bool live = enemy && IsGangMember(enemy);
+		int roe = TeamROE();
+		bool suppress = roe == NBC_Orders.ROE_SUPPRESS;
+		// suppressing fire goes where they were last seen
+		if (!live && !(suppress && suppressTics > 0)) { SetStateLabel("See"); return; }
 		if (roundsLeft <= 0) { SetStateLabel("Reload"); return; }
-		angle = AngleTo(enemy);
 		double r = range > 0 ? range : SIGHT_RANGE;
-		double pit = AimLineAttack(angle, r);
+		double pit;
+		if (live)
+		{
+			angle = AngleTo(enemy);
+			pit = AimLineAttack(angle, r);
+		}
+		else
+		{
+			Vector3 d = suppressPos + (0, 0, 32) - (pos + (0, 0, height * 0.75));
+			angle = VectorAngle(d.x, d.y);
+			pit = -VectorAngle(d.xy.Length(), d.z);
+		}
 		A_StartSound(fireSound, CHAN_WEAPON);
 		for (int i = 0; i < pellets; i++)
 		{
-			double sp = pellets > 1 ? spread + 4 : spread;
+			double sp = (pellets > 1 ? spread + 4 : spread) * (suppress ? 1.5 : 1.0);
 			int dmg = int(random(dmgMin, dmgMax) * dmgMul);
 			LineAttack(angle + frandom(-sp, sp), r, pit + frandom(-sp, sp) * 0.5, dmg, dmgType, "BulletPuff");
 		}
 		roundsLeft--;
+		// rounds snapping past make them flinch
+		if (suppress && live && enemy.health > 0 && random(0, 99) < 12)
+		{
+			let ps = enemy.FindState("Pain");
+			if (ps && !enemy.InStateSequence(enemy.CurState, ps)) enemy.SetState(ps);
+		}
 	}
 
 	void A_AllyBurstNext()

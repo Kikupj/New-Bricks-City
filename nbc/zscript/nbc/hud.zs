@@ -95,8 +95,25 @@ class NBC_StatusBar : DoomStatusBar
 				double frac = clamp(a.health / double(max(1, a.maxHp)), 0, 1);
 				Fill(frac > 0.6 ? Color(255, 88, 176, 74) : (frac > 0.3 ? Color(255, 242, 169, 59) : Color(255, 200, 53, 43)), x, y + 21, 20 * frac, 2);
 				DrawString(nbcSmallFont, down ? "DOWN" : (o ? o.surname : a.GetTag()), (x, y + 24), DI_TEXT_ALIGN_LEFT, down ? Font.CR_RED : Font.CR_GRAY, scale: (0.26, 0.26));
+				// the fireteam letter in the corner
+				int team = rd.TeamOfSlot(a.slot);
+				Fill(team == NBC_Orders.TEAM_ALPHA ? Color(255, 79, 195, 217) : Color(255, 242, 169, 59), x + 14, y, 6, 6);
+				DrawString(nbcSmallFont, team == NBC_Orders.TEAM_ALPHA ? "A" : "B", (x + 15, y), DI_TEXT_ALIGN_LEFT, Font.CR_BLACK, scale: (0.24, 0.24));
 			}
 			if (rm.squad.Size()) y += 30;
+			// each fireteam's order and rules of engagement; ">" marks who your keys talk to
+			if (rm.squad.Size() && rd.teamOrder.Size() == NBC_Orders.TEAMS)
+				for (int t = 0; t < NBC_Orders.TEAMS; t++)
+				{
+					if (!NBC_Orders.TeamSize(rd, t)) continue;
+					bool talking = rd.cmdTeam == NBC_Orders.CT_ALL || rd.cmdTeam - 1 == t;
+					String line = String.Format("%s%s  %s  %s", talking ? "> " : "  ", NBC_Orders.TEAM_NAME[t],
+						NBC_Orders.ORDER_NAME[rd.teamOrder[t]], NBC_Orders.ROE_NAME[rd.teamROE[t]]);
+					if (rd.teamOrder[t] == NBC_Orders.ORD_ADVANCE) line = line .. String.Format("  (%d wp)", NBC_Orders.WaypointCount(rd, t));
+					DrawString(nbcSmallFont, line, (3, y), DI_TEXT_ALIGN_LEFT, t == NBC_Orders.TEAM_ALPHA ? Font.CR_CYAN : Font.CR_GOLD, scale: (0.34, 0.34));
+					y += 6;
+				}
+			y += 2;
 		}
 		if (rd.caseActive)
 			DrawString(nbcSmallFont, String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS,
@@ -112,5 +129,49 @@ class NBC_StatusBar : DoomStatusBar
 		DrawNBCWeaponAmmo();
 		DrawNBCDebris();
 		DrawNBCCase();
+		DrawThreatRing();
+		DrawSquadLog();
+	}
+
+	// Ghost Recon's threat indicator: a ring at the bottom of the screen, a mark for every gang member the squad
+	// can see, in the direction it is from where you're looking (up = ahead). Red: it's after you or an officer.
+	void DrawThreatRing()
+	{
+		let ord = NBC_Orders.Get();
+		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
+		let rd = NBC_RunData.Find();
+		if (!ord || !rm || !rm.IsRaidMap(rd) || !CPlayer || !CPlayer.mo) return;
+		Actor me = CPlayer.mo;
+		Vector2 c = (0, -62);
+		double r = 13;
+		for (int i = 0; i < 16; i++)
+		{
+			double an = i * 22.5;
+			Fill(Color(150, 120, 140, 160), c.x + sin(an) * r - 0.5, c.y - cos(an) * r - 0.5, 1, 1, DI_SCREEN_CENTER_BOTTOM);
+		}
+		Fill(Color(200, 220, 220, 220), c.x - 0.5, c.y - r - 2, 1, 2, DI_SCREEN_CENTER_BOTTOM);   // ahead
+		for (int i = 0; i < ord.contacts.Size(); i++)
+		{
+			Actor m = ord.contacts[i];
+			if (!m) continue;
+			double rel = Actor.DeltaAngle(me.angle, me.AngleTo(m));
+			double dist = me.Distance2D(m);
+			double sz = dist < 384 ? 3 : (dist < 1024 ? 2 : 1.5);
+			Color col = ord.contactHot[i] ? Color(255, 230, 60, 50) : Color(255, 240, 200, 70);
+			Fill(col, c.x - sin(rel) * r - sz / 2, c.y - cos(rel) * r - sz / 2, sz, sz, DI_SCREEN_CENTER_BOTTOM);
+		}
+	}
+
+	// the squad's radio log, bottom left, fading out
+	void DrawSquadLog()
+	{
+		let ord = NBC_Orders.Get();
+		if (!ord || !nbcSmallFont) return;
+		int n = ord.logText.Size();
+		for (int i = 0; i < n; i++)
+		{
+			double alpha = min(1.0, ord.logTics[i] / 35.0);
+			DrawString(nbcSmallFont, ord.logText[i], (3, -78 - (n - 1 - i) * 7), DI_TEXT_ALIGN_LEFT, ord.logColor[i], alpha, scale: (0.36, 0.36));
+		}
 	}
 }
