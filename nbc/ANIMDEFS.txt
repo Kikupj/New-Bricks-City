@@ -1,0 +1,3 @@
+// New Bricks City switches (zscript/nbc/mapmarks.zs puts them on the maps' switch lines): off -> on.
+switch NBCSW1A on pic NBCSW1B tics 0
+switch NBCSWEX1 on pic NBCSWEX2 tics 0

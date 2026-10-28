@@ -9,7 +9,7 @@ map NBC_CT01 "Pike Water Towers"
   nointermission
 }
 
-map NBC_CT02 "Fulton Storm Drains"
+map NBC_CT02 "Fulton Junction"
 {
   levelnum = 102
   sky1 = "CITYSKY", 0
@@ -18,7 +18,7 @@ map NBC_CT02 "Fulton Storm Drains"
   nointermission
 }
 
-map NBC_CT03 "Mercer Terminal"
+map NBC_CT03 "Mercer Block"
 {
   levelnum = 103
   sky1 = "CITYSKY", 0
@@ -27,7 +27,7 @@ map NBC_CT03 "Mercer Terminal"
   nointermission
 }
 
-map NBC_CT04 "Wexford Junction"
+map NBC_CT04 "Wexford Commons"
 {
   levelnum = 104
   sky1 = "CITYSKY", 0
@@ -36,7 +36,7 @@ map NBC_CT04 "Wexford Junction"
   nointermission
 }
 
-map NBC_CT05 "Sutter Walk-ups"
+map NBC_CT05 "Sutter Storm Drains"
 {
   levelnum = 105
   sky1 = "CITYSKY", 0
@@ -45,7 +45,7 @@ map NBC_CT05 "Sutter Walk-ups"
   nointermission
 }
 
-map NBC_CT06 "Cypress Playground"
+map NBC_CT06 "Cypress Houses"
 {
   levelnum = 106
   sky1 = "CITYSKY", 0
@@ -54,7 +54,7 @@ map NBC_CT06 "Cypress Playground"
   nointermission
 }
 
-map NBC_CT07 "Carver Towers"
+map NBC_CT07 "Carver Row"
 {
   levelnum = 107
   sky1 = "CITYSKY", 0
@@ -63,7 +63,7 @@ map NBC_CT07 "Carver Towers"
   nointermission
 }
 
-map NBC_CT08 "Arden Street"
+map NBC_CT08 "Arden Docks"
 {
   levelnum = 108
   sky1 = "CITYSKY", 0

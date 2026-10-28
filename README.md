@@ -335,13 +335,13 @@ ship as `nbc/maps/NBC_CT01-08.wad`. `nbc/districts.txt` is the pool the raid boa
 | Map | District | Environment |
 |---|---|---|
 | NBC_CT01 | Pike Water Towers | rooftops |
-| NBC_CT02 | Fulton Storm Drains | underground (basements, sewers) |
-| NBC_CT03 | Mercer Terminal | industrial park |
-| NBC_CT04 | Wexford Junction | subway |
-| NBC_CT05 | Sutter Walk-ups | streets |
-| NBC_CT06 | Cypress Playground | park |
-| NBC_CT07 | Carver Towers | housing towers |
-| NBC_CT08 | Arden Street | streets |
+| NBC_CT02 | Fulton Junction | subway |
+| NBC_CT03 | Mercer Block | streets |
+| NBC_CT04 | Wexford Commons | park |
+| NBC_CT05 | Sutter Storm Drains | underground (basements, sewers) |
+| NBC_CT06 | Cypress Houses | housing towers |
+| NBC_CT07 | Carver Row | streets |
+| NBC_CT08 | Arden Docks | industrial park |
 
 Each district also has a rooftop map for helicopter insertions, `NBC_RF01-08` ("<district> Rooftops"), paired in
 `nbc/rooftops.txt`.

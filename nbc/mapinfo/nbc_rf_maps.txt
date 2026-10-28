@@ -9,7 +9,7 @@ map NBC_RF01 "Pike Water Towers Rooftops"
   nointermission
 }
 
-map NBC_RF02 "Fulton Storm Drains Rooftops"
+map NBC_RF02 "Fulton Junction Rooftops"
 {
   levelnum = 202
   sky1 = "CITYSKY", 0
@@ -18,7 +18,7 @@ map NBC_RF02 "Fulton Storm Drains Rooftops"
   nointermission
 }
 
-map NBC_RF03 "Mercer Terminal Rooftops"
+map NBC_RF03 "Mercer Block Rooftops"
 {
   levelnum = 203
   sky1 = "CITYSKY", 0
@@ -27,7 +27,7 @@ map NBC_RF03 "Mercer Terminal Rooftops"
   nointermission
 }
 
-map NBC_RF04 "Wexford Junction Rooftops"
+map NBC_RF04 "Wexford Commons Rooftops"
 {
   levelnum = 204
   sky1 = "CITYSKY", 0
@@ -36,7 +36,7 @@ map NBC_RF04 "Wexford Junction Rooftops"
   nointermission
 }
 
-map NBC_RF05 "Sutter Walk-ups Rooftops"
+map NBC_RF05 "Sutter Storm Drains Rooftops"
 {
   levelnum = 205
   sky1 = "CITYSKY", 0
@@ -45,7 +45,7 @@ map NBC_RF05 "Sutter Walk-ups Rooftops"
   nointermission
 }
 
-map NBC_RF06 "Cypress Playground Rooftops"
+map NBC_RF06 "Cypress Houses Rooftops"
 {
   levelnum = 206
   sky1 = "CITYSKY", 0
@@ -54,7 +54,7 @@ map NBC_RF06 "Cypress Playground Rooftops"
   nointermission
 }
 
-map NBC_RF07 "Carver Towers Rooftops"
+map NBC_RF07 "Carver Row Rooftops"
 {
   levelnum = 207
   sky1 = "CITYSKY", 0
@@ -63,7 +63,7 @@ map NBC_RF07 "Carver Towers Rooftops"
   nointermission
 }
 
-map NBC_RF08 "Arden Street Rooftops"
+map NBC_RF08 "Arden Docks Rooftops"
 {
   levelnum = 208
   sky1 = "CITYSKY", 0

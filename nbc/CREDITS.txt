@@ -489,6 +489,11 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
   tools/art/make_vehicle_art.py. In the field the vehicles are the Voxel Vehicles Pack (credited above).
 - maps/NBC_RF01-08.wad: rooftop maps generated with Obsidian and the New Bricks City theme.
 
+== Keys, key doors and switches ==
+- textures/nbc/NBCDRRED.png, NBCDRBLU.png, NBCDRYEL.png, NBCSW1A.png, NBCSW1B.png, NBCSWEX1.png, NBCSWEX2.png and
+  sprites/keys/RKEYA0-YKEYB0.png: original art for New Bricks City, drawn by tools/art/make_key_art.py over the theme's
+  own door (ADDOORS) and panel (AXW38) textures.
+
 == Title and music ==
 - graphics/NBCTITLE.png, NBCTITLB.png (the title splash and its blurred side fill): the project owner's art
   (art/new_brick_city_menu_screen.png), cropped and scaled by tools/art/make_title_art.py.

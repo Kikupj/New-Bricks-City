@@ -61,6 +61,7 @@ class NBC_RunManager : EventHandler
 		let rd = NBC_RunData.Get();
 		let dept = NBC_Department.Get();
 		if (IsRaidMap(rd)) NBC_Music.Start(NBC_Music.ForRaid(rd));
+		if (!IsHub()) NBC_MapMarks.Apply();
 		if (IsHub())
 		{
 			NBC_Music.Start(NBC_Music.ForHub(rd));
@@ -481,6 +482,7 @@ class NBC_RunManager : EventHandler
 		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * InsertionCrewFactor(rd)
 			* g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev]);
 		want = min(want, cand.Size());
+		SpreadAlongRoute(cand, p.pos, exitPos, want);
 		int placed = 0, k = 0, asleep = 0;
 		while (placed < want && k < cand.Size())
 		{
@@ -533,6 +535,48 @@ class NBC_RunManager : EventHandler
 			when = when .. ". It's dark: F for your flashlight (they'll see it too)";
 		Announce(String.Format("%s%s, %s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
 			how, title, when, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
+	}
+
+	// The crew spread along the way in, not bunched where Obsidian put most of its monsters (owner playtest: quiet
+	// until the leader, then a crowd). Four bands by how far from the start towards the exit; the last band, where
+	// the leader and the escorts already stand, gets the fewest. Reorders cand (already shuffled with the case RNG)
+	// so the first `want` spots are the picks.
+	static void SpreadAlongRoute(out Array<NBC_Spot> cand, Vector3 start, Vector3 exitAt, int want)
+	{
+		static const double share[] = { 0.3, 0.3, 0.25, 0.15 };
+		double span = max(256, (exitAt.xy - start.xy).Length());
+		Array<NBC_Spot> band0, band1, band2, band3, picked, rest;
+		for (int i = 0; i < cand.Size(); i++)
+		{
+			double t = (cand[i].pos.xy - start.xy).Length() / span;
+			if (t < 0.3) band0.Push(cand[i]);
+			else if (t < 0.55) band1.Push(cand[i]);
+			else if (t < 0.8) band2.Push(cand[i]);
+			else band3.Push(cand[i]);
+		}
+		int quota[4], taken[4], size[4];
+		size[0] = band0.Size(); size[1] = band1.Size(); size[2] = band2.Size(); size[3] = band3.Size();
+		int given = 0;
+		for (int b = 0; b < 4; b++) { quota[b] = int(want * share[b]); given += quota[b]; taken[b] = 0; }
+		quota[0] += want - given;
+		// a band short of spots passes the rest on to the next one that has them
+		int spill = 0;
+		for (int pass = 0; pass < 2; pass++)
+			for (int b = 0; b < 4; b++)
+			{
+				int q = quota[b] + spill;
+				int n = min(q, size[b] - taken[b]);
+				taken[b] += n;
+				spill = q - n;
+				quota[b] = 0;
+			}
+		for (int i = 0; i < band0.Size(); i++) { if (i < taken[0]) picked.Push(band0[i]); else rest.Push(band0[i]); }
+		for (int i = 0; i < band1.Size(); i++) { if (i < taken[1]) picked.Push(band1[i]); else rest.Push(band1[i]); }
+		for (int i = 0; i < band2.Size(); i++) { if (i < taken[2]) picked.Push(band2[i]); else rest.Push(band2[i]); }
+		for (int i = 0; i < band3.Size(); i++) { if (i < taken[3]) picked.Push(band3[i]); else rest.Push(band3[i]); }
+		cand.Clear();
+		for (int i = 0; i < picked.Size(); i++) cand.Push(picked[i]);
+		for (int i = 0; i < rest.Size(); i++) cand.Push(rest[i]);
 	}
 
 	// ------------------------------------------------------------ the motorcade (garage.zs)
@@ -1189,7 +1233,6 @@ class NBC_RunManager : EventHandler
 			int alive = 0, off = 0;
 			for (int i = 0; i < crew.Size(); i++) if (crew[i] && crew[i].health > 0) { alive++; if (crew[i].FindInventory("NBC_OffGuard")) off++; }
 			Console.Printf("  raid: %s, event %d, %d of the crew standing, %d off guard, block awake %d", NBC_Clock.WindowLine(rd.raidWindow), rd.raidEvent, alive, off, blockAwake);
-		}
 		for (int d = 0; d < districtMaps.Size(); d++)
 		{
 			int gi = d < rd.districtGang.Size() ? rd.districtGang[d] : -1;

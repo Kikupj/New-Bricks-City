@@ -43,6 +43,7 @@ $set = [ordered]@{
     "natural_parks" = "none"          # nature parks are caves with trees, not city parks
     "bool_allow_teleporter_emergency_breaks" = "0"   # no teleporters in the Bricks, not even to mend a layout
     "zdoom_skybox" = "themed"         # the 3D city skybox (the theme's skyboxes) round every map
+    "float_size" = "26"               # owner playtest: the maps were large and sparse (36 by default); about half the floor
     "traps" = "none"                  # monster closets: the game places its own gangs
     "room_heights" = "tall-ish"       # room for split levels, balconies and stair runs
     "float_mons" = "0.6"              # a light layer: the game replaces it with the gang (only its spots count)

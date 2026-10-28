@@ -89,6 +89,17 @@ class NBC_StatusBar : BaseStatusBar
 			Say(nbcSmallFont, NewSmallFont, names[clamp(sel, 0, 3)] .. " (G)", (x + 10, -BAR_H + 19), cb | DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, 4);
 		}
 
+		// the keys you carry (mapmarks.zs: the doors they open wear their colour)
+		x += 48;
+		for (let it = mo.Inv; it; it = it.Inv)
+		{
+			if (!(it is "Key")) continue;
+			String spr = it is "RedCard" ? "RKEYA0" : (it is "BlueCard" ? "BKEYA0" : (it is "YellowCard" ? "YKEYA0" : ""));
+			if (spr != "") DrawImage(spr, (x, -5), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (12, 16));
+			else DrawInventoryIcon(it, (x, -BAR_H / 2), cb | DI_ITEM_CENTER, 1.0, (12, 16));
+			x += 13;
+		}
+
 		// the weapon: its picture, the magazine and the reserve
 		let w = CPlayer.ReadyWeapon;
 		if (!w) return;
@@ -111,36 +122,47 @@ class NBC_StatusBar : BaseStatusBar
 	}
 
 	// Case and raid readout, top left (PLAN M2 vertical slice).
+	// the readout's lines, gathered first so the panel behind them can be sized (owner playtest: the text floated)
+	Array<String> rlText;
+	Array<int> rlColor, rlY;
+	Array<double> rlScale;
+
+	void Line(String text, int cr, double scale, int y)
+	{
+		rlText.Push(text); rlColor.Push(cr); rlScale.Push(scale); rlY.Push(y);
+	}
+
+	// a slate panel with an amber rule along its top, like the precinct screens
+	void HudPanel(double x, double y, double w, double h, int flags, double alpha = 1.0)
+	{
+		Fill(Hex(0x080B10, int(200 * alpha)), x, y, w, h, flags);
+		Fill(Hex(0x8A5E1E, int(255 * alpha)), x, y, w, 1, flags);
+	}
+
 	void DrawNBCCase()
 	{
 		let rd = NBC_RunData.Find();
 		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
 		if (!rd || !rm || !nbcSmallFont || (!rd.caseActive && !rd.raidActive)) return;
-		int y = 3;
+		rlText.Clear(); rlColor.Clear(); rlScale.Clear(); rlY.Clear();
+		int y = 4;
+		int squadY = -1;
+		let dept = NBC_Department.Find();
 		if (rm.IsRaidMap(rd))
 		{
 			let g = rm.GangAt(rd.raidGang);
-			String title = rm.TurfTitle(rd.raidDistrict);
-			DrawString(nbcSmallFont, title .. (g ? "  -  " .. g.name : ""), (3, y), DI_TEXT_ALIGN_LEFT, g ? g.TextColor() : Font.CR_WHITE, scale: (0.4, 0.4));
+			Line(rm.TurfTitle(rd.raidDistrict) .. (g ? "  -  " .. g.name : ""), g ? g.TextColor() : Font.CR_WHITE, 0.4, y);
 			y += 7;
 			// the hour (clock.zs) and the day's event, if it's this raid's
 			String when = NBC_Clock.WindowLine(rd.raidWindow);
 			if (rd.raidEvent > NBC_Clock.EV_NONE && rd.raidEvent < NBC_Clock.EV_COUNT) when = when .. "  -  " .. NBC_Clock.EV_NAME[rd.raidEvent];
-			DrawString(nbcSmallFont, when, (3, y), DI_TEXT_ALIGN_LEFT, rd.raidEvent ? Font.CR_GOLD : Font.CR_GRAY, scale: (0.4, 0.4));
+			Line(when, rd.raidEvent ? Font.CR_GOLD : Font.CR_GRAY, 0.4, y);
 			y += 7;
 			// the flashlight (F): on, or a reminder after dark
 			let np = NBC_Player(CPlayer ? CPlayer.mo : null);
 			bool dark = rd.raidWindow == NBC_Clock.W_DUSK || rd.raidWindow == NBC_Clock.W_NIGHT || rd.raidEvent == NBC_Clock.EV_BLACKOUT;
-			if (np && np.nbcFlashlightOn)
-			{
-				DrawString(nbcSmallFont, "Flashlight ON", (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_YELLOW, scale: (0.4, 0.4));
-				y += 7;
-			}
-			else if (dark)
-			{
-				DrawString(nbcSmallFont, "Flashlight off (F)", (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_DARKGRAY, scale: (0.4, 0.4));
-				y += 7;
-			}
+			if (np && np.nbcFlashlightOn) { Line("Flashlight ON", Font.CR_YELLOW, 0.4, y); y += 7; }
+			else if (dark) { Line("Flashlight off (F)", Font.CR_DARKGRAY, 0.4, y); y += 7; }
 			String lead;
 			int lc = Font.CR_RED;
 			if (rd.leaderDown) { lead = "Leader down: get to the exit"; lc = Font.CR_GREEN; }
@@ -152,40 +174,20 @@ class NBC_StatusBar : BaseStatusBar
 				lead = String.Format("Leader: %s, %d m %s", g ? g.leaderTitle : "?", int(d.Length() / 32), dirs[o]);
 			}
 			else lead = "Leader: unknown";
-			DrawString(nbcSmallFont, lead, (3, y), DI_TEXT_ALIGN_LEFT, lc, scale: (0.4, 0.4));
+			Line(lead, lc, 0.4, y);
 			y += 7;
 			// shot down: the ambush round the wreck
 			if (rd.raidMode == NBC_Motor.MODE_CRASH)
 			{
-				String cs = rd.crashClear ? "CRASH SITE: the way out is clear - get to the exit" :
-					String.Format("CRASH SITE: hold out (wave %d of %d)", rd.crashWave, NBC_Motor.CRASH_WAVES);
-				DrawString(nbcSmallFont, cs, (3, y), DI_TEXT_ALIGN_LEFT, rd.crashClear ? Font.CR_GREEN : Font.CR_ORANGE, scale: (0.4, 0.4));
+				Line(rd.crashClear ? "CRASH SITE: the way out is clear - get to the exit" :
+					String.Format("CRASH SITE: hold out (wave %d of %d)", rd.crashWave, NBC_Motor.CRASH_WAVES), rd.crashClear ? Font.CR_GREEN : Font.CR_ORANGE, 0.4, y);
 				y += 7;
 			}
 			int left = 0;
 			for (int i = 0; i < rm.crew.Size(); i++) if (rm.crew[i] && rm.crew[i].health > 0) left++;
-			DrawString(nbcSmallFont, String.Format("Crew left %d", left), (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_LIGHTBLUE, scale: (0.4, 0.4));
+			Line(String.Format("Crew left %d", left), Font.CR_LIGHTBLUE, 0.4, y);
 			y += 8;
-			// the squad strip: a portrait, a health bar, the name (Hamburger Hill's squad panel)
-			let dept = NBC_Department.Find();
-			for (int i = 0; i < rm.squad.Size(); i++)
-			{
-				let a = NBC_Ally(rm.squad[i]);
-				if (!a) continue;
-				let o = dept ? dept.OfficerById(a.officerId) : null;
-				double x = 3 + i * 26;
-				bool down = a.health <= 0;
-				if (o) DrawImage(o.Portrait(), (x, y), DI_ITEM_LEFT_TOP, down ? 0.35 : 1.0, scale: (0.21, 0.21));   // 96-px portraits
-				Fill(Color(255, 10, 14, 20), x, y + 21, 20, 2);
-				double frac = clamp(a.health / double(max(1, a.maxHp)), 0, 1);
-				Fill(frac > 0.6 ? Color(255, 88, 176, 74) : (frac > 0.3 ? Color(255, 242, 169, 59) : Color(255, 200, 53, 43)), x, y + 21, 20 * frac, 2);
-				DrawString(nbcSmallFont, down ? "DOWN" : (o ? o.surname : a.GetTag()), (x, y + 24), DI_TEXT_ALIGN_LEFT, down ? Font.CR_RED : Font.CR_GRAY, scale: (0.26, 0.26));
-				// the fireteam letter in the corner
-				int team = rd.TeamOfSlot(a.slot);
-				Fill(team == NBC_Orders.TEAM_ALPHA ? Color(255, 79, 195, 217) : Color(255, 242, 169, 59), x + 14, y, 6, 6);
-				DrawString(nbcSmallFont, team == NBC_Orders.TEAM_ALPHA ? "A" : "B", (x + 15, y), DI_TEXT_ALIGN_LEFT, Font.CR_BLACK, scale: (0.24, 0.24));
-			}
-			if (rm.squad.Size()) y += 30;
+			if (rm.squad.Size()) { squadY = y; y += 30; }
 			// each fireteam's order and rules of engagement; ">" marks who your keys talk to
 			if (rm.squad.Size() && rd.teamOrder.Size() == NBC_Orders.TEAMS)
 				for (int t = 0; t < NBC_Orders.TEAMS; t++)
@@ -195,18 +197,53 @@ class NBC_StatusBar : BaseStatusBar
 					String line = String.Format("%s%s  %s  %s", talking ? "> " : "  ", NBC_Orders.TEAM_NAME[t],
 						NBC_Orders.ORDER_NAME[rd.teamOrder[t]], NBC_Orders.ROE_NAME[rd.teamROE[t]]);
 					if (rd.teamOrder[t] == NBC_Orders.ORD_ADVANCE) line = line .. String.Format("  (%d wp)", NBC_Orders.WaypointCount(rd, t));
-					DrawString(nbcSmallFont, line, (3, y), DI_TEXT_ALIGN_LEFT, t == NBC_Orders.TEAM_ALPHA ? Font.CR_CYAN : Font.CR_GOLD, scale: (0.34, 0.34));
+					Line(line, t == NBC_Orders.TEAM_ALPHA ? Font.CR_CYAN : Font.CR_GOLD, 0.34, y);
 					y += 6;
 				}
 			y += 2;
 		}
 		if (rd.caseActive)
-			DrawString(nbcSmallFont, String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS,
-				rd.strikes, NBC_RunData.MAX_STRIKES, rd.cash), (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, scale: (0.4, 0.4));
+		{
+			Line(String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS, rd.strikes, NBC_RunData.MAX_STRIKES, rd.cash), Font.CR_GRAY, 0.4, y);
+			y += 7;
+		}
 		// at the precinct: today's event
 		if (rd.caseActive && !rd.raidActive && rd.evKind > NBC_Clock.EV_NONE && rd.evKind < NBC_Clock.EV_COUNT)
-			DrawString(nbcSmallFont, String.Format("TODAY: %s in %s, %s", NBC_Clock.EV_NAME[rd.evKind], rm.TurfTitle(rd.evDistrict),
-				NBC_Clock.WindowLine(rd.evWindow)), (3, y + 7), DI_TEXT_ALIGN_LEFT, rd.evKind == NBC_Clock.EV_PINNED ? Font.CR_RED : Font.CR_GOLD, scale: (0.4, 0.4));
+		{
+			Line(String.Format("TODAY: %s in %s, %s", NBC_Clock.EV_NAME[rd.evKind], rm.TurfTitle(rd.evDistrict), NBC_Clock.WindowLine(rd.evWindow)),
+				rd.evKind == NBC_Clock.EV_PINNED ? Font.CR_RED : Font.CR_GOLD, 0.4, y);
+			y += 7;
+		}
+		if (!rlText.Size()) return;
+
+		// the panel, as wide as the longest line (or the squad strip)
+		double w = squadY >= 0 ? rm.squad.Size() * 26 + 2 : 0;
+		for (int i = 0; i < rlText.Size(); i++) w = max(w, NewSmallFont.StringWidth(rlText[i]) * rlScale[i]);
+		HudPanel(0, 0, w + 8, y + 2, DI_SCREEN_LEFT_TOP);
+		for (int i = 0; i < rlText.Size(); i++)
+			DrawString(nbcSmallFont, rlText[i], (4, rlY[i]), DI_TEXT_ALIGN_LEFT, rlColor[i], scale: (rlScale[i], rlScale[i]));
+
+		// the squad strip: a portrait, a health bar, the name (Hamburger Hill's squad panel)
+		if (squadY >= 0)
+			for (int i = 0; i < rm.squad.Size(); i++)
+			{
+				let a = NBC_Ally(rm.squad[i]);
+				if (!a) continue;
+				let o = dept ? dept.OfficerById(a.officerId) : null;
+				double x = 4 + i * 26;
+				int sy = squadY;
+				bool down = a.health <= 0;
+				Fill(Hex(0x3D5064), x - 1, sy - 1, 22, 22);
+				if (o) DrawImage(o.Portrait(), (x, sy), DI_ITEM_LEFT_TOP, down ? 0.35 : 1.0, scale: (0.21, 0.21));   // 96-px portraits
+				Fill(Color(255, 10, 14, 20), x, sy + 21, 20, 2);
+				double frac = clamp(a.health / double(max(1, a.maxHp)), 0, 1);
+				Fill(frac > 0.6 ? Color(255, 88, 176, 74) : (frac > 0.3 ? Color(255, 242, 169, 59) : Color(255, 200, 53, 43)), x, sy + 21, 20 * frac, 2);
+				DrawString(nbcSmallFont, down ? "DOWN" : (o ? o.surname : a.GetTag()), (x, sy + 24), DI_TEXT_ALIGN_LEFT, down ? Font.CR_RED : Font.CR_GRAY, scale: (0.26, 0.26));
+				// the fireteam letter in the corner
+				int team = rd.TeamOfSlot(a.slot);
+				Fill(team == NBC_Orders.TEAM_ALPHA ? Color(255, 79, 195, 217) : Color(255, 242, 169, 59), x + 14, sy, 6, 6);
+				DrawString(nbcSmallFont, team == NBC_Orders.TEAM_ALPHA ? "A" : "B", (x + 15, sy), DI_TEXT_ALIGN_LEFT, Font.CR_BLACK, scale: (0.24, 0.24));
+			}
 	}
 
 	override void Draw(int state, double TicFrac)
@@ -256,6 +293,16 @@ class NBC_StatusBar : BaseStatusBar
 		let ord = NBC_Orders.Get();
 		if (!ord || !nbcSmallFont) return;
 		int n = ord.logText.Size();
+		if (n)
+		{
+			double w = 0, alpha = 0;
+			for (int i = 0; i < n; i++)
+			{
+				w = max(w, NewSmallFont.StringWidth(ord.logText[i]) * 0.36);
+				alpha = max(alpha, min(1.0, ord.logTics[i] / 35.0));
+			}
+			HudPanel(0, -80 - (n - 1) * 7, w + 8, n * 7 + 3, DI_SCREEN_LEFT_BOTTOM, alpha);
+		}
 		for (int i = 0; i < n; i++)
 		{
 			double alpha = min(1.0, ord.logTics[i] / 35.0);

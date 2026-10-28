@@ -60,6 +60,7 @@ settings = {
     "natural_parks": "none", "traps": "none", "room_heights": "tall-ish", "float_mons": "0.6",
     "bool_allow_teleporter_emergency_breaks": "0",   # no teleporters in the Bricks, not even to mend a layout
     "zdoom_skybox": "themed",        # the 3D city skybox (the theme's skyboxes) round every map
+    "float_size": "26",              # owner playtest: the maps were large and sparse (36 by default); about half the floor
 }
 lines, seen = [], set()
 for line in open(base, encoding="latin-1").read().splitlines():

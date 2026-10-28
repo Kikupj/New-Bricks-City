@@ -281,7 +281,8 @@ class NBC_Department : Thinker
 		for (int i = 0; i < NBC_Cat.PLAYER_POUCHES; i++) pPouch.Push(-1);
 		locker.Clear();
 		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) locker.Push(0);
-		// the officers who survived your last game (nbc_roster), else the department's first four
+		// the officers who survived your last game (nbc_roster), else two patrol officers (owner: start small; the
+		// specialists come by recruiting)
 		LoadRoster(CVar.GetCVar("nbc_roster").GetString(), CVar.GetCVar("nbc_memorial").GetString());
 		playerFace = CVar.GetCVar("nbc_avatar").GetInt();
 		if (playerFace < 0 || playerFace >= NBC_Cat.FACES) playerFace = NBC_Cat.VANCE_FACE;
@@ -290,8 +291,6 @@ class NBC_Department : Thinker
 		{
 			Recruit(NBC_Cat.C_PATROL, null, true);
 			Recruit(NBC_Cat.C_PATROL, null, true);
-			Recruit(NBC_Cat.C_BREACHER, null, true);
-			Recruit(NBC_Cat.C_MEDIC, null, true);
 		}
 		ResetLocker();
 		AutoSquad();

@@ -163,11 +163,36 @@ class NBC_Ally : Actor
 			if (!IsGangMember(mo)) continue;
 			if (roe == NBC_Orders.ROE_RECON && !InTheFight(mo)) continue;
 			double d = Distance3D(mo);
-			if (d >= bestDist || !CheckSight(mo, SF_IGNOREVISIBILITY)) continue;
+			if (d >= bestDist || !CheckSight(mo, SF_IGNOREVISIBILITY) || !ClearShot(mo)) continue;
 			best = mo;
 			bestDist = d;
 		}
 		return best;
+	}
+
+	// Sight goes through fences, railings, gaps and furniture that bullets don't (owner report: officers shot
+	// at walls): a trace from the gun to the target's middle has to reach it, or another gang member.
+	bool ClearShot(Actor mo)
+	{
+		double gunZ = height * 0.75;
+		Vector3 to = mo.pos + (0, 0, mo.height * 0.5) - (pos + (0, 0, gunZ));
+		double dist = to.Length();
+		if (dist < 1) return true;
+		FLineTraceData t;
+		LineTrace(VectorAngle(to.x, to.y), dist + 8, -VectorAngle(to.xy.Length(), to.z), 0, gunZ, 0, 0, t);
+		if (t.HitType == TRACE_HitActor) return t.HitActor == mo || IsGangMember(t.HitActor);
+		return t.HitType == TRACE_HitNone || t.Distance >= dist - mo.radius;
+	}
+
+	// suppressing fire only where a round can go: not into the wall in front of them
+	bool ClearTo(Vector3 at)
+	{
+		double gunZ = height * 0.75;
+		Vector3 to = at - (pos + (0, 0, gunZ));
+		double dist = to.Length();
+		FLineTraceData t;
+		LineTrace(VectorAngle(to.x, to.y), dist, -VectorAngle(to.xy.Length(), to.z), TRF_THRUACTORS, gunZ, 0, 0, t);
+		return t.HitType == TRACE_HitNone || t.Distance >= dist * 0.85;
 	}
 
 	bool InTheFight(Actor mo)
@@ -223,7 +248,7 @@ class NBC_Ally : Actor
 		}
 
 		// contact, by the rules of engagement
-		if (enemy && (!IsGangMember(enemy) || !CheckSight(enemy, SF_IGNOREVISIBILITY)))
+		if (enemy && (!IsGangMember(enemy) || !CheckSight(enemy, SF_IGNOREVISIBILITY) || !ClearShot(enemy)))
 		{
 			if (IsGangMember(enemy)) { suppressPos = enemy.pos; suppressTics = 35 * 2; }   // last seen there
 			enemy = null;
@@ -239,7 +264,7 @@ class NBC_Ally : Actor
 			return;
 		}
 		// suppress: keep rounds going where they went to ground
-		if (roe == NBC_Orders.ROE_SUPPRESS && suppressTics > 0 && roundsLeft > 0 && random(0, 99) < 60)
+		if (roe == NBC_Orders.ROE_SUPPRESS && suppressTics > 0 && roundsLeft > 0 && random(0, 99) < 60 && ClearTo(suppressPos + (0, 0, 32)))
 		{
 			angle = VectorAngle(suppressPos.x - pos.x, suppressPos.y - pos.y);
 			burstLeft = burst + 2;
@@ -494,6 +519,8 @@ class NBC_Ally : Actor
 		bool suppress = roe == NBC_Orders.ROE_SUPPRESS;
 		// suppressing fire goes where they were last seen
 		if (!live && !(suppress && suppressTics > 0)) { SetStateLabel("See"); return; }
+		// the shot's gone behind cover since the burst began
+		if (live && !ClearShot(enemy)) { enemy = null; SetStateLabel("See"); return; }
 		if (roundsLeft <= 0) { SetStateLabel("Reload"); return; }
 		double r = range > 0 ? range : SIGHT_RANGE;
 		double pit;
