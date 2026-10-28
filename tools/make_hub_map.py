@@ -5,7 +5,7 @@
 One UDMF room furnished with the ported Corpo Wars props (nbc/mapinfo/cw_props.txt):
 * the raid board (a whiteboard; NBC_RaidBoard 26010 is the Use target) on the north wall
 * the armory (a row of lockers and a gun bench; NBC_ArmoryLocker 26011) on the west wall
-* desks and file cabinets in the middle, a squad corner with a sofa and TV on the east side
+* desks and file cabinets in the middle, a squad corner with a sofa on the east side (NBC_SquadRoom 26012)
 UZDoom builds the nodes on load.
 """
 import os
@@ -24,7 +24,7 @@ def prop_ids():
     text = open(os.path.join(ROOT, "nbc", "mapinfo", "cw_props.txt")).read()
     for m in re.finditer(r"(\d+)\s*=\s*(\w+)", text):
         ids[m.group(2)] = int(m.group(1))
-    ids.update({"Player1": 1, "NBC_RaidBoard": 26010, "NBC_ArmoryLocker": 26011})
+    ids.update({"Player1": 1, "NBC_RaidBoard": 26010, "NBC_ArmoryLocker": 26011, "NBC_SquadRoom": 26012})
     return ids
 
 
@@ -48,7 +48,8 @@ def things():
           ("CW_FPlanter", 160, 16, 90)]
     # the squad corner: sofa against the east wall, table, armchairs
     t += [("CW_FSofa", 1131, 384, 180), ("CW_FCoffeeTable", 1070, 384, 0),
-          ("CW_FArmchair", 1040, 300, 45), ("CW_FArmchair", 1040, 468, 315), ("CWD_Apt_Painting_City", 1151, 384, 180)]
+          ("CW_FArmchair", 1040, 300, 45), ("CW_FArmchair", 1040, 468, 315), ("CWD_Apt_Painting_City", 1151, 384, 180),
+          ("NBC_SquadRoom", 1104, 384, 180)]   # Use the sofa: the squad room (roster, promotions, recruits)
     return t
 
 

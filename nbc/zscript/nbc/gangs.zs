@@ -119,9 +119,10 @@ class NBC_Gangs
 		}
 	}
 
-	static void LoadDistricts(out Array<String> maps, out Array<String> titles)
+	// map, "Title", environment (rooftops, streets, towers, underground, subway, parks, industrial)
+	static void LoadDistricts(out Array<String> maps, out Array<String> titles, out Array<String> envs)
 	{
-		maps.Clear(); titles.Clear();
+		maps.Clear(); titles.Clear(); envs.Clear();
 		Array<String> lines, w;
 		ReadText("districts.txt").Split(lines, "\n");
 		for (int i = 0; i < lines.Size(); i++)
@@ -133,6 +134,7 @@ class NBC_Gangs
 			if (w.Size() == 0) continue;
 			maps.Push(w[0]);
 			titles.Push(w.Size() > 1 ? w[1] : w[0]);
+			envs.Push(w.Size() > 2 ? w[2] : "streets");
 		}
 	}
 

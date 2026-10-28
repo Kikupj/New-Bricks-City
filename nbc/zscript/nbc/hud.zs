@@ -79,14 +79,24 @@ class NBC_StatusBar : DoomStatusBar
 			y += 7;
 			int left = 0;
 			for (int i = 0; i < rm.crew.Size(); i++) if (rm.crew[i] && rm.crew[i].health > 0) left++;
-			String sq = String.Format("Crew left %d   Squad:", left);
+			DrawString(nbcSmallFont, String.Format("Crew left %d", left), (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_LIGHTBLUE, scale: (0.4, 0.4));
+			y += 8;
+			// the squad strip: a portrait, a health bar, the name (Hamburger Hill's squad panel)
+			let dept = NBC_Department.Find();
 			for (int i = 0; i < rm.squad.Size(); i++)
 			{
-				let a = rm.squad[i];
-				sq = sq .. String.Format("  %s %s", a ? a.GetTag() : "?", a && a.health > 0 ? String.Format("%d", a.health) : "DOWN");
+				let a = NBC_Ally(rm.squad[i]);
+				if (!a) continue;
+				let o = dept ? dept.OfficerById(a.officerId) : null;
+				double x = 3 + i * 26;
+				bool down = a.health <= 0;
+				if (o) DrawImage(o.Portrait(), (x, y), DI_ITEM_LEFT_TOP, down ? 0.35 : 1.0, scale: (0.42, 0.42));
+				Fill(Color(255, 10, 14, 20), x, y + 21, 20, 2);
+				double frac = clamp(a.health / double(max(1, a.maxHp)), 0, 1);
+				Fill(frac > 0.6 ? Color(255, 88, 176, 74) : (frac > 0.3 ? Color(255, 242, 169, 59) : Color(255, 200, 53, 43)), x, y + 21, 20 * frac, 2);
+				DrawString(nbcSmallFont, down ? "DOWN" : (o ? o.surname : a.GetTag()), (x, y + 24), DI_TEXT_ALIGN_LEFT, down ? Font.CR_RED : Font.CR_GRAY, scale: (0.26, 0.26));
 			}
-			DrawString(nbcSmallFont, sq, (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_LIGHTBLUE, scale: (0.4, 0.4));
-			y += 7;
+			if (rm.squad.Size()) y += 30;
 		}
 		if (rd.caseActive)
 			DrawString(nbcSmallFont, String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS,

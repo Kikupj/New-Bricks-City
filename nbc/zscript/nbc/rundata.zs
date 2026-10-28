@@ -13,7 +13,6 @@ class NBC_RunData : Thinker
 {
 	const MAX_DAYS = 30;
 	const MAX_STRIKES = 3;
-	const SQUAD_SIZE = 2;
 
 	bool caseActive;
 	int caseResult;
@@ -28,15 +27,15 @@ class NBC_RunData : Thinker
 	// the current raid
 	bool raidActive, leaderDown, officerDown;
 	int raidDistrict, raidGang, raidKills, raidBounty;
-	// the kit floor the raid runs on (M2b): map, variant, layout seed and preferred entry (NBC_KitGen.EK_*)
+	// the map the raid runs on (a district's Obsidian map); on a kit floor (M2b, test maps) also the variant,
+	// layout seed and preferred entry (NBC_KitGen.EK_*)
 	String raidMap;
 	int raidVariant, raidKitSeed, raidEntry;
-	Array<int> squadHealth;
-	Array<String> squadNames;
-
-	// the card shown back at the hub
-	Array<String> report;
-	bool reportPending;
+	// the officers who went in (NBC_Officer ids), their kills and their health at the end (0 = down)
+	Array<int> raidOff, raidOffKills, raidOffHealth;
+	int raidPlayerKills, raidHealthLost, raidTics;
+	// what the player was issued from the Evidence Locker (per NBC_Cat item), to tell loot from kit afterwards
+	Array<int> raidIssued;
 
 	static NBC_RunData Get()
 	{
@@ -83,8 +82,6 @@ class NBC_RunData : Thinker
 		strikes = 0;
 		cash = 0;
 		raidActive = false;
-		reportPending = false;
-		report.Clear();
 
 		gangToppled.Clear(); gangAlert.Clear();
 		for (int i = 0; i < gangCount; i++) { gangToppled.Push(false); gangAlert.Push(0); }
@@ -100,19 +97,6 @@ class NBC_RunData : Thinker
 		districtGang.Clear();
 		for (int d = 0; d < districtCount; d++)
 			districtGang.Push(gangCount > 0 ? deck[d % gangCount] : -1);
-
-		squadNames.Clear(); squadHealth.Clear();
-		static const String first[] = { "Reyes", "Okafor", "Brandt", "Castillo", "Nguyen", "Doyle", "Harlan", "Mbeki", "Sorensen", "Vance" };
-		static const String rank[] = { "Ofc.", "Ofc.", "Cpl." };
-		Array<int> used;
-		for (int s = 0; s < SQUAD_SIZE; s++)
-		{
-			int k = Rand(0, 9);
-			while (used.Find(k) != used.Size()) k = (k + 1) % 10;
-			used.Push(k);
-			squadNames.Push(rank[Rand(0, 2)] .. " " .. first[k]);
-			squadHealth.Push(100);
-		}
 	}
 
 	// The gangs still standing; the case is won when none are.
@@ -143,16 +127,25 @@ class NBC_RunData : Thinker
 		raidVariant = 0;
 		raidKitSeed = 0;
 		raidEntry = 0;
+		raidOff.Clear(); raidOffKills.Clear(); raidOffHealth.Clear();
+		raidPlayerKills = 0;
+		raidHealthLost = 0;
+		raidTics = 0;
+		raidIssued.Clear();
 	}
 
-	// One day passes: officers recover, alert decays for gangs you left alone, the case may end.
+	clearscope int RaidSlotOf(int officerId) const
+	{
+		for (int i = 0; i < raidOff.Size(); i++) if (raidOff[i] == officerId) return i;
+		return -1;
+	}
+
+	// One day passes (the department heals its officers: NBC_Department.NewDay): alert decays for gangs you left alone, the case may end.
 	void EndDay(int hitGang)
 	{
 		day++;
 		for (int i = 0; i < gangAlert.Size(); i++)
 			if (i != hitGang && gangAlert[i] > 0) gangAlert[i]--;
-		for (int s = 0; s < squadHealth.Size(); s++)
-			squadHealth[s] = squadHealth[s] <= 0 ? 100 : min(100, squadHealth[s] + 50);
 
 		if (GangsLeft() == 0) caseResult = NBC_CASE_WON;
 		else if (strikes >= MAX_STRIKES) caseResult = NBC_CASE_STRUCK_OUT;

@@ -10,9 +10,15 @@ version "4.10"
 #include "zscript/nbc/hud.zs"
 #include "zscript/nbc/gangs.zs"
 #include "zscript/nbc/rundata.zs"
+#include "zscript/nbc/dept.zs"
 #include "zscript/nbc/ally.zs"
 #include "zscript/nbc/runmanager.zs"
 #include "zscript/nbc/hub.zs"
+// the precinct screens: the terminal, the deploy screen, the after-action report (M7c)
+#include "zscript/nbc/ui/nbcui.zs"
+#include "zscript/nbc/ui/terminal.zs"
+#include "zscript/nbc/ui/deploy.zs"
+#include "zscript/nbc/ui/results.zs"
 #include "zscript/nbc/kits.zs"
 
 // Corpo Wars props and decor, placeable map things (tools/import/port_cw_props.py)

@@ -1,11 +1,15 @@
-// The vertical-slice loop (PLAN.md M2, M2b): hub -> raid board -> one of the gang's kit floors -> the hub.
+// The case loop (PLAN.md M2, M3, M6): precinct -> plan a raid -> a district's Obsidian map -> the precinct.
 //
-// The raid board picks a turf; the raid runs on one of the holding gang's kit floors (gangs.txt "mansion"),
-// generated from the case RNG by NBC_KitRunner. The manager fills the kit's spawn spots with the raiding
-// gang (count from the gang's tier, budget and alert). The leader stands nearest the exit with escorts; two
-// officers come in with the player. Taking the exit resolves the raid: leader down = gang toppled, otherwise
-// a retreat. Lethal damage = OFFICER DOWN. (Maps without a kit, like the frozen Obsidian NBC_CT maps, still
-// work: their monster layer becomes the spawn spots.)
+// The precinct terminal (nbc/zscript/nbc/ui/) opens a case, picks a district (each held by a gang) and fits out
+// the raid: up to four officers off the roster, everyone's kit from the Evidence Locker. The raid runs on the
+// district's map (districts.txt, built by Obsidian): the manager clears the map's own monsters, fills their
+// spots with the holding gang (count from the gang's tier, budget and alert), stands the leader near the exit
+// with escorts, kits the player out and brings the squad in behind them. Taking the exit resolves the raid:
+// leader down = gang toppled, otherwise a retreat. Lethal damage = OFFICER DOWN. Afterwards everything the
+// player carries goes back into the locker, the evidence team bags what the gang dropped (a taken block only),
+// officers earn XP or go to the hospital or the memorial, and the after-action report waits at the precinct.
+//
+// Kit maps (NBC_K*, M2b) still work as raid maps: the kit gives the spawn spots and the exit.
 
 // A spawn spot (ZScript 4.10 has no arrays of vectors).
 class NBC_Spot
@@ -18,15 +22,15 @@ class NBC_RunManager : EventHandler
 {
 	const HUB_MAP = "NBC_HUB";
 	const SAFE_RADIUS = 768.0;          // no gang member starts this close to the player
-	const REINFORCE_AT = 0.6;           // fraction of the starting crew down before the stairs fill up
+	const REINFORCE_AT = 0.6;           // fraction of the starting crew down before reinforcements come
 	const OFFICER_DOWN_TICS = 70;
 
 	Array<NBC_GangDef> gangs;
-	Array<String> districtMaps, districtTitles;
+	Array<String> districtMaps, districtTitles, districtEnvs;
 
 	// raid bookkeeping (this map only)
 	bool raidSetUp, reinforced, exitFound;
-	int startCount, officerDownTics;
+	int startCount, officerDownTics, cashAtStart;
 	Vector3 exitPos;
 	Actor leader;
 	Array<Actor> crew, squad;
@@ -35,32 +39,28 @@ class NBC_RunManager : EventHandler
 	// messages
 	String announceText;
 	int announceTics;
-	Array<String> card;
-	int cardTics;
 
-	// the raid board (NBC_RaidBoard.Used bumps this; the UI opens the menu)
-	int boardRequests;
-	ui int boardSeen;
+	// the precinct terminal: the hub usables ask for it (a tab), the UI opens it
+	int menuRequests, menuTab;
+	ui int menuSeen, reportSeen, rosterSaved;
 
 	override void WorldLoaded(WorldEvent e)
 	{
 		NBC_Gangs.LoadGangs(gangs);
-		NBC_Gangs.LoadDistricts(districtMaps, districtTitles);
+		NBC_Gangs.LoadDistricts(districtMaps, districtTitles, districtEnvs);
 		if (e.IsSaveGame) return;
 
 		let rd = NBC_RunData.Get();
+		let dept = NBC_Department.Get();
 		if (IsHub())
 		{
-			if (rd.reportPending)
-			{
-				card.Copy(rd.report);
-				cardTics = 35 * 14;
-				rd.reportPending = false;
-			}
-			else Announce("CHECKPOINT 9. Use the raid board to pick a district.", 35 * 6);
-			return;
+			// the kit lives in the Evidence Locker between raids (it was checked in when the raid map unloaded)
+			let p = players[consoleplayer].mo;
+			if (p) StripKit(p);
+			if (!dept.reportPending)
+				Announce(rd.caseActive ? "CHECKPOINT 9. Plan the next raid at the raid board." :
+					"CHECKPOINT 9. Open a case at the raid board.", 35 * 6);
 		}
-
 	}
 
 	override void WorldUnloaded(WorldEvent e)
@@ -74,16 +74,16 @@ class NBC_RunManager : EventHandler
 	override void WorldTick()
 	{
 		if (announceTics > 0) announceTics--;
-		if (cardTics > 0) cardTics--;
 
 		let rd = NBC_RunData.Find();
 		if (!IsRaidMap(rd)) return;
 		if (!raidSetUp)
 		{
-			// wait two tics: the kit puts the player at the insertion on the first, and spawners resolve
+			// wait two tics: a kit puts the player at the insertion on the first, and spawners resolve
 			if (level.maptime >= 2) SetupRaid(rd);
 			return;
 		}
+		rd.raidTics++;
 		RaidTick(rd);
 	}
 
@@ -105,44 +105,35 @@ class NBC_RunManager : EventHandler
 		return d >= 0 && d < districtTitles.Size() ? districtTitles[d] : "the block";
 	}
 
-	// Pick one of the gang's kit floors ("tower:gang floor") with the case RNG and set the raid up to run on it.
-	static void PickMansion(NBC_GangDef g, NBC_RunData rd)
+	clearscope String TurfEnv(int d) const
 	{
-		int kit = NBC_KitGen.KIT_TOWER, v = 0;
-		if (g && g.mansion.Size())
-		{
-			String pick = g.mansion[rd.Rand(0, g.mansion.Size() - 1)];
-			int colon = pick.IndexOf(":");
-			String kitName = colon >= 0 ? pick.Left(colon) : pick;
-			String varName = colon >= 0 ? pick.Mid(colon + 1) : "";
-			int k = NBC_KitGen.KitByName(kitName);
-			let probe = k ? NBC_KitGen.Make(k) : null;
-			if (probe)
-			{
-				kit = k;
-				v = -1;
-				for (int i = 0; i < probe.VariantCount() && v < 0; i++)
-				{
-					probe.variant = i;
-					if (probe.VariantName() ~== varName) v = i;
-				}
-				if (v < 0)
-				{
-					Console.Printf("\cggangs.txt: %s has no kit variant \"%s\"; using %s.", g.id, pick, probe.VariantName());
-					v = 0;
-				}
-			}
-			else Console.Printf("\cggangs.txt: %s mansion \"%s\" isn't a kit (tower, street, basement or roof).", g.id, pick);
-		}
-		rd.raidMap = NBC_KitGen.MapOfKit(kit);
-		rd.raidVariant = v;
-		rd.raidKitSeed = rd.Rand(1, 0x7ffffff);
-		rd.raidEntry = 0;
+		return d >= 0 && d < districtEnvs.Size() ? districtEnvs[d] : "streets";
 	}
 
 	clearscope NBC_GangDef GangAt(int i) const
 	{
 		return i >= 0 && i < gangs.Size() ? gangs[i] : null;
+	}
+
+	// the gang holding a district (null: nobody), and whether it's already down
+	clearscope NBC_GangDef DistrictGang(NBC_RunData rd, int d) const
+	{
+		return rd && d >= 0 && d < rd.districtGang.Size() ? GangAt(rd.districtGang[d]) : null;
+	}
+	clearscope bool DistrictTaken(NBC_RunData rd, int d) const
+	{
+		int gi = rd && d >= 0 && d < rd.districtGang.Size() ? rd.districtGang[d] : -1;
+		return gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi];
+	}
+	// roughly how many are on the block (the raid's own count, before the dice)
+	clearscope int CrewEstimate(NBC_RunData rd, int d) const
+	{
+		let g = DistrictGang(rd, d);
+		if (!g) return 0;
+		int gi = rd.districtGang[d];
+		int alert = gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0;
+		static const int baseCount[] = { 22, 18, 16 };
+		return int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert)) + 1 + g.escorts;
 	}
 
 	static int NewSeed()
@@ -158,6 +149,172 @@ class NBC_RunManager : EventHandler
 		announceTics = tics;
 	}
 
+	// ------------------------------------------------------------ the player's kit
+
+	static const String MAGAZINES[] = { "NBC_ColtMagazine", "NBC_Dual92Magazine", "NBC_PumpMagazine", "NBC_UziMagazine", "NBC_AKMagazine" };
+
+	// everything the catalog knows about out of the player's hands (fists, debris and the quick throw stay)
+	static void StripKit(Actor p)
+	{
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+		{
+			class<Inventory> cls = NBC_Cat.ITEM_CLASS[i];
+			if (cls && !(cls is "BasicArmorPickup")) p.TakeInventory(cls, 0x7fffffff);
+		}
+		for (int i = 0; i < NBC_RunManager.MAGAZINES.Size(); i++) p.TakeInventory(NBC_RunManager.MAGAZINES[i], 0x7fffffff);
+		p.TakeInventory("MolotovCocktail", 1);
+		p.TakeInventory("BasicArmor", 0x7fffffff);
+		if (p.player && !p.player.ReadyWeapon)
+		{
+			let fists = Weapon(p.FindInventory("FistsOfFury"));
+			if (!fists) fists = Weapon(p.GiveInventoryType("FistsOfFury"));
+			let pp = PlayerPawn(p);
+			if (fists && pp) { p.player.PendingWeapon = fists; pp.BringUpWeapon(); }
+		}
+	}
+
+	// the kit the terminal fitted, out of the locker: weapons, ammo for them (up to a carry cap), pouches, vest
+	void IssueKit(PlayerPawn p, NBC_Department dept, NBC_RunData rd)
+	{
+		StripKit(p);
+		rd.raidIssued.Clear();
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) rd.raidIssued.Push(0);
+		static const int AMMO_CAP[] = { 200, 50, 150 };   // light, shells, rifle
+
+		Array<int> slots;
+		slots.Push(dept.pPrimary); slots.Push(dept.pSidearm); slots.Push(dept.pMelee);
+		Weapon first = null;
+		for (int k = 0; k < slots.Size(); k++)
+		{
+			int it = slots[k];
+			if (it < 0) continue;
+			class<Inventory> cls = NBC_Cat.ITEM_CLASS[it];
+			let w = Weapon(p.GiveInventoryType(cls));
+			rd.raidIssued[it]++;
+			if (w && !first) first = w;
+			int am = NBC_Cat.AmmoOf(it);
+			if (am >= 0 && rd.raidIssued[am] == 0)
+			{
+				int n = min(dept.locker[am], AMMO_CAP[am - NBC_Cat.IT_LIGHT]);
+				dept.Take(am, n);
+				rd.raidIssued[am] = n;
+				class<Inventory> acls = NBC_Cat.ITEM_CLASS[am];
+				p.TakeInventory(acls, 0x7fffffff);
+				if (n > 0) p.GiveInventory(acls, n);
+			}
+		}
+		// the guns came with a few loose rounds of their own: none of those, the magazines load from the reserve
+		for (int i = 0; i < NBC_RunManager.MAGAZINES.Size(); i++) p.TakeInventory(NBC_RunManager.MAGAZINES[i], 0x7fffffff);
+		for (int i = NBC_Cat.IT_LIGHT; i <= NBC_Cat.IT_RIFLE; i++)
+		{
+			class<Inventory> acls = NBC_Cat.ITEM_CLASS[i];
+			let have = p.FindInventory(acls);
+			if (have) have.Amount = rd.raidIssued[i];
+		}
+		for (let inv = p.Inv; inv; inv = inv.Inv)
+		{
+			let w = NBC_ReloadWeapon(inv);
+			if (!w || !w.AmmoType1 || !w.AmmoType2) continue;
+			let mag = p.FindInventory(w.AmmoType1);
+			if (!mag) mag = p.GiveInventoryType(w.AmmoType1);
+			let res = p.FindInventory(w.AmmoType2);
+			if (!mag || !res) continue;
+			mag.MaxAmount = w.NBC_MagazineCapacity();
+			int load = min(mag.MaxAmount - mag.Amount, res.Amount);
+			mag.Amount += load;
+			res.Amount -= load;
+		}
+
+		// pouches: one bottle or one medkit each
+		int bottles = 0, kits = 0;
+		for (int k = 0; k < dept.pPouch.Size(); k++)
+		{
+			if (dept.pPouch[k] == NBC_Cat.IT_MOLOTOV) bottles++;
+			else if (dept.pPouch[k] == NBC_Cat.IT_MEDKIT) kits++;
+		}
+		rd.raidIssued[NBC_Cat.IT_MOLOTOV] = bottles;
+		rd.raidIssued[NBC_Cat.IT_MEDKIT] = kits;
+		if (bottles > 0)
+		{
+			p.GiveInventoryType("MolotovCocktail");
+			let a = p.FindInventory("MolotovAmmo");
+			if (a) a.Amount = bottles;
+		}
+		if (kits > 0) p.GiveInventory("NBC_Medkit", kits);
+		if (dept.pVest) { p.GiveInventory("GreenArmor", 1); rd.raidIssued[NBC_Cat.IT_VEST] = 1; }
+
+		if (first && p.player) { p.player.PendingWeapon = first; p.BringUpWeapon(); }
+	}
+
+	// what the player brings out, per catalog item (magazines count as rounds)
+	static void CountKit(Actor p, out Array<int> back)
+	{
+		back.Clear();
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) back.Push(0);
+		if (!p) return;
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+		{
+			int k = NBC_Cat.Kind(i);
+			class<Inventory> cls = NBC_Cat.ITEM_CLASS[i];
+			if (k == NBC_Cat.K_VEST || !cls) continue;
+			back[i] = NBC_Cat.IsWeapon(i) ? (p.FindInventory(cls) ? 1 : 0) : p.CountInv(cls);
+		}
+		for (let inv = p.Inv; inv; inv = inv.Inv)
+		{
+			let w = NBC_ReloadWeapon(inv);
+			if (!w || !w.AmmoType1 || !w.AmmoType2) continue;
+			int am = NBC_Cat.ItemOfClass(w.AmmoType2);
+			if (am >= 0) back[am] += p.CountInv(w.AmmoType1);
+		}
+		// magazines shared by two guns were counted twice: count each magazine type once
+		Array<Name> seen;
+		for (let inv = p.Inv; inv; inv = inv.Inv)
+		{
+			let w = NBC_ReloadWeapon(inv);
+			if (!w || !w.AmmoType1 || !w.AmmoType2) continue;
+			Name mn = w.AmmoType1.GetClassName();
+			if (seen.Find(mn) != seen.Size())
+			{
+				int am = NBC_Cat.ItemOfClass(w.AmmoType2);
+				if (am >= 0) back[am] -= p.CountInv(w.AmmoType1);
+			}
+			else seen.Push(mn);
+		}
+		let armor = p.FindInventory("BasicArmor");
+		back[NBC_Cat.IT_VEST] = armor && armor.Amount > 0 ? 1 : 0;
+	}
+
+	// The evidence team bags what the gang dropped (items that fell from bodies, not what Obsidian placed).
+	// Guns past three of a kind come back as their rounds.
+	static void SweepDrops(out Array<int> found)
+	{
+		found.Clear();
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) found.Push(0);
+		let it = ThinkerIterator.Create("Inventory");
+		Inventory item;
+		while ((item = Inventory(it.Next())))
+		{
+			if (item.Owner || !item.bDropped) continue;
+			if (item is "MolotovCocktail") { found[NBC_Cat.IT_MOLOTOV]++; continue; }
+			if (item is "NBC_ShellAmmoBox") { found[NBC_Cat.IT_SHELL] += 20; continue; }
+			for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+			{
+				class<Inventory> cls = NBC_Cat.ITEM_CLASS[i];
+				if (!cls || !(item is cls)) continue;
+				found[i] += NBC_Cat.IsWeapon(i) ? 1 : max(1, item.Amount);
+				break;
+			}
+		}
+		// every thug carries a pistol: the evidence team keeps three of a kind, the rest are stripped for rounds
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+		{
+			if (!NBC_Cat.IsWeapon(i) || found[i] <= 3) continue;
+			int am = NBC_Cat.AmmoOf(i);
+			if (am >= 0) found[am] += (found[i] - 3) * 8;
+			found[i] = 3;
+		}
+	}
+
 	// ------------------------------------------------------------ raid setup
 
 	void SetupRaid(NBC_RunData rd)
@@ -166,8 +323,10 @@ class NBC_RunManager : EventHandler
 		let p = players[consoleplayer].mo;
 		let g = GangAt(rd.raidGang);
 		if (!p || !g) return;
+		let dept = NBC_Department.Get();
+		cashAtStart = rd.cash;
 
-		// 1. any placed monsters out (their spots kept for maps without a kit); a kit gives its own spots
+		// 1. the map's own monsters out (their spots kept); a kit gives its own spots
 		Array<NBC_Spot> spots;
 		Array<Actor> remove;
 		let it = ThinkerIterator.Create("Actor");
@@ -274,25 +433,25 @@ class NBC_RunManager : EventHandler
 		for (; k < cand.Size(); k++) spareSpots.Push(cand[k]);
 		startCount = crew.Size();
 
-		// 6. the squad comes in behind the player
-		for (int s = 0; s < rd.squadNames.Size(); s++)
+		// 6. your kit, then the squad in behind you
+		IssueKit(p, dept, rd);
+		for (int s = 0; s < rd.raidOff.Size(); s++)
 		{
-			if (rd.squadHealth[s] <= 0) continue;
+			let o = dept.OfficerById(rd.raidOff[s]);
+			if (!o) continue;
 			let a = NBC_Ally(Actor.Spawn("NBC_Ally", p.pos, NO_REPLACE));
 			if (!a) continue;
-			a.slot = s;
-			a.health = rd.squadHealth[s];
-			a.SetTag(rd.squadNames[s]);
+			a.Equip(o, s);
 			a.CatchUp(p);
 			squad.Push(a);
 		}
 
 		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers. Exit %s.",
-			level.MapName, kit ? kit.VariantName() : "no kit", g.name, spots.Size(), startCount, leader ? "leader" : "no leader",
-			squad.Size(), exitFound ? "found" : "not found (far spot)");
+			level.MapName, kit ? kit.VariantName() : TurfEnv(rd.raidDistrict), g.name, spots.Size(), startCount,
+			leader ? "leader" : "no leader", squad.Size(), exitFound ? "found" : "not found (far spot)");
 		String title = TurfTitle(rd.raidDistrict);
 		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
-		Announce(String.Format("%s. %s hold this block (%d on the floor).\nTake down %s, then get to the exit sign.",
+		Announce(String.Format("%s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
 			title, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
 	}
 
@@ -350,7 +509,7 @@ class NBC_RunManager : EventHandler
 			}
 			p.player.cheats |= CF_TOTALLYFROZEN | CF_GODMODE;
 			if (--officerDownTics == 1)
-				level.ChangeLevel(HUB_MAP, 0, CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_RESETINVENTORY | CHANGELEVEL_RESETHEALTH);
+				level.ChangeLevel(HUB_MAP, 0, CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_RESETHEALTH);
 			return;
 		}
 
@@ -391,7 +550,7 @@ class NBC_RunManager : EventHandler
 				crew.Push(a);
 				sent++;
 			}
-			if (sent) Announce("Radio: more of them coming down the stairwells.", 35 * 4);
+			if (sent) Announce("Radio: more of them coming in behind you.", 35 * 4);
 		}
 	}
 
@@ -404,7 +563,6 @@ class NBC_RunManager : EventHandler
 		if (t is "NBC_Ally")
 		{
 			let a = NBC_Ally(t);
-			if (a.slot < rd.squadHealth.Size()) rd.squadHealth[a.slot] = 0;
 			Announce(String.Format("%s is down!", a.GetTag()), 35 * 3);
 			return;
 		}
@@ -421,10 +579,24 @@ class NBC_RunManager : EventHandler
 
 	override void WorldThingDamaged(WorldEvent e)
 	{
+		let rd = NBC_RunData.Find();
+		if (!rd || !rd.raidActive || !raidSetUp || !e.Thing) return;
+		Actor t = e.Thing;
+		if (t.player) { rd.raidHealthLost += e.Damage; return; }
+		if (!t.bIsMonster || t is "NBC_Ally") return;
+		// who gets the kill (this event comes just before the death)
+		if (t.health <= 0 && e.DamageSource)
+		{
+			if (e.DamageSource.player) rd.raidPlayerKills++;
+			else if (e.DamageSource is "NBC_Ally")
+			{
+				int s = rd.RaidSlotOf(NBC_Ally(e.DamageSource).officerId);
+				if (s >= 0) rd.raidOffKills[s]++;
+			}
+			return;
+		}
 		// shot by an officer: often turn on them
-		if (e.DamageSource is "NBC_Ally" && e.Thing && e.Thing.bIsMonster && !(e.Thing is "NBC_Ally")
-			&& e.Thing.health > 0 && random(0, 99) < 60)
-			e.Thing.target = e.DamageSource;
+		if (e.DamageSource is "NBC_Ally" && t.health > 0 && random(0, 99) < 60) t.target = e.DamageSource;
 	}
 
 	// ------------------------------------------------------------ results
@@ -432,85 +604,222 @@ class NBC_RunManager : EventHandler
 	void ResolveRaid(NBC_RunData rd)
 	{
 		let g = GangAt(rd.raidGang);
-		String gname = g ? g.name : "The gang";
+		let dept = NBC_Department.Get();
 		String title = TurfTitle(rd.raidDistrict);
+		int gi = rd.raidGang;
+		bool taken = !rd.officerDown && rd.leaderDown && gi >= 0 && gi < rd.gangToppled.Size();
 
+		let rep = new("NBC_Report");
+		rep.place = title;
+		rep.gang = g ? g.name : "";
+		rep.kills = rd.raidKills;
+		rep.playerKills = rd.raidPlayerKills;
+		rep.crewTotal = startCount + (leader ? 1 : 0);
+		rep.healthLost = rd.raidHealthLost;
+		rep.timeSecs = rd.raidTics / 35;
+		rep.leaderDown = rd.leaderDown;
+
+		// a day has passed for the officers who stayed behind (before this raid's wounds are counted)
+		dept.NewDay();
+
+		// 1. the officers who went in
 		for (int s = 0; s < squad.Size(); s++)
 		{
 			let a = NBC_Ally(squad[s]);
-			if (a && a.slot < rd.squadHealth.Size()) rd.squadHealth[a.slot] = max(0, a.health);
+			if (!a) continue;
+			int slot = rd.RaidSlotOf(a.officerId);
+			if (slot < 0) continue;
+			rd.raidOffHealth[slot] = max(0, a.health);
+			let o = dept.OfficerById(a.officerId);
+			if (o && a.health > 0) a.ReturnPouches(o);
 		}
+		int lost = 0, critical = 0;
+		for (int s = 0; s < rd.raidOff.Size(); s++)
+		{
+			let o = dept.OfficerById(rd.raidOff[s]);
+			if (!o) continue;
+			int hp = rd.raidOffHealth[s];
+			int kills = rd.raidOffKills[s];
+			int st = NBC_Report.OS_FIT;
+			o.raids++;
+			o.kills += kills;
+			o.xp += kills * 10 + (hp > 0 ? 20 : 0) + (rd.leaderDown ? 15 : 0);
+			if (hp <= 0)
+			{
+				// pulled out alive? Better odds when the block is yours and the medics get in
+				int chance = (taken ? 50 : (rd.officerDown ? 15 : 30)) + 10 * o.rank;
+				if (rd.Rand(0, 99) < chance)
+				{
+					st = NBC_Report.OS_CRITICAL;
+					o.state = NBC_Officer.ST_HOSPITAL;
+					o.hospital = 4;
+					o.health = max(1, o.MaxHealth() / 4);
+					critical++;
+				}
+				else
+				{
+					st = NBC_Report.OS_KIA;
+					lost++;
+				}
+			}
+			else
+			{
+				o.health = min(hp, o.MaxHealth());
+				if (hp * 100 < o.MaxHealth() * 40) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 2; }
+				else if (hp * 100 < o.MaxHealth() * 70) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 1; }
+			}
+			rep.offId.Push(o.id);
+			rep.offName.Push(o.RankedName());
+			rep.offFace.Push(o.face);
+			rep.offRank.Push(o.rank);
+			rep.offKills.Push(kills);
+			rep.offState.Push(st);
+			rep.offXP.Push(o.xp);
+			rep.offPromote.Push(st != NBC_Report.OS_KIA && o.CanPromote());
+			if (st == NBC_Report.OS_KIA) dept.KillOfficer(o, rd.day, title);
+		}
+		dept.PruneSquad();
+		dept.rosterVersion++;
 
-		rd.report.Clear();
-		int gi = rd.raidGang;
+		// 2. the player's kit back into the locker, plus what the evidence team bags on a taken block
+		Array<int> back, found, loot;
+		CountKit(players[consoleplayer].mo, back);
+		dept.CheckIn(back, rd.raidIssued, loot);
+		if (taken)
+		{
+			SweepDrops(found);
+			for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+			{
+				dept.Give(i, found[i]);
+				loot[i] += found[i];
+			}
+		}
+		for (int i = 0; i < NBC_Cat.IT_COUNT; i++)
+			if (loot[i] > 0) { rep.lootItem.Push(i); rep.lootCount.Push(loot[i]); }
+
+		// 3. the block
 		if (rd.officerDown)
 		{
+			rep.outcome = NBC_Report.OUT_DOWN;
+			rep.title = "OFFICER DOWN";
 			rd.strikes++;
-			rd.cash /= 2;
+			rd.cash = cashAtStart + (rd.cash - cashAtStart) / 2;
 			if (gi >= 0 && gi < rd.gangAlert.Size()) rd.gangAlert[gi] = min(3, rd.gangAlert[gi] + 1);
-			rd.report.Push("OFFICER DOWN");
-			rd.report.Push(String.Format("You were pulled out of %s. Strike %d of %d.", title, rd.strikes, NBC_RunData.MAX_STRIKES));
-			rd.report.Push("Half the seized cash went missing in the confusion.");
 		}
-		else if (rd.leaderDown && gi >= 0 && gi < rd.gangToppled.Size())
+		else if (taken)
 		{
+			rep.outcome = NBC_Report.OUT_TAKEN;
+			rep.title = String.Format("%s TOPPLED", g ? g.shortName.MakeUpper() : "GANG");
 			rd.gangToppled[gi] = true;
 			rd.cash += rd.raidBounty;
-			rd.report.Push(String.Format("%s TOPPLED", g ? g.shortName.MakeUpper() : "GANG"));
-			rd.report.Push(String.Format("%s is in custody or in the morgue. Bounty: $%d.", g ? g.leaderTitle : "The leader", rd.raidBounty));
+			rep.bounty = rd.raidBounty;
 		}
 		else
 		{
+			rep.outcome = NBC_Report.OUT_RETREAT;
+			rep.title = "RETREAT";
 			if (gi >= 0 && gi < rd.gangAlert.Size()) rd.gangAlert[gi] = min(3, rd.gangAlert[gi] + 1);
-			rd.report.Push("RETREAT");
-			rd.report.Push(String.Format("You pulled out of %s. %s are on alert.", title, gname));
 		}
-		rd.report.Push(String.Format("Gang members down: %d.   Seized cash: $%d.", rd.raidKills, rd.cash));
-		String sq = "Squad:";
-		for (int s = 0; s < rd.squadNames.Size(); s++)
-			sq = sq .. String.Format("  %s %s", rd.squadNames[s], rd.squadHealth[s] > 0 ? String.Format("(%d)", rd.squadHealth[s]) : "(hospital)");
-		rd.report.Push(sq);
+		rep.cashRaid = rd.cash - cashAtStart - rep.bounty;
+		rep.balance = rd.cash;
+
+		// 4. the grade: the block, the body count, the cost
+		int score = (taken ? 40 : 0) + (rep.crewTotal > 0 ? 35 * min(rep.kills, rep.crewTotal) / rep.crewTotal : 0)
+			+ (lost + critical == 0 && rd.raidOff.Size() > 0 ? 10 : 0) + 15
+			- lost * 15 - critical * 5 - min(20, rep.healthLost / 10);
+		if (rd.officerDown) score = min(score, 25);
+		rep.grade = score >= 80 ? "A" : (score >= 65 ? "B" : (score >= 50 ? "C" : (score >= 35 ? "D" : "F")));
 
 		rd.raidActive = false;
 		rd.EndDay(gi);
 		switch (rd.caseResult)
 		{
-		case NBC_CASE_WON: rd.report.Push("CASE CLOSED. Every gang in the Bricks is down."); break;
-		case NBC_CASE_STRUCK_OUT: rd.report.Push("Three strikes. Internal Affairs takes your badge. The case is over."); break;
-		case NBC_CASE_DEMOLITION: rd.report.Push("Day 30. The demolition crews roll in. The case is over."); break;
-		default: rd.report.Push(String.Format("Day %d of %d begins.", rd.day, NBC_RunData.MAX_DAYS)); break;
+		case NBC_CASE_WON: rep.dayLine = "CASE CLOSED. Every gang in the Bricks is down."; break;
+		case NBC_CASE_STRUCK_OUT: rep.dayLine = "Three strikes. Internal Affairs takes your badge. The case is over."; break;
+		case NBC_CASE_DEMOLITION: rep.dayLine = "Day 30. The demolition crews roll in. The case is over."; break;
+		default: rep.dayLine = rd.officerDown ? String.Format("Strike %d of %d. Day %d of %d begins.", rd.strikes,
+			NBC_RunData.MAX_STRIKES, rd.day, NBC_RunData.MAX_DAYS) : String.Format("Day %d of %d begins.", rd.day, NBC_RunData.MAX_DAYS); break;
 		}
-		rd.reportPending = true;
+		dept.PostReport(rep);
 	}
 
-	// ------------------------------------------------------------ the board and debug commands
+	// ------------------------------------------------------------ the terminal's netevents, and debug commands
 
 	override void NetworkProcess(ConsoleEvent e)
 	{
 		if (e.Name ~== "nbc_debug_case") { DebugCase(); return; }
+		if (e.Name ~== "nbc_debug_clear") { DebugClear(e.Args[0]); return; }
+		if (e.Name.Left(9) ~== "nbc_dept.")
+		{
+			// "nbc_dept.<op>" a b c (SendNetworkEvent carries three numbers; the op rides in the name)
+			NBC_Department.Get().Apply(e.Name.Mid(9).ToInt(), e.Args[0], e.Args[1], e.Args[2], NBC_RunData.Get());
+			return;
+		}
+		if (e.Name ~== "nbc_deploy") { Deploy(e.Args[0]); return; }
+		if (e.Name ~== "nbc_terminal") { menuTab = e.Args[0]; menuRequests++; return; }   // netevent nbc_terminal <tab 0-3>
 		if (!(e.Name ~== "nbc_board")) return;
 		let rd = NBC_RunData.Get();
+		let dept = NBC_Department.Get();
 		int choice = e.Args[0];
 		if (choice == -1)
 		{
 			rd.NewCase(NewSeed(), gangs.Size(), districtMaps.Size());
+			dept.NewCase();
 			Announce(String.Format("New case opened (seed %d). %d gangs, %d districts, %d days.",
 				rd.seed, gangs.Size(), districtMaps.Size(), NBC_RunData.MAX_DAYS), 35 * 5);
 			return;
 		}
-		if (!rd.caseActive) return;
-		if (choice == -2)
+		if (choice == -2 && rd.caseActive && !rd.raidActive)
 		{
 			rd.EndDay(-1);
-			Announce(rd.caseActive ? String.Format("You close the day. Day %d.", rd.day) : "The case is over.", 35 * 4);
+			dept.NewDay();
+			Announce(rd.caseActive ? String.Format("You close the day. The squad rests. Day %d.", rd.day) : "The case is over.", 35 * 4);
+		}
+	}
+
+	// ASSAULT on the deploy screen: the squad as picked goes in with you
+	void Deploy(int d)
+	{
+		let rd = NBC_RunData.Get();
+		let dept = NBC_Department.Get();
+		if (!rd.caseActive || rd.raidActive || !IsHub() || d < 0 || d >= districtMaps.Size()) return;
+		if (!DistrictGang(rd, d) || DistrictTaken(rd, d)) return;
+		if (!LevelInfo.MapExists(districtMaps[d]))
+		{
+			Console.Printf("\cgnbc: district map %s is missing (tools/Obsidian/make_bricks).", districtMaps[d]);
 			return;
 		}
-		if (choice < 0 || choice >= districtMaps.Size()) return;
-		int gi = choice < rd.districtGang.Size() ? rd.districtGang[choice] : -1;
-		if (gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi]) return;
-		rd.BeginRaid(choice);
-		PickMansion(GangAt(gi), rd);
+		rd.BeginRaid(d);
+		rd.raidMap = districtMaps[d];
+		dept.PruneSquad();
+		for (int s = 0; s < dept.squad.Size(); s++)
+		{
+			rd.raidOff.Push(dept.squad[s]);
+			rd.raidOffKills.Push(0);
+			let o = dept.OfficerById(dept.squad[s]);
+			rd.raidOffHealth.Push(o ? o.health : 0);
+		}
 		level.ChangeLevel(rd.raidMap, 0, CHANGELEVEL_NOINTERMISSION);
+	}
+
+	// testing: down the leader and the first N of the crew (all of them for 0), the kills shared between you and
+	// the squad, as if they'd been shot
+	void DebugClear(int n)
+	{
+		let rd = NBC_RunData.Find();
+		if (!IsRaidMap(rd) || !raidSetUp) return;
+		Array<Actor> who;
+		who.Push(players[consoleplayer].mo);
+		for (int i = 0; i < squad.Size(); i++) if (squad[i] && squad[i].health > 0) who.Push(squad[i]);
+		Array<Actor> victims;
+		if (leader && leader.health > 0) victims.Push(leader);
+		for (int i = 0; i < crew.Size() && (n <= 0 || victims.Size() < n + 1); i++) if (crew[i] && crew[i].health > 0) victims.Push(crew[i]);
+		for (int i = 0; i < victims.Size(); i++)
+		{
+			Actor src = who[i % who.Size()];
+			victims[i].DamageMobj(src, src, victims[i].health + 1000, 'NBC_Light', DMG_FORCED | DMG_THRUSTLESS);
+		}
+		Console.Printf("nbc: downed %d (leader %s)", victims.Size(), rd.leaderDown ? "down" : "standing");
 	}
 
 	void DebugCase()
@@ -523,25 +832,56 @@ class NBC_RunManager : EventHandler
 		{
 			int gi = d < rd.districtGang.Size() ? rd.districtGang[d] : -1;
 			let g = GangAt(gi);
-			Console.Printf("  %s  %s  %s  alert %d%s", districtMaps[d], districtTitles[d], g ? g.name : "-",
-				gi >= 0 && gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0,
-				gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi] ? "  TOPPLED" : "");
+			Console.Printf("  %s  %s (%s)  %s  alert %d%s", districtMaps[d], districtTitles[d], TurfEnv(d), g ? g.name : "-",
+				gi >= 0 && gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0, DistrictTaken(rd, d) ? "  TOPPLED" : "");
+		}
+		let dept = NBC_Department.Find();
+		if (dept)
+		{
+			Console.Printf("  roster %d, fallen %d, squad %d", dept.roster.Size(), dept.fallen.Size(), dept.squad.Size());
+			for (int i = 0; i < dept.roster.Size(); i++)
+			{
+				let o = dept.roster[i];
+				Console.Printf("    #%d %s, %s %s, hp %d/%d xp %d kills %d raids %d%s%s", o.id, o.RankedName(), o.RankName(), o.ClassName(),
+					o.health, o.MaxHealth(), o.xp, o.kills, o.raids, o.state == NBC_Officer.ST_HOSPITAL ? String.Format(" hospital %d", o.hospital) : "",
+					dept.InSquad(o.id) ? " SQUAD" : "");
+			}
+			String lk = "  locker:";
+			for (int i = 0; i < NBC_Cat.IT_COUNT; i++) if (dept.locker[i]) lk = lk .. String.Format(" %s %d,", NBC_Cat.ItemName(i), dept.locker[i]);
+			Console.Printf("%s", lk);
 		}
 		if (rd.raidActive)
-			Console.Printf("  raid: turf %d gang %d on %s variant %d (kit seed %d), crew %d/%d kills %d leader %s", rd.raidDistrict,
-				rd.raidGang, rd.raidMap, rd.raidVariant, rd.raidKitSeed, crew.Size(), startCount, rd.raidKills, rd.leaderDown ? "down" : "at large");
+			Console.Printf("  raid: turf %d gang %d on %s, crew %d/%d kills %d (you %d) leader %s", rd.raidDistrict,
+				rd.raidGang, rd.raidMap, crew.Size(), startCount, rd.raidKills, rd.raidPlayerKills, rd.leaderDown ? "down" : "at large");
 	}
+
+	// ------------------------------------------------------------ the UI side: menus and the roster CVars
 
 	override void UiTick()
 	{
-		if (boardRequests != boardSeen)
+		let dept = NBC_Department.Find();
+		if (dept && dept.rosterVersion != rosterSaved)
 		{
-			boardSeen = boardRequests;
-			Menu.SetMenu("NBC_RaidBoardMenu");
+			// the officers who survive outlast the save (AGENTS.md: permanent progress in CVars)
+			rosterSaved = dept.rosterVersion;
+			CVar.FindCVar("nbc_roster").SetString(dept.SaveRoster());
+			CVar.FindCVar("nbc_memorial").SetString(dept.SaveMemorial());
+		}
+		if (gamestate != GS_LEVEL || menuactive != Menu.Off) return;
+		if (dept && dept.reportPending && dept.reportSerial != reportSeen && IsHub())
+		{
+			reportSeen = dept.reportSerial;
+			Menu.SetMenu("NBC_ResultsMenu");
+			return;
+		}
+		if (menuRequests != menuSeen)
+		{
+			menuSeen = menuRequests;
+			NBC_Terminal.Open(menuTab);
 		}
 	}
 
-	// ------------------------------------------------------------ overlay: announcements, officer down, the card
+	// ------------------------------------------------------------ overlay: announcements, officer down
 
 	override void RenderOverlay(RenderEvent e)
 	{
@@ -564,20 +904,6 @@ class NBC_RunManager : EventHandler
 			announceText.Split(lines, "\n");
 			for (int i = 0; i < lines.Size(); i++)
 				Screen.DrawText(NewSmallFont, Font.CR_GOLD, (vw - NewSmallFont.StringWidth(lines[i])) / 2, 220 + i * 16, lines[i],
-					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
-		}
-
-		if (cardTics > 0 && card.Size())
-		{
-			double alpha = min(1.0, cardTics / 35.0);
-			int h = 34 + card.Size() * 16;
-			int top = 150;
-			Screen.Dim(0, 0.7 * alpha, Screen.GetWidth() / 8, int(Screen.GetHeight() * top / double(vh)),
-				Screen.GetWidth() * 3 / 4, int(Screen.GetHeight() * h / double(vh)));
-			Screen.DrawText(BigFont, Font.CR_GOLD, (vw - BigFont.StringWidth(card[0])) / 2, top + 8, card[0],
-				DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
-			for (int i = 1; i < card.Size(); i++)
-				Screen.DrawText(NewSmallFont, Font.CR_WHITE, (vw - NewSmallFont.StringWidth(card[i])) / 2, top + 16 + i * 16, card[i],
 					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
 		}
 	}

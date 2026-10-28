@@ -16,6 +16,7 @@ DoomEdNums
 	26004 = NBC_RubblePile
 	26010 = NBC_RaidBoard
 	26011 = NBC_ArmoryLocker
+	26012 = NBC_SquadRoom
 }
 
 // New Game starts at the hub (PLAN M2).
