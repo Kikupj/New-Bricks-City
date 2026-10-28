@@ -13,12 +13,16 @@ foreach ($f in @($exe, (Join-Path $root $iwad))) {
 }
 
 $maps = [ordered]@{
-    "1" = @("NBC_HUB",  "New game (Checkpoint 9 hub)")
+    "1" = @("NBC_HUB",  "New game (Checkpoint 9 precinct)")
     "2" = @("NBC_TEST", "Test room")
-    "3" = @("NBC_CT01", "District: Mercer Street")
-    "4" = @("NBC_CT02", "District: Wexford Row")
-    "5" = @("NBC_CT03", "District: Sutter Alley")
-    "6" = @("NBC_CT04", "District: Cypress Avenue")
+    "3" = @("NBC_CT01", "District: Pike Water Towers (rooftops)")
+    "4" = @("NBC_CT02", "District: Fulton Storm Drains (underground)")
+    "5" = @("NBC_CT03", "District: Mercer Terminal (industrial)")
+    "6" = @("NBC_CT04", "District: Wexford Junction (subway)")
+    "7" = @("NBC_CT05", "District: Sutter Walk-ups (streets)")
+    "8" = @("NBC_CT06", "District: Cypress Playground (park)")
+    "9" = @("NBC_CT07", "District: Carver Towers (housing towers)")
+    "A" = @("NBC_CT08", "District: Arden Street (streets)")
 }
 $cheats = $false
 $skill  = 3
@@ -36,7 +40,7 @@ while ($true) {
     Write-Host ("Cheats: {0}   Skill: {1}" -f ($(if ($cheats) { "ON (give all, god)" } else { "OFF" }), $skill))
     Write-Host ""
     foreach ($k in $maps.Keys) { Write-Host ("  {0}  {1}  ({2})" -f $k, $maps[$k][1], $maps[$k][0]) }
-    Write-Host "  7  Other map..."
+    Write-Host "  M  Other map..."
     Write-Host ""
     Write-Host "  C  Toggle cheats          S  Set skill (1-5)"
     Write-Host "  T  Smoke test, all maps   K  Static lump checks"
@@ -44,7 +48,7 @@ while ($true) {
     $c = (Read-Host "Choose").Trim().ToUpper()
     if ($maps.Contains($c)) { Start-Game $maps[$c][0]; continue }
     switch ($c) {
-        "7" { $m = Read-Host "Map lump name"; if ($m) { Start-Game $m.Trim() } }
+        "M" { $m = Read-Host "Map lump name"; if ($m) { Start-Game $m.Trim() } }
         "C" { $cheats = -not $cheats }
         "S" { $s = Read-Host "Skill 1-5"; if ($s -match '^[1-5]$') { $skill = [int]$s } }
         "T" {
