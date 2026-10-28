@@ -75,7 +75,7 @@ class NBC_ResultsMenu : NBC_UI
 			double cx = 464 + i * 118, cy = 94;
 			Inset(cx, cy, 108, 168);
 			int st = rep.offState[i];
-			Pic(String.Format("NBCPF%02d", clamp(rep.offFace[i], 0, 39)), cx + 10, cy + 6, 88, 88, 1.0, st == NBC_Report.OS_KIA);
+			Pic(NBC_Cat.Face(rep.offFace[i]), cx + 10, cy + 6, 88, 88, 1.0, st == NBC_Report.OS_KIA);
 			Text(NewSmallFont, Font.CR_WHITE, cx + 54, cy + 100, rep.offName[i], 11, 1);
 			Text(NewSmallFont, rep.offKills[i] > 0 ? Font.CR_GOLD : Font.CR_DARKGRAY, cx + 54, cy + 116,
 				rep.offKills[i] > 0 ? String.Format("+%d KILL%s", rep.offKills[i], rep.offKills[i] == 1 ? "" : "S") : "no kills", 10, 1);

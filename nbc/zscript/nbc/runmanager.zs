@@ -41,7 +41,11 @@ class NBC_RunManager : EventHandler
 	int announceTics;
 
 	// the precinct terminal: the hub usables ask for it (a tab), the UI opens it
-	int menuRequests, menuTab;
+	enum EMenuKind { MK_TERMINAL, MK_WHEELSUP }
+	int menuRequests, menuTab, menuKind, menuOfficer;
+	// someone at the HQ talking: a subtitle along the bottom (NBC_HQNpc)
+	String speakName, speakText, speakHint, speakFace;
+	int speakTics;
 	ui int menuSeen, reportSeen, rosterSaved;
 
 	override void WorldLoaded(WorldEvent e)
@@ -58,9 +62,42 @@ class NBC_RunManager : EventHandler
 			let p = players[consoleplayer].mo;
 			if (p) StripKit(p);
 			if (!dept.reportPending)
-				Announce(rd.caseActive ? "CHECKPOINT 9. Plan the next raid at the raid board." :
-					"CHECKPOINT 9. Open a case at the raid board.", 35 * 6);
+				Announce(rd.caseActive ? "CHECKPOINT 9. Plan the next raid at the raid board, or ask the captain." :
+					"CHECKPOINT 9. Talk to the captain, or open a case at the raid board.", 35 * 6);
+			StaffHQ(dept);
 		}
+	}
+
+	// The officers fit for duty stand around the HQ (NBC_HQSpot things, in order); the hospital keeps the rest.
+	void StaffHQ(NBC_Department dept)
+	{
+		Array<Actor> spots;
+		let it = ThinkerIterator.Create("NBC_HQSpot");
+		Actor s;
+		while ((s = Actor(it.Next()))) spots.Push(s);
+		// the map's order, by editor position, so the same officer gets the same spot
+		for (int i = 1; i < spots.Size(); i++)
+			for (int j = i; j > 0 && spots[j - 1].SpawnPoint.x * 4096 + spots[j - 1].SpawnPoint.y > spots[j].SpawnPoint.x * 4096 + spots[j].SpawnPoint.y; j--)
+			{
+				Actor t = spots[j]; spots[j] = spots[j - 1]; spots[j - 1] = t;
+			}
+		int k = 0;
+		for (int i = 0; i < dept.roster.Size() && k < spots.Size(); i++)
+		{
+			let o = dept.roster[i];
+			if (!o.Available()) continue;
+			let npc = NBC_HQOfficer(Actor.Spawn("NBC_HQOfficer", spots[k].pos, NO_REPLACE));
+			if (!npc) continue;
+			npc.angle = spots[k].angle;
+			npc.Dress(o);
+			k++;
+		}
+	}
+
+	void Speak(String who, String text, String hint = "", String face = "")
+	{
+		speakName = who; speakText = text; speakHint = hint; speakFace = face;
+		speakTics = 35 * 6;
 	}
 
 	override void WorldUnloaded(WorldEvent e)
@@ -74,6 +111,7 @@ class NBC_RunManager : EventHandler
 	override void WorldTick()
 	{
 		if (announceTics > 0) announceTics--;
+		if (speakTics > 0) speakTics--;
 
 		let rd = NBC_RunData.Find();
 		if (!IsRaidMap(rd)) return;
@@ -756,7 +794,8 @@ class NBC_RunManager : EventHandler
 			return;
 		}
 		if (e.Name ~== "nbc_deploy") { Deploy(e.Args[0]); return; }
-		if (e.Name ~== "nbc_terminal") { menuTab = e.Args[0]; menuRequests++; return; }   // netevent nbc_terminal <tab 0-3>
+		if (e.Name ~== "nbc_terminal") { menuKind = MK_TERMINAL; menuTab = e.Args[0]; menuOfficer = 0; menuRequests++; return; }   // netevent nbc_terminal <tab 0-3>
+		if (e.Name ~== "nbc_ready") { Ready(e.Args[0]); return; }
 		if (!(e.Name ~== "nbc_board")) return;
 		let rd = NBC_RunData.Get();
 		let dept = NBC_Department.Get();
@@ -777,7 +816,17 @@ class NBC_RunManager : EventHandler
 		}
 	}
 
-	// ASSAULT on the deploy screen: the squad as picked goes in with you
+	// READY on the deploy screen: the raid's planned; the pilot starts it (NBC_Pilot -> NBC_WheelsUp -> Deploy)
+	void Ready(int d)
+	{
+		let rd = NBC_RunData.Get();
+		if (!rd.caseActive || rd.raidActive || !IsHub() || d < 0 || d >= districtMaps.Size()) return;
+		if (!DistrictGang(rd, d) || DistrictTaken(rd, d)) return;
+		rd.readyDistrict = d;
+		Announce(String.Format("%s: the plan's set. Talk to Rook at the chopper when you're ready to go.", TurfTitle(d)), 35 * 6);
+	}
+
+	// WHEELS UP at the pilot (or netevent nbc_deploy <district> for testing): the squad as picked goes in with you
 	void Deploy(int d)
 	{
 		let rd = NBC_RunData.Get();
@@ -789,6 +838,7 @@ class NBC_RunManager : EventHandler
 			Console.Printf("\cgnbc: district map %s is missing (tools/Obsidian/make_bricks).", districtMaps[d]);
 			return;
 		}
+		rd.readyDistrict = -1;
 		rd.BeginRaid(d);
 		rd.raidMap = districtMaps[d];
 		dept.PruneSquad();
@@ -890,7 +940,8 @@ class NBC_RunManager : EventHandler
 		if (menuRequests != menuSeen)
 		{
 			menuSeen = menuRequests;
-			NBC_Terminal.Open(menuTab);
+			if (menuKind == MK_WHEELSUP) Menu.SetMenu("NBC_WheelsUp");
+			else NBC_Terminal.Open(menuTab, menuOfficer);
 		}
 	}
 
@@ -917,6 +968,44 @@ class NBC_RunManager : EventHandler
 			announceText.Split(lines, "\n");
 			for (int i = 0; i < lines.Size(); i++)
 				Screen.DrawText(NewSmallFont, Font.CR_GOLD, (vw - NewSmallFont.StringWidth(lines[i])) / 2, 220 + i * 16, lines[i],
+					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
+		}
+
+		// at the HQ: a raid waiting on the pilot
+		if (rd && rd.readyDistrict >= 0 && IsHub())
+		{
+			String r = String.Format("RAID READY: %s.  Talk to Rook (the pilot) to go.", TurfTitle(rd.readyDistrict));
+			Screen.DrawText(NewSmallFont, Font.CR_GOLD, (vw - NewSmallFont.StringWidth(r)) / 2, 24, r,
+				DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true);
+		}
+
+		// someone talking: name, line, a portrait if they have one, and what Use does next
+		if (speakTics > 0 && speakText != "")
+		{
+			double alpha = min(1.0, speakTics / 20.0);
+			int bw = 620, bx = (vw - bw) / 2, by = 404, bh = 84;
+			double k = Screen.GetHeight() / double(vh);
+			double ox = (Screen.GetWidth() - vw * k) / 2;
+			Screen.Dim(0x05080C, 0.78 * alpha, int(ox + bx * k), int(by * k), int(bw * k), int(bh * k));
+			Screen.Dim(0xF2A93B, 0.9 * alpha, int(ox + bx * k), int(by * k), int(bw * k), max(1, int(2 * k)));
+			int tx = bx + 12;
+			if (speakFace != "")
+			{
+				TextureID t = TexMan.CheckForTexture(speakFace, TexMan.Type_Any);
+				if (t.IsValid())
+					Screen.DrawTexture(t, false, bx + 10, by + 10, DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true,
+						DTA_DestWidth, 64, DTA_DestHeight, 64, DTA_Alpha, alpha);
+				tx = bx + 84;
+			}
+			Screen.DrawText(NewSmallFont, Font.CR_GOLD, tx, by + 10, speakName, DTA_VirtualWidth, vw, DTA_VirtualHeight, vh,
+				DTA_KeepRatio, true, DTA_Alpha, alpha);
+			// the line, wrapped to the box
+			BrokenLines bl = NewSmallFont.BreakLines(speakText, bx + bw - 12 - tx);
+			for (int i = 0; i < bl.Count() && i < 3; i++)
+				Screen.DrawText(NewSmallFont, Font.CR_WHITE, tx, by + 28 + i * 14, bl.StringAt(i), DTA_VirtualWidth, vw, DTA_VirtualHeight, vh,
+					DTA_KeepRatio, true, DTA_Alpha, alpha);
+			if (speakHint != "")
+				Screen.DrawText(NewSmallFont, Font.CR_DARKGRAY, bx + bw - 12 - NewSmallFont.StringWidth(speakHint), by + bh - 16, speakHint,
 					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
 		}
 	}

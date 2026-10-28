@@ -24,6 +24,9 @@ class NBC_RunData : Thinker
 	Array<int> gangAlert;
 	Array<int> districtGang;
 
+	// the raid planned on the deploy screen (READY), waiting on the pilot; -1: none
+	int readyDistrict;
+
 	// the current raid
 	bool raidActive, leaderDown, officerDown;
 	int raidDistrict, raidGang, raidKills, raidBounty;
@@ -54,6 +57,7 @@ class NBC_RunData : Thinker
 		{
 			rd = new("NBC_RunData");
 			rd.ChangeStatNum(STAT_STATIC);
+			rd.readyDistrict = -1;
 		}
 		return rd;
 	}
@@ -84,6 +88,7 @@ class NBC_RunData : Thinker
 	{
 		caseActive = true;
 		caseResult = NBC_CASE_RUNNING;
+		readyDistrict = -1;
 		seed = newSeed;
 		rngState = newSeed;
 		rngSteps = 0;
@@ -160,6 +165,7 @@ class NBC_RunData : Thinker
 	void EndDay(int hitGang)
 	{
 		day++;
+		readyDistrict = -1;
 		for (int i = 0; i < gangAlert.Size(); i++)
 			if (i != hitGang && gangAlert[i] > 0) gangAlert[i]--;
 

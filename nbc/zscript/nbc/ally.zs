@@ -1,7 +1,7 @@
 // Allied officers (AGENTS.md squad rules): their own target-finding, no engine FRIENDLY AI.
 // Each one is an officer off the roster (NBC_Officer): the class sets the build (specop, militia shotgunner,
 // sniper and specop-F sprites from actors/enemies/, whose classes stay out of every enemy pool) and the
-// issue weapon, the portrait sets the clothes (a plain-clothes recolor, nbc/TRNSLATE.txt); the kit can swap
+// issue weapon, the face picks the clothes (a plain-clothes recolor, nbc/TRNSLATE.txt); the kit can swap
 // in a seized gun; rank, aim and perks shape how well they shoot.
 // They follow the player, shoot visible gang members with hitscan in the gun's damage type (never "Enemy"),
 // reload every magazine, use their pouches (medkits when hurt, Molotovs on a bunch of gang members), the
@@ -77,7 +77,7 @@ class NBC_Ally : Actor
 		health = clamp(o.health, 1, maxHp);
 		SetTag(o.RankedName());
 		sprite = GetSpriteIndex(NBC_Cat.CLASS_SPRITE[clamp(cls, 0, NBC_Cat.C_COUNT - 1)]);
-		// their own clothes, the same as in their portrait (nbc/TRNSLATE.txt, tools/art/make_portraits.py)
+		// their own clothes (nbc/TRNSLATE.txt), picked by their face so it's always the same outfit
 		A_SetTranslation(String.Format("NBC_Outfit%d", o.face * 3 % 8));
 		if (cls == NBC_Cat.C_MEDIC) { SeeSound = "EliteF/see"; PainSound = "EliteF/pain"; DeathSound = "EliteF/die"; }
 

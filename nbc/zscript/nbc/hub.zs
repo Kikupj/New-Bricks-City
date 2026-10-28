@@ -28,7 +28,9 @@ class NBC_TerminalUsable : NBC_HubUsable
 		if (!user || !user.player) return false;
 		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
 		if (!rm) return false;
+		rm.menuKind = NBC_RunManager.MK_TERMINAL;
 		rm.menuTab = tab;
+		rm.menuOfficer = 0;
 		rm.menuRequests++;
 		A_StartSound("misc/chat", CHAN_BODY);
 		return true;

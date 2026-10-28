@@ -57,7 +57,8 @@ class NBC_DeployMenu : NBC_UI
 		{
 		case ID_BACK: Leave(); return;
 		case ID_ASSAULT:
-			EventHandler.SendNetworkEvent("nbc_deploy", district);
+			// the plan's set; the pilot starts the raid (NBC_Pilot, NBC_WheelsUp)
+			EventHandler.SendNetworkEvent("nbc_ready", district);
 			LeaveAll();
 			return;
 		case ID_ROSTER:
@@ -152,7 +153,7 @@ class NBC_DeployMenu : NBC_UI
 			x += 92;
 		}
 		bool canGo = !rd.raidActive && rd.caseActive && g && !rm.DistrictTaken(rd, district);
-		Button(ID_ASSAULT, 0, VW - 16 - 190, 552, 190, 40, "ASSAULT", canGo, 20, C_AMBER);
+		Button(ID_ASSAULT, 0, VW - 16 - 190, 552, 190, 40, "READY", canGo, 20, C_AMBER);
 
 		registering = true;
 		if (picking >= 0) DrawPicker(dept);

@@ -90,7 +90,7 @@ class NBC_StatusBar : DoomStatusBar
 				let o = dept ? dept.OfficerById(a.officerId) : null;
 				double x = 3 + i * 26;
 				bool down = a.health <= 0;
-				if (o) DrawImage(o.Portrait(), (x, y), DI_ITEM_LEFT_TOP, down ? 0.35 : 1.0, scale: (0.42, 0.42));
+				if (o) DrawImage(o.Portrait(), (x, y), DI_ITEM_LEFT_TOP, down ? 0.35 : 1.0, scale: (0.21, 0.21));   // 96-px portraits
 				Fill(Color(255, 10, 14, 20), x, y + 21, 20, 2);
 				double frac = clamp(a.health / double(max(1, a.maxHp)), 0, 1);
 				Fill(frac > 0.6 ? Color(255, 88, 176, 74) : (frac > 0.3 ? Color(255, 242, 169, 59) : Color(255, 200, 53, 43)), x, y + 21, 20 * frac, 2);

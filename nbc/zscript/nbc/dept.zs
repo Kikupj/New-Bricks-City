@@ -24,6 +24,9 @@ class NBC_Cat
 		P_STEADY, P_TOUGH, P_KEVLAR, P_HOLLOW, P_TRIGGER, P_SPEED, P_REFLEX, P_MEDIC, P_PACK, P_WATCH, P_COUNT
 	}
 	const MAX_RANK = 3;
+	// the officers' faces: graphics/portraits/NBCPF000-143 (tools/art/import_npc_art.py); one is Det. Vance's
+	const FACES = 144;
+	const VANCE_FACE = 10;
 	const SQUAD_SLOTS = 4;
 	const PLAYER_POUCHES = 4;
 
@@ -119,6 +122,7 @@ class NBC_Cat
 		int k = clamp(cls, 0, C_COUNT - 1) * 6 + (clamp(newRank, 1, MAX_RANK) - 1) * 2 + clamp(choice, 0, 1);
 		return NBC_Cat.PERK_TREE[k];
 	}
+	clearscope static String Face(int f) { return String.Format("NBCPF%03d", clamp(f, 0, FACES - 1)); }
 	clearscope static String Money(int v)
 	{
 		String s = String.Format("%d", abs(v));
@@ -165,7 +169,7 @@ class NBC_Officer
 	clearscope int NextXP() const { return rank < NBC_Cat.MAX_RANK ? NBC_Cat.RANK_XP[rank + 1] : 0; }
 	clearscope bool CanPromote() const { return state != ST_KIA && rank < NBC_Cat.MAX_RANK && xp >= NBC_Cat.RANK_XP[rank + 1]; }
 	clearscope bool Available() const { return state == ST_ACTIVE; }
-	clearscope String Portrait() const { return String.Format("NBCPF%02d", clamp(face, 0, 39)); }
+	clearscope String Portrait() const { return NBC_Cat.Face(face); }
 	clearscope String PrimaryName() const
 	{
 		return kitPrimary >= 0 ? NBC_Cat.ItemName(kitPrimary) : NBC_Cat.CLASS_ISSUE[clamp(cls, 0, 3)];
@@ -364,7 +368,7 @@ class NBC_Department : Thinker
 		// stats come from the case RNG when there's a case (AGENTS.md), else the start-of-game roll
 		o.surname = PickSurname(rd);
 		o.initial = String.Format("%c", 65 + Roll(rd, 0, 25));
-		o.face = cls * 10 + Roll(rd, 0, 9);
+		o.face = PickFace(rd);
 		o.baseAim = NBC_Cat.CLASS_AIM[cls] + Roll(rd, -8, 8);
 		o.tough = Roll(rd, -10, 10);
 		o.kitPrimary = -1;
@@ -377,6 +381,19 @@ class NBC_Department : Thinker
 	int Roll(NBC_RunData rd, int lo, int hi)
 	{
 		return rd && rd.caseActive ? rd.Rand(lo, hi) : random(lo, hi);
+	}
+	// a face nobody on the roster has (and never Vance's)
+	int PickFace(NBC_RunData rd)
+	{
+		for (int t = 0; t < 30; t++)
+		{
+			int f = Roll(rd, 0, NBC_Cat.FACES - 1);
+			if (f == NBC_Cat.VANCE_FACE) continue;
+			bool used = false;
+			for (int i = 0; i < roster.Size() && !used; i++) if (roster[i].face == f) used = true;
+			if (!used) return f;
+		}
+		return (Roll(rd, 0, NBC_Cat.FACES - 2) + NBC_Cat.VANCE_FACE + 1) % NBC_Cat.FACES;
 	}
 	String PickSurname(NBC_RunData rd)
 	{

@@ -21,11 +21,16 @@ class NBC_Terminal : NBC_UI
 
 	static const String TAB_NAME[] = { "RAID BOARD", "SQUAD ROOM", "EVIDENCE LOCKER", "MEMORIAL" };
 
-	static void Open(int tab)
+	// officer: an officer id to open the squad room on (an officer in the HQ was talked to), 0 = none
+	static void Open(int tab, int officer = 0)
 	{
 		Menu.SetMenu("NBC_Terminal");
 		let t = NBC_Terminal(GetCurrentMenu());
-		if (t) t.SetTab(tab);
+		if (!t) return;
+		let dept = NBC_Department.Find();
+		if (dept && officer)
+			for (int i = 0; i < dept.roster.Size(); i++) if (dept.roster[i].id == officer) t.selOfficer = i;
+		t.SetTab(tab);
 	}
 
 	override void Init(Menu parent)
@@ -487,7 +492,7 @@ class NBC_Terminal : NBC_UI
 			bool afford = rd && rd.caseActive && rd.cash >= NBC_Cat.CLASS_PRICE[c] && dept && dept.roster.Size() < 16;
 			bool f = IsFocus(ID_RECRUIT_CLASS, c);
 			Inset(bx, by, 195, 220, f ? C_AMBER : -1);
-			Pic(String.Format("NBCPF%02d", c * 10 + 3), bx + 57, by + 10, 80, 80, afford ? 1.0 : 0.4, !afford);
+			Pic(NBC_Cat.Face(c * 31 + 5), bx + 57, by + 10, 80, 80, afford ? 1.0 : 0.4, !afford);
 			Text(BigFont, f ? Font.CR_GOLD : Font.CR_WHITE, bx + 97, by + 96, NBC_Cat.CLASS_NAME[c].MakeUpper(), 15, 1);
 			Text(NewSmallFont, Font.CR_GRAY, bx + 97, by + 116, String.Format("%s  -  %d HP  -  aim %d", NBC_Cat.CLASS_ISSUE[c],
 				NBC_Cat.CLASS_HP[c], NBC_Cat.CLASS_AIM[c]), 9, 1);

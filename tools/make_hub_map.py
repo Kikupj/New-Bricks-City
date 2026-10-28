@@ -6,6 +6,7 @@ One UDMF room furnished with the ported Corpo Wars props (nbc/mapinfo/cw_props.t
 * the raid board (a whiteboard; NBC_RaidBoard 26010 is the Use target) on the north wall
 * the armory (a row of lockers and a gun bench; NBC_ArmoryLocker 26011) on the west wall
 * desks and file cabinets in the middle, a squad corner with a sofa on the east side (NBC_SquadRoom 26012)
+* the captain (NBC_Captain 26013), the pilot (NBC_Pilot 26014), and spots where officers stand (NBC_HQSpot 26015)
 UZDoom builds the nodes on load.
 """
 import os
@@ -24,7 +25,8 @@ def prop_ids():
     text = open(os.path.join(ROOT, "nbc", "mapinfo", "cw_props.txt")).read()
     for m in re.finditer(r"(\d+)\s*=\s*(\w+)", text):
         ids[m.group(2)] = int(m.group(1))
-    ids.update({"Player1": 1, "NBC_RaidBoard": 26010, "NBC_ArmoryLocker": 26011, "NBC_SquadRoom": 26012})
+    ids.update({"Player1": 1, "NBC_RaidBoard": 26010, "NBC_ArmoryLocker": 26011, "NBC_SquadRoom": 26012,
+                "NBC_Captain": 26013, "NBC_Pilot": 26014, "NBC_HQSpot": 26015})
     return ids
 
 
@@ -50,6 +52,14 @@ def things():
     t += [("CW_FSofa", 1131, 384, 180), ("CW_FCoffeeTable", 1070, 384, 0),
           ("CW_FArmchair", 1040, 300, 45), ("CW_FArmchair", 1040, 468, 315), ("CWD_Apt_Painting_City", 1151, 384, 180),
           ("NBC_SquadRoom", 1104, 384, 180)]   # Use the sofa: the squad room (roster, promotions, recruits)
+    # the people (nbc/zscript/nbc/hq.zs): the captain by the raid board, the pilot by the south-west door out to
+    # the pad, and where the officers fit for duty stand (in this order, by position)
+    t += [("NBC_Captain", 700, 690, 270), ("NBC_Pilot", 230, 110, 45)]
+    t += [("NBC_HQSpot", x, y, a) for x, y, a in (
+        (458, 410, 180), (694, 410, 0), (458, 550, 180), (694, 550, 0),       # at the desks
+        (990, 300, 0), (990, 470, 0), (1050, 384, 0),                         # the squad corner
+        (96, 320, 0), (96, 430, 0),                                           # by the lockers
+        (576, 260, 90))]                                                      # the bullpen
     return t
 
 

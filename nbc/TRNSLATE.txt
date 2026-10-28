@@ -1,7 +1,6 @@
 // New Bricks City: the officers' clothes in the field (NBC_Ally.Equip). The ally sprites come from the enemy
 // pack's soldiers (green tops 112-127, blue trousers 192-207); these remap them to plain clothes so nobody looks
-// like a modern tactical unit. Outfit n matches the portraits drawn with outfit n (tools/art/make_portraits.py:
-// face f wears outfit (f * 3) % 8).
+// like a modern tactical unit. An officer with face f wears outfit (f * 3) % 8, on raids and at the HQ.
 NBC_Outfit0 = "112:127=[134,92,58]:[26,16,10]", "192:207=[88,102,130]:[14,18,26]"      // brown leather, jeans
 NBC_Outfit1 = "112:127=[160,160,164]:[26,26,28]", "192:207=[72,68,62]:[12,12,10]"      // grey hoodie, dark trousers
 NBC_Outfit2 = "112:127=[164,58,50]:[30,10,8]", "192:207=[88,102,130]:[14,18,26]"       // red flannel, jeans

@@ -54,23 +54,26 @@ dialogue, image and sound in the mod is original.
 
 ## How a case plays
 
-1. **New Game** starts you at Checkpoint 9. Use the **raid board** to open a case. A seed deals the four
-   gangs across eight districts.
+1. **New Game** starts you at Checkpoint 9, the precinct. Captain Harrow, Rook the pilot and your officers
+   who are fit for duty are there; talk to them with Use. Use the **raid board** (or the captain) to open a
+   case. A seed deals the four gangs across eight districts.
 2. **Plan a raid.** Pick a district on the raid board. Its dossier shows the gang, its leader, its tier,
    how alert it is, how many are on the block and what works on them.
 3. **Deploy.** Choose up to four officers, split them into fireteams ALPHA and BRAVO, and fit everyone out
-   (you included) from the Evidence Locker. Then **ASSAULT**.
-4. **The raid.** You land in the district with your squad behind you. The game clears the map's own
+   (you included) from the Evidence Locker. Press **READY** to lock in the plan.
+4. **Wheels up.** Walk to Rook, the pilot, and talk to them. The wheels-up check shows where you're going and
+   who's going in. **WHEELS UP** starts the raid.
+5. **The raid.** You land in the district with your squad behind you. The game clears the map's own
    monsters and fills it with the holding gang. The leader waits near the exit with escorts, and
    reinforcements come once most of the crew is down. Command the squad, take down the leader and leave
    by the exit to **topple** the gang. Leaving with the leader alive is a **retreat**, and the gang goes
    on alert. A lethal hit means **OFFICER DOWN**: you're pulled out with a strike against you.
-5. **The after-action report.** You get a grade, kills, time and health lost. Officers earn XP, go to
+6. **The after-action report.** You get a grade, kills, time and health lost. Officers earn XP, go to
    the hospital, or go onto the memorial wall. Everything you carried goes back into the locker, and on a
    taken block the evidence team bags what the gang dropped. You also get the cash and the bounty.
-6. **Between raids:** promote officers (each promotion picks one of two perks), recruit new ones, sell
+7. **Between raids:** promote officers (each promotion picks one of two perks), recruit new ones, sell
    seized guns and requisition supplies, or **close the day** to let the squad heal.
-7. **The case ends** when every gang is down (case closed), after three strikes (Internal Affairs takes
+8. **The case ends** when every gang is down (case closed), after three strikes (Internal Affairs takes
    your badge), or on day 30 (demolition). Officers who survive carry over to your next game.
 
 ## Getting started
@@ -141,8 +144,8 @@ Q / E (or Tab) switch tabs.
 
 Every officer is a person, Hamburger Hill / XCOM style:
 
-- **A name, a face and their own clothes.** There are 40 original pixel portraits, and each officer's
-  sprite on the street wears the same outfit as their portrait.
+- **A name, a face and their own clothes.** There are 144 pixel portraits (no two alike on the roster), and
+  each officer's sprite wears one of eight plain-clothes outfits, the same on raids and at the HQ.
 - **A class:**
 
   | Class | Issue weapon | Role |
@@ -200,6 +203,20 @@ The command system follows **Ghost Recon (2001)**:
 Officers route through the districts over a navigation graph (ported from Corpo Wars). It is built
 automatically on every map.
 
+## Checkpoint 9
+
+The precinct is a place with people in it:
+
+- **Captain Harrow** stands by the raid board with a cigar. Talk to him for the state of the case (the day,
+  the gangs left, strikes, who's in the hospital, who's due a promotion). Talk again for the raid board.
+- **Rook, the pilot,** waits by the door out to the pad. Once a raid is planned (READY on the deploy screen),
+  talking to Rook brings up the **wheels-up check**: the district, the gang, everyone going in. WHEELS UP
+  starts the raid.
+- **Your officers** who are fit for duty stand around the precinct in their own clothes, at the desks, in the
+  squad corner, by the lockers. Talk to one for a line about how they're doing. Talk again to open the squad
+  room on their service file. Officers in the hospital aren't there.
+- **The raid board, the lockers and the squad-room sofa** open the precinct terminal.
+
 ## The precinct screens
 
 All the screens share one look (slate-blue panels, amber selection, stencil titles), and their layouts
@@ -214,7 +231,9 @@ follow Hamburger Hill's:
   - **Memorial:** the officers lost in the line of duty.
 - **Deploy:** the roster, the squad (you plus four, AUTO, ALPHA/BRAVO badges) and the kit of whoever is
   selected. Each slot opens a picker showing what's left in the locker. The bottom bar shows the locker
-  totals, BACK and ASSAULT.
+  totals, BACK and READY.
+- **Wheels up** (talk to the pilot): the helicopter, the district and gang, everyone going in, and WHEELS UP /
+  CHANGE PLAN / NOT YET.
 - **After-action report:** the outcome title, a stats table and letter grade, each officer's portrait
   with kills and KIA / CRITICAL / WOUNDED / PROMOTION stamps, the loot tiles, the cash, and CONTINUE.
 
@@ -295,9 +314,9 @@ nbc/                    the mod, loaded as a folder (-file nbc); build_pk3.py zi
   CREDITS.txt           every asset's credit (never remove a line)
 tools/                  launcher, smoke tests, lump checks, PK3 build, map builders, Obsidian pipeline
   Obsidian/             make_bricks.ps1/.sh, export_maps.py, addons/NewBricksCity/ (the Obsidian theme)
-  art/make_portraits.py the officer portraits
+  art/import_npc_art.py the officer portraits and the HQ characters, from the owner's art in art/
   import/               one-time import scripts (kept as a record; never re-run)
-art/                    source art (the debris sprites' pxl file)
+art/                    source art: the debris sprites' pxl file, the portrait sheets, the captain, pilot and helicopter
 docs/STATUS.md          what's done, verified and waiting on a playtest
 docs/hamburger-hill-analysis.md, docs/corpowars-port-map.md    design references
 reference/              read-only source: Corpo Wars and the weapon packs' extra files (never loaded)
@@ -318,6 +337,7 @@ AGENTS.md               the rules for anyone (or any AI agent) working on the co
 | `CW_NavGraph` | `cw/nav.zs` | The navigation graph built from the map's geometry; Dijkstra routes. |
 | `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results and the command map. |
 | `NBC_StatusBar` | `hud.zs` | The magazine and debris readouts, the raid readout, the squad strip, the threat ring, the radio log. |
+| `NBC_HQNpc` and kin | `hq.zs` | The captain, the pilot and the officers at Checkpoint 9: talk lines, the pilot's wheels-up step. |
 | `NBC_Player` | `player.zs` | The player class: weapon slots, flashlight, quick throw, the OFFICER DOWN intercept. |
 | `NBC_Gangs` | `gangs.zs` | Reads `gangs.txt` and `districts.txt`; gang damage profiles. |
 
@@ -391,8 +411,8 @@ textures carry no formal licence.
 - **Levels:** generated with Obsidian (GPL).
 - **IWAD:** Freedoom (BSD), not shipped.
 - **Engine:** UZDoom.
-- **Original to this project:** the code, the officer portraits, the debris art, the hub and test maps,
-  and the Obsidian theme.
+- **Original to this project:** the code, the officer portraits, the captain, pilot and helicopter art (by
+  the project owner), the debris art, the hub and test maps, and the Obsidian theme.
 
 The full, line-by-line list is in **`nbc/CREDITS.txt`**. Every asset added to the mod gets a line there,
 and no line is ever removed.
