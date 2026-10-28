@@ -6,6 +6,24 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Tactical Duck & Dodge AI — the gang and the squad (2026-10-28, by Claude)
+- **Owner request:** integrate the Tactical Duck & Dodge mod (`reference/TacticalDuckDodge/`) into both the enemies and the squad. Keep KAI and Smart Marines (`reference/*.zip`) as reference for later.
+- **The port** (`nbc/zscript/nbc/tactical.zs`; CVars in `CVARINFO.txt`; the menu in `MENUDEF.txt`; `NBC_TacticalHandler` in MAPINFO): the reference ZScript with its classes renamed NBC_ (`NBC_TacticalAI`, `NBC_CookingBarrel`, ...). Changes are marked `NBC:` in the code.
+  - The gang: every gang member with a gun who isn't off guard. Off-guard members are left alone until they wake.
+  - Puffs and throws count by side. Your shots and the squad's suppress the gang; the gang's shots suppress the squad. The gang dodges your Molotovs, debris and grenades, and the squad's grenades. Tracers are too fast to dodge.
+  - A flashbang (`grenades.zs`) knocks a gang member out of any duck or dodge, and pauses their tactics while they're dazed.
+- **The squad** (`nbc_squad_tactical`, on by default): an officer's opponent is their own target (`NBC_Ally.enemy`). A gang member shooting at them stands in for the player's crosshair and trigger.
+  - Officers duck, pop up into a burst (`NBC_Ally.TacticalFire`), fire from a crouch, side-step or roll, hide at corners and peek, and sprint to cover. They take a one-round snap shot mid-dodge (`TacticalSnapShot`) and dive away from cooking barrels.
+  - Their chances are `nbc_squad_tactical_pct` (60%) of the gang's.
+  - Left off for officers: retreat (it steers by `A_Chase`, which officers don't walk by), the push (their orders decide where they go), and the reference's reload (they have their own magazines).
+- **Testing aid:** `netevent nbc_debug_ambush <count> <distance>` stands gang members down your line of sight, already after the nearest officer. `nbc_debug_tactical 1` logs every move.
+- **Verified (scripted, software renderer):**
+  - NBC_TEST: gang members strafed, ducked in the open, popped up, fired from a crouch, pushed when the player went quiet, sprinted to corner cover, reloaded behind cover and took mid-dodge snap shots. Their sprites squash when they duck.
+  - A shot barrel cooked: a Goon dive-rolled away, fled, and went back to the fight after the blast.
+  - A raid on Mercer Block with two officers and `nbc_debug_ambush 4 450`: the gang ducked behind low walls ("LOW-WALL COVER") and reloaded. The officers ducked, popped up into bursts, fired from a crouch, strafed to a wall corner and sprinted to corner cover.
+  - `check_lumps` 0 new problems; smoke test PASS on NBC_TEST, NBC_HUB, NBC_CT03.
+- **Found in testing, existing:** on Mercer Block's start the officers spawned on top of the player (their `CatchUp` found no spot behind) and couldn't shoot past them until the player moved off.
+
 ### Arsenal — the Super Shorty; smoke grenades and flashbangs (2026-10-28, by Claude)
 - **Owner request:** add a new shotgun pack (`Weapons/SuperShorty.zip`), and smoke and flashbang grenades for the player and the squad to use on the gang.
 - **`NBC_SuperShorty`** (slot 3, with the pump): the pack's three-shell sawn-off pump, ported to `NBC_ReloadWeapon` (`NBC_ShortyMagazine`, shells). It pumps after every shot, loads shell by shell (the trigger cuts a reload short) and pumps a dry gun after the first shell, as in the pack. It's a seized locker item (`IT_SHORTY`, sells 80). Breachers can carry it; officers fire 9 pellets. Super Shotgun spots drop it. The pack's DECORATE is kept unused in `nbc/actors/weapons/supershorty/`.
@@ -318,6 +336,14 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `python tools\build_pk3.py` → `dist\NewBricksCity.pk3`, 9,103 files, 41.5 MB. It boots and loads NBC_TEST with no errors.
 
 ## Needs playtest (owner)
+- **Tactical AI:**
+  - Does the gang feel smarter without being exhausting? Tune in Options → Tactical AI (gang and squad).
+  - Is ducking after nearly every burst too much? (`nbc_duck_chance` 75)
+  - Are the rolls and strafes readable? Sprite roll only shows in OpenGL / Vulkan.
+  - Is the push on a quiet player fair?
+  - Do the squad's ducks and dodges help, or slow them down when following you? (`nbc_squad_tactical_pct`)
+  - Do officers on HOLD drift from their spot after a sprint to cover? They walk back by their orders.
+  - Barrels cooking for 1.5 s before they blow.
 - **Grenades and the Super Shorty:** the squad's grenade use wasn't seen in a test (it needs a raid with officers carrying them). Do they throw flashbangs and smoke at sensible moments, never onto you? Is the daze too long or short? Is the smoke dense enough on a real GPU (the software renderer draws the puffs blocky)? Does the gang feel blind in it, without being too easy? Do they still fire through it sometimes (they re-acquire you for up to 4 tics before the cloud clears them again)? The throw from the inventory bar and from the keys; Y and U, if those keys suit you. The Super Shorty's spread and damage next to the pump.
 - **The MP5K-SD and M16:** the feel of each (spread, damage, burst cadence) next to the Uzi and the AK; the MP5's mode switch (altfire) and its reloads; does the suppressed MP5 really let you pick off sleepers quietly? Do they show on the armory and deploy screens with the right icons, and do officers carry them?
 - **This round's fixes:** does the squad still shoot when it should (an open street, a doorway), and hold fire behind fences and furniture? Are the smaller maps the right size, and is the crew spread along the way now? Can you pick out the key doors, switches and keycards on every environment (the breaker box shows only through the switch prefab's window)? Do the HUD panels sit well at your HUD scale?

@@ -157,6 +157,10 @@ Every officer is a person, Hamburger Hill / XCOM style:
   each officer's sprite wears one of eight plain-clothes outfits, the same on raids and at the HQ.
 - **They never block you** (or each other) and, when one gets stuck or left behind while following you, they
   step in behind you.
+- **They use cover** (Tactical Duck & Dodge AI): an officer in a fight ducks behind low walls, side-steps or
+  rolls when a gang member is on them, hides at corners and peeks out to shoot, and runs for nearby cover in the
+  open. Their chances are 60% of the gang's (`nbc_squad_tactical_pct`), so they hold their ground more; they don't
+  retreat or push, so their orders stand. `nbc_squad_tactical 0` turns it off for them.
 - **A class:**
 
   | Class | Issue weapon | Role |
@@ -328,6 +332,18 @@ Every attack has a damage type (`NBC_Light`, `NBC_Shell`, `NBC_Rifle`, `Melee`, 
 right gun for the gang matters. The enemies themselves are the DeeDeeOZ **DeePayback** pack: thugs,
 punks, goons and militia.
 
+**They fight like they mean it** (Tactical Duck & Dodge AI, `tactical.zs`). Gang members:
+- duck after a burst and pop up to shoot, or fire from a crouch
+- side-step or dive-roll when you aim at them or hit them
+- read the geometry between you and them: low walls to duck behind, corners to hide behind and peek out of
+- back off under fire, and push when you've gone quiet and out of sight
+- reload in cover, with a magazine for every gun
+- dive away from your Molotovs, grenades and thrown debris
+- run from a barrel that's been shot: barrels now cook for a moment before they blow
+
+Options → *Tactical AI (gang and squad)* has every setting. The squad does the same, at a share of the gang's
+chances; see below.
+
 ## The districts
 
 Levels are generated outside the game by **Obsidian** with the mod's own **New Bricks City** theme, and
@@ -425,6 +441,8 @@ AGENTS.md               the rules for anyone (or any AI agent) working on the co
 | `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results and the command map. |
 | `NBC_StatusBar` | `hud.zs` | The magazine and debris readouts, the raid readout, the squad strip, the threat ring, the radio log. |
 | `NBC_Motor`, `NBC_Vehicle` | `garage.zs` | The vehicle catalog, the garage's vehicles, seats, wear, the shoot-down risk, the crash site's fire. |
+| `NBC_TacticalHandler`, `NBC_TacticalAI` | `tactical.zs` | Tactical Duck & Dodge: a controller on every gang member and officer (duck, pop-up, dodge, roll, cover, corner peek, retreat, push, reloads, projectile dodging); cooking barrels. |
+| `NBC_Grenades` | `grenades.zs` | Smoke grenades and flashbangs: the throws, the cloud that breaks sight, the daze. |
 | `NBC_Clock`, `NBC_OffGuard` | `clock.zs` | The time of day (sky, light, the squad's sight), the day's events, gang members off guard. |
 | `NBC_HQNpc` and kin | `hq.zs` | The captain, the pilot and the officers at Checkpoint 9: talk lines, the pilot's wheels-up step. |
 | `NBC_Player` | `player.zs` | The player class: weapon slots, flashlight, quick throw, the OFFICER DOWN intercept. |
@@ -502,6 +520,8 @@ textures carry no formal licence.
 - **Corpo Wars** (the project owner's earlier mod): props, furniture, textures, the kit generator and the
   navigation graph, plus the packs it credits. Universal Enhanced AI is MIT
   (`reference/corpowars/LICENSE-UEAI.txt`).
+- **AI:** Tactical Duck & Dodge (the project owner's), with mechanics ported from the Koala AI Library (KAI, GPLv3)
+  and Smart Marines (LGPL 2.1), both by inkoalawetrust.
 - **Font:** "Miniplicity" by Jimmy, after the Ultimate Simplicity bigfont by Agent Spork.
 - **Levels:** generated with Obsidian (GPL).
 - **IWAD:** Freedoom (BSD), not shipped.

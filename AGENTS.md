@@ -9,6 +9,8 @@ This is a roguelite FPS mod for **UZDoom** (a GZDoom fork). The police are losin
 - **`reference/`** is read-only source to port from, and it's never loaded by the game:
   - `reference/corpowars/` holds the owner's earlier mod Corpo Wars: its full ZScript, definition lumps, `Design Docs/` and credits.
   - `reference/weapons/<pack>/` holds the weapon packs' INFO, OLDCODE and KEYCONF files and FragGrenade's code.
+  - `reference/TacticalDuckDodge/` is the owner's Tactical Duck & Dodge AI mod, ported as `nbc/zscript/nbc/tactical.zs` (gang and squad).
+  - `reference/KAI-0.5.0.zip` (the Koala AI library, GPLv3) and `reference/Smart-Marines-New-1.0.1.zip` (LGPL 2.1), both by inkoalawetrust, are reference for future AI work. Credit them in `nbc/CREDITS.txt` for anything ported, and keep their licenses in mind.
 
   Port by copying into `nbc/` and adapting. Never edit `reference/`. **`docs/corpowars-port-map.md`** lists each Corpo Wars system's files and every outside class it uses; read it before porting. The original `C:\Games\Corpo Wars\` exists as a fallback, also read-only.
 - `DeePaybackEnemies/` and `Weapons/` are the original downloads. They're **read-only**: copy from them, never edit them.

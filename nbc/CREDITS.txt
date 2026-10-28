@@ -534,3 +534,11 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
   flight frames; see its credits) recoloured into a smoke canister and a flashbang by tools/art/make_grenade_art.py.
 - sprites/grenades/NSMKA0-D0 (smoke puffs) and sounds/grenades/NBCSMKHS.wav (the canister's hiss): original, generated
   by tools/art/make_grenade_art.py. The bang is the FragGrenade pack's explosion, pitched up.
+
+== Tactical AI ==
+- zscript/nbc/tactical.zs and the nbc_ tactical CVars and menu: Tactical Duck & Dodge AI, the project owner's mod for New
+  Bricks City (reference/TacticalDuckDodge/), adapted for the gang and the squad.
+- It ports mechanics from the Koala AI Library (KAI) by inkoalawetrust (GPLv3; trail code by Boondorl, helpers by
+  Lewisk3, Custodian, Kizoky, with RaveYard) and Smart Marines by inkoalawetrust (LGPL 2.1): 3D projectile-path
+  dodging (KAI_Math.distance3dline / SM_ShouldDodgeProjectile), the mid-dodge snap shot, walking backwards while
+  retreating, props as cover and running to nearby cover (SM_LocateNearbyCover). Both are kept in reference/.

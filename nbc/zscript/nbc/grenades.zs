@@ -308,6 +308,9 @@ class NBC_FlashStun : Thinker
 		s.ChangeStatNum(STAT_USER);
 		s.victim = mo;
 		s.left = tics;
+		// out of whatever ducking or dodging they were at (tactical.zs), and nothing more till it wears off
+		let tac = NBC_TacticalAI(mo.FindInventory("NBC_TacticalAI"));
+		if (tac) { tac.EnterNormalState(); tac.dazedUntil = level.maptime + tics; }
 		State pain = mo.FindState("Pain");
 		if (pain) mo.SetState(pain);
 	}

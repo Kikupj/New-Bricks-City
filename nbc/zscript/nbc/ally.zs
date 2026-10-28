@@ -604,6 +604,30 @@ class NBC_Ally : Actor
 		}
 	}
 
+	// Tactical Duck & Dodge (tactical.zs): popping up out of cover fires a burst, if the target's still there
+	void TacticalFire()
+	{
+		if (!enemy || !IsGangMember(enemy) || !ClearShot(enemy)) return;
+		if (roundsLeft <= 0) { SetStateLabel("Reload"); return; }
+		angle = AngleTo(enemy);
+		burstLeft = burst + (TeamROE() == NBC_Orders.ROE_SUPPRESS ? 3 : 0);
+		SetStateLabel("Missile");
+	}
+
+	// ... and a snap shot in the middle of a dodge: one round
+	void TacticalSnapShot()
+	{
+		if (!enemy || !IsGangMember(enemy) || roundsLeft <= 0 || !ClearShot(enemy)) return;
+		angle = AngleTo(enemy);
+		double r = range > 0 ? range : SIGHT_RANGE;
+		double pit = AimLineAttack(angle, r);
+		double sp = spread + 3;
+		A_StartSound(fireSound, CHAN_WEAPON);
+		for (int i = 0; i < pellets; i++)
+			LineAttack(angle + frandom(-sp, sp), r, pit + frandom(-sp, sp) * 0.5, int(random(dmgMin, dmgMax) * dmgMul), dmgType, "BulletPuff");
+		roundsLeft--;
+	}
+
 	void A_AllyBurstNext()
 	{
 		if (roundsLeft <= 0) { SetStateLabel("Reload"); return; }
