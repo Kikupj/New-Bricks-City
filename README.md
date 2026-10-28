@@ -357,10 +357,13 @@ The weapon roster is only the packs in `Weapons/`, ported to ZScript with magazi
 Also in the game:
 
 - **Thrown debris** (G): bricks, half bricks, concrete chunks and bottles, picked up from rubble piles.
-  Built on the FragGrenade pack's throwing code, with no explosion.
+  Built on the FragGrenade pack's throwing code, with no explosion. Your gun drops out of view while the hand
+  throws, and comes back up after.
 - **Medkits** (40 health; officers carry them too).
 - **Kevlar vests.**
-- **The flashlight.**
+- **The flashlight** (F): the Flashlight pack's beam and sounds on a key of its own rather than a weapon slot, so
+  your gun stays in hand. At dusk and night the HUD reminds you it's there. The beam gives you away: shine it on a
+  gang member who's off guard and they wake up. It needs dynamic lights (OpenGL or Vulkan).
 
 ## Repository layout
 

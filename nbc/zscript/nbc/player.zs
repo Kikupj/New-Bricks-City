@@ -13,7 +13,10 @@ class NBC_Player : PlayerPawn
 	int nbcThrowType;
 	int nbcThrowChargeTics;
 	int nbcThrowChargeSteps;
+	bool nbcThrowDrawn;              // the gun is down and the hand's up (until then the hand waits)
 	Weapon nbcThrowWeapon;
+	Array<int> nbcHiddenLayers;      // the weapon's other layers, hidden for the throw, and their alpha
+	Array<double> nbcHiddenAlpha;
 
 Default
 {
@@ -134,28 +137,95 @@ void NBC_StartQuickThrow()
 	nbcThrowChargeTics = 0;
 	nbcThrowChargeSteps = 0;
 	nbcThrowReleaseStarted = false;
+	nbcThrowDrawn = false;
 	nbcThrowWeapon = player.ReadyWeapon;
 	nbcThrowActive = true;
 
 	NBC_ReloadWeapon reloadWeapon = NBC_ReloadWeapon(nbcThrowWeapon);
 	if (reloadWeapon) reloadWeapon.NBC_AbortReloadForQuickThrow();
 	if (nbcThrowWeapon)
+	{
+		// the gun drops out of view first (Tick lowers it). Frozen in its ready frame: A_WeaponReady would put it
+		// back at the top every tic, and the throwing hand came up beside it (three arms on screen)
 		player.SetPsprite(PSP_WEAPON, nbcThrowWeapon.GetReadyState());
+		PSprite ws = player.GetPSprite(PSP_WEAPON);
+		if (ws) ws.Tics = -1;
+	}
+	NBC_HideWeaponLayers();
+	A_Overlay(2, "NBC_DebrisDraw");
+	NBC_PlaceThrowHand();
+}
 
-	if (nbcThrowType == NBC_DEBRIS_BOTTLE)
-		A_Overlay(2, "NBC_DebrisBottleHold");
-	else
-		A_Overlay(2, "NBC_DebrisHold");
+// The hand doesn't follow the gun down: it stands where the gun stood (A_Overlay puts a layer back on the
+// weapon at 0, 0 each time it changes the hand's state, so this follows every A_Overlay on layer 2).
+void NBC_PlaceThrowHand()
+{
+	PSprite hand = player ? player.FindPSprite(2) : null;
+	if (!hand) return;
+	hand.bAddWeapon = false;
+	hand.x = 0;
+	hand.y = WEAPONTOP;
+}
+
+// The weapon's other layers (a muzzle flash, the Molotov's lighter and flame) out of sight for the throw.
+void NBC_HideWeaponLayers()
+{
+	nbcHiddenLayers.Clear();
+	nbcHiddenAlpha.Clear();
+	if (!player) return;
+	for (PSprite ps = player.psprites; ps; ps = ps.Next)
+	{
+		if (ps.ID == PSP_WEAPON || ps.ID == 2) continue;
+		nbcHiddenLayers.Push(ps.ID);
+		nbcHiddenAlpha.Push(ps.alpha);
+	}
+	for (int i = 0; i < nbcHiddenLayers.Size(); i++)
+	{
+		A_OverlayFlags(nbcHiddenLayers[i], PSPF_ALPHA | PSPF_FORCEALPHA, true);
+		A_OverlayAlpha(nbcHiddenLayers[i], 0);
+	}
+}
+
+void NBC_ShowWeaponLayers()
+{
+	if (!player) return;
+	for (int i = 0; i < nbcHiddenLayers.Size(); i++)
+	{
+		if (!player.FindPSprite(nbcHiddenLayers[i])) continue;
+		A_OverlayAlpha(nbcHiddenLayers[i], nbcHiddenAlpha[i]);
+		A_OverlayFlags(nbcHiddenLayers[i], PSPF_FORCEALPHA, false);
+	}
+	nbcHiddenLayers.Clear();
+	nbcHiddenAlpha.Clear();
+}
+
+// The hand waits until the gun's out of view, then comes up with the debris.
+void NBC_DrawDebrisOverlay()
+{
+	if (!nbcThrowActive) { A_ClearOverlays(2, 2); return; }
+	if (player && (player.PendingWeapon != WP_NOCHANGE || player.ReadyWeapon != nbcThrowWeapon))
+	{
+		NBC_CancelQuickThrow();
+		return;
+	}
+	PSprite ws = player ? player.GetPSprite(PSP_WEAPON) : null;
+	if (ws && nbcThrowWeapon && ws.y < WEAPONBOTTOM) return;
+	nbcThrowDrawn = true;
+	if (nbcThrowType == NBC_DEBRIS_BOTTLE) A_Overlay(2, "NBC_DebrisBottleHold");
+	else A_Overlay(2, "NBC_DebrisHold");
+	NBC_PlaceThrowHand();
 }
 
 void NBC_ReleaseQuickThrow()
 {
 	if (!nbcThrowActive && !nbcThrowQueued) return;
 	nbcThrowHeld = false;
-	if (nbcThrowActive && !nbcThrowReleaseStarted)
+	// still drawing: the hold state lets go on its first tic
+	if (nbcThrowActive && nbcThrowDrawn && !nbcThrowReleaseStarted)
 	{
 		nbcThrowReleaseStarted = true;
 		A_Overlay(2, "NBC_DebrisRelease");
+		NBC_PlaceThrowHand();
 	}
 }
 
@@ -166,9 +236,11 @@ void NBC_CancelQuickThrow()
 	NBC_ReloadWeapon reloadWeapon = NBC_ReloadWeapon(oldWeapon);
 	if (reloadWeapon) reloadWeapon.NBC_AbortReloadForQuickThrow();
 	A_ClearOverlays(2, 2);
+	NBC_ShowWeaponLayers();
 	nbcThrowActive = false;
 	nbcThrowQueued = false;
 	nbcThrowHeld = false;
+	nbcThrowDrawn = false;
 	if (player && oldWeapon && player.ReadyWeapon == oldWeapon && player.PendingWeapon == WP_NOCHANGE)
 		player.SetPsprite(PSP_WEAPON, oldWeapon.GetUpState());
 	nbcThrowWeapon = null;
@@ -188,6 +260,7 @@ void NBC_AdvanceDebrisOverlay()
 		{
 			nbcThrowReleaseStarted = true;
 			A_Overlay(2, "NBC_DebrisRelease");
+			NBC_PlaceThrowHand();
 		}
 		return;
 	}
@@ -202,6 +275,7 @@ void NBC_AdvanceDebrisOverlay()
 				A_Overlay(2, "NBC_DebrisBottleWindup");
 			else
 				A_Overlay(2, "NBC_DebrisWindup");
+			NBC_PlaceThrowHand();
 		}
 	}
 }
@@ -237,9 +311,11 @@ void NBC_FinishQuickThrow()
 {
 	Weapon oldWeapon = nbcThrowWeapon;
 	A_ClearOverlays(2, 2);
+	NBC_ShowWeaponLayers();
 	nbcThrowActive = false;
 	nbcThrowQueued = false;
 	nbcThrowHeld = false;
+	nbcThrowDrawn = false;
 	nbcThrowChargeTics = 0;
 	nbcThrowChargeSteps = 0;
 	nbcThrowReleaseStarted = false;
@@ -327,9 +403,14 @@ override void Tick()
 			NBC_CancelQuickThrow();
 		else
 		{
+			// the gun goes down (frozen, so nothing puts it back up) and stays down for the throw
 			PSprite weaponSprite = null;
 			if (player) weaponSprite = player.GetPSprite(PSP_WEAPON);
-			if (weaponSprite) weaponSprite.y = min(WEAPONBOTTOM, weaponSprite.y + 12);
+			if (weaponSprite && nbcThrowWeapon)
+			{
+				weaponSprite.Tics = -1;
+				weaponSprite.y = min(WEAPONBOTTOM, weaponSprite.y + 24);
+			}
 		}
 	}
 	UpdateNBCFlashlight();
@@ -337,6 +418,9 @@ override void Tick()
 
 States
 {
+NBC_DebrisDraw:
+	TNT1 A 1 { NBC_DrawDebrisOverlay(); }
+	Loop;
 NBC_DebrisHold:
 	BRKH A 1 { NBC_AdvanceDebrisOverlay(); }
 	Loop;

@@ -69,6 +69,19 @@ class NBC_StatusBar : DoomStatusBar
 			if (rd.raidEvent > NBC_Clock.EV_NONE && rd.raidEvent < NBC_Clock.EV_COUNT) when = when .. "  -  " .. NBC_Clock.EV_NAME[rd.raidEvent];
 			DrawString(nbcSmallFont, when, (3, y), DI_TEXT_ALIGN_LEFT, rd.raidEvent ? Font.CR_GOLD : Font.CR_GRAY, scale: (0.4, 0.4));
 			y += 7;
+			// the flashlight (F): on, or a reminder after dark
+			let np = NBC_Player(CPlayer ? CPlayer.mo : null);
+			bool dark = rd.raidWindow == NBC_Clock.W_DUSK || rd.raidWindow == NBC_Clock.W_NIGHT || rd.raidEvent == NBC_Clock.EV_BLACKOUT;
+			if (np && np.nbcFlashlightOn)
+			{
+				DrawString(nbcSmallFont, "Flashlight ON", (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_YELLOW, scale: (0.4, 0.4));
+				y += 7;
+			}
+			else if (dark)
+			{
+				DrawString(nbcSmallFont, "Flashlight off (F)", (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_DARKGRAY, scale: (0.4, 0.4));
+				y += 7;
+			}
 			String lead;
 			int lc = Font.CR_RED;
 			if (rd.leaderDown) { lead = "Leader down: get to the exit"; lc = Font.CR_GREEN; }

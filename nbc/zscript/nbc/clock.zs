@@ -107,11 +107,14 @@ class NBC_Clock
 }
 
 // A gang member off guard (asleep, high, half-watching): stands frozen where they are and notices nothing until
-// they're shot, someone fires nearby (they're up a few seconds later), or an officer walks right up to them. On a
-// crowded street the first shot at any of them wakes the whole block (NBC_RunManager.blockAwake).
+// they're shot, someone fires nearby (they're up a few seconds later), an officer walks right up to them, or your
+// flashlight's beam falls on them (NBC_Player's F toggle: in the dark it's see or be seen). On a crowded street the
+// first shot at any of them wakes the whole block (NBC_RunManager.blockAwake).
 class NBC_OffGuard : Inventory
 {
 	const SEE_RANGE = 320.0;
+	const BEAM_RANGE = 512.0;        // the flashlight's reach (NBC_Player.UpdateNBCFlashlight)
+	const BEAM_ANGLE = 24.0;
 	int wakeAt, startHealth;
 	Actor noticed;
 
@@ -171,6 +174,10 @@ class NBC_OffGuard : Inventory
 		// someone right on top of them
 		let p = players[consoleplayer].mo;
 		if (p && o.Distance3D(p) < SEE_RANGE && o.CheckSight(p)) WakeIn(random[nbcoff](20, 45), p);
+		// a light in their face
+		let np = NBC_Player(p);
+		if (np && np.nbcFlashlightOn && o.Distance3D(p) < BEAM_RANGE && abs(Actor.DeltaAngle(p.angle, p.AngleTo(o))) < BEAM_ANGLE && o.CheckSight(p))
+			WakeIn(random[nbcoff](10, 30), p);
 		if (rm)
 			for (int i = 0; i < rm.squad.Size(); i++)
 			{

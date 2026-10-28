@@ -527,6 +527,8 @@ class NBC_RunManager : EventHandler
 		String when = NBC_Clock.WindowLine(w);
 		if (ev != NBC_Clock.EV_NONE) when = String.Format("%s, %s", when, NBC_Clock.EV_NAME[ev]);
 		if (ev == NBC_Clock.EV_CROWD) when = when .. ": no fire in the crowd";
+		if (w == NBC_Clock.W_DUSK || w == NBC_Clock.W_NIGHT || ev == NBC_Clock.EV_BLACKOUT)
+			when = when .. ". It's dark: F for your flashlight (they'll see it too)";
 		Announce(String.Format("%s%s, %s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
 			how, title, when, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
 	}
