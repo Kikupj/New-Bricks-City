@@ -15,6 +15,7 @@ class NBC_Player : PlayerPawn
 	int nbcThrowChargeSteps;
 	bool nbcThrowDrawn;              // the gun is down and the hand's up (until then the hand waits)
 	Weapon nbcThrowWeapon;
+	class<Inventory> nbcThrowGrenade;  // a grenade (grenades.zs) instead of debris; null for debris
 	Array<int> nbcHiddenLayers;      // the weapon's other layers, hidden for the throw, and their alpha
 	Array<double> nbcHiddenAlpha;
 
@@ -31,7 +32,7 @@ Default
 	Player.StartItem "NBC_LightAmmo", 18; // NBC: Colt45 contributes 6 pickup-give rounds, for 24 total.
 	Player.WeaponSlot 1, "FistsOfFury", "CombatKnife", "Machete";
 	Player.WeaponSlot 2, "NBC_Colt45", "NBC_Dual92";
-	Player.WeaponSlot 3, "NBC_PumpShotgun";
+	Player.WeaponSlot 3, "NBC_PumpShotgun", "NBC_SuperShorty";
 	Player.WeaponSlot 4, "NBC_MicroUzi", "NBC_MP5kSD";
 	Player.WeaponSlot 5, "NBC_AK47", "NBC_M16";
 	Player.WeaponSlot 6, "MolotovCocktail";
@@ -123,6 +124,7 @@ void NBC_BeginQuickThrow()
 	if (!FindInventory("NBC_QuickThrow")) return;
 	NBC_DebrisSatchel satchel = NBC_GetDebrisSatchel();
 	if (!satchel || satchel.nbcCounts[satchel.nbcSelected] <= 0) return;
+	nbcThrowGrenade = null;
 	nbcThrowHeld = true;
 	if (player && player.PendingWeapon != WP_NOCHANGE && player.PendingWeapon != null)
 	{
@@ -132,13 +134,36 @@ void NBC_BeginQuickThrow()
 	NBC_StartQuickThrow();
 }
 
+// A grenade goes through the same hand: held, it winds up like debris; from the inventory bar it's thrown
+// as soon as the hand's up, at a middling strength.
+void NBC_BeginGrenadeThrow(class<Inventory> cls, bool held)
+{
+	if (nbcThrowActive || nbcThrowQueued || !cls || CountInv(cls) <= 0) return;
+	nbcThrowGrenade = cls;
+	nbcThrowHeld = held;
+	if (player && player.PendingWeapon != WP_NOCHANGE && player.PendingWeapon != null)
+	{
+		nbcThrowQueued = true;
+		return;
+	}
+	NBC_StartQuickThrow();
+}
+
+bool NBC_HasThrowable()
+{
+	if (nbcThrowGrenade) return CountInv(nbcThrowGrenade) > 0;
+	NBC_DebrisSatchel satchel = NBC_GetDebrisSatchel();
+	return satchel && satchel.nbcCounts[satchel.nbcSelected] > 0;
+}
+
 void NBC_StartQuickThrow()
 {
+
 	NBC_DebrisSatchel satchel = NBC_GetDebrisSatchel();
-	if (!player || !satchel || satchel.nbcCounts[satchel.nbcSelected] <= 0) return;
+	if (!player || !satchel || !NBC_HasThrowable()) return;
 	nbcThrowType = satchel.nbcSelected;
 	nbcThrowChargeTics = 0;
-	nbcThrowChargeSteps = 0;
+	nbcThrowChargeSteps = nbcThrowGrenade && !nbcThrowHeld ? 6 : 0;
 	nbcThrowReleaseStarted = false;
 	nbcThrowDrawn = false;
 	nbcThrowWeapon = player.ReadyWeapon;
@@ -214,7 +239,13 @@ void NBC_DrawDebrisOverlay()
 	PSprite ws = player ? player.GetPSprite(PSP_WEAPON) : null;
 	if (ws && nbcThrowWeapon && ws.y < WEAPONBOTTOM) return;
 	nbcThrowDrawn = true;
-	if (nbcThrowType == NBC_DEBRIS_BOTTLE) A_Overlay(2, "NBC_DebrisBottleHold");
+	if (nbcThrowGrenade)
+	{
+		if (nbcThrowGrenade is "NBC_SmokeGrenade") A_Overlay(2, "NBC_SmokeHold");
+		else A_Overlay(2, "NBC_FlashHold");
+		A_StartSound("FragGrenade/pin", CHAN_7);
+	}
+	else if (nbcThrowType == NBC_DEBRIS_BOTTLE) A_Overlay(2, "NBC_DebrisBottleHold");
 	else A_Overlay(2, "NBC_DebrisHold");
 	NBC_PlaceThrowHand();
 }
@@ -244,6 +275,7 @@ void NBC_CancelQuickThrow()
 	nbcThrowQueued = false;
 	nbcThrowHeld = false;
 	nbcThrowDrawn = false;
+	nbcThrowGrenade = null;
 	if (player && oldWeapon && player.ReadyWeapon == oldWeapon && player.PendingWeapon == WP_NOCHANGE)
 		player.SetPsprite(PSP_WEAPON, oldWeapon.GetUpState());
 	nbcThrowWeapon = null;
@@ -272,7 +304,7 @@ void NBC_AdvanceDebrisOverlay()
 	{
 		nbcThrowChargeTics = 0;
 		nbcThrowChargeSteps = min(12, nbcThrowChargeSteps + 1);
-		if (nbcThrowChargeSteps > 0)
+		if (nbcThrowChargeSteps > 0 && !nbcThrowGrenade)
 		{
 			if (nbcThrowType == NBC_DEBRIS_BOTTLE)
 				A_Overlay(2, "NBC_DebrisBottleWindup");
@@ -285,6 +317,22 @@ void NBC_AdvanceDebrisOverlay()
 
 void NBC_ThrowSelectedDebris()
 {
+	if (nbcThrowGrenade)
+	{
+		let item = NBC_GrenadeItem(FindInventory(nbcThrowGrenade));
+		if (!item || item.Amount <= 0) return;
+		// from the throwing hand, a little up from where you look; held longer, it goes further
+		double z = player ? player.viewz - pos.z - 10 : height * 0.75;
+		Actor nade = Spawn(item.Projectile(), pos + (AngleToVector(angle - 30, 8), z), ALLOW_REPLACE);
+		if (!nade) return;
+		nade.target = self;
+		nade.angle = angle;
+		nade.Vel3DFromAngle(8 + (16 * nbcThrowChargeSteps) / 12.0, angle, pitch - 6);
+		nade.vel.xy += vel.xy * 0.5;
+		TakeInventory(nbcThrowGrenade, 1);
+		A_StartSound("FragGrenade/throw", CHAN_WEAPON);
+		return;
+	}
 	NBC_DebrisSatchel satchel = NBC_GetDebrisSatchel();
 	if (!satchel || satchel.nbcCounts[nbcThrowType] <= 0) return;
 	Class<Actor> projectileClass;
@@ -322,6 +370,7 @@ void NBC_FinishQuickThrow()
 	nbcThrowChargeTics = 0;
 	nbcThrowChargeSteps = 0;
 	nbcThrowReleaseStarted = false;
+	nbcThrowGrenade = null;
 	if (player && oldWeapon && player.ReadyWeapon == oldWeapon && player.PendingWeapon == WP_NOCHANGE)
 		player.SetPsprite(PSP_WEAPON, oldWeapon.GetUpState());
 	nbcThrowWeapon = null;
@@ -397,8 +446,8 @@ override void Tick()
 		(player.PendingWeapon == WP_NOCHANGE || player.PendingWeapon == null))
 	{
 		nbcThrowQueued = false;
-		if (NBC_GetTotalDebris() > 0) NBC_StartQuickThrow();
-		else nbcThrowHeld = false;
+		if (NBC_HasThrowable()) NBC_StartQuickThrow();
+		else { nbcThrowHeld = false; nbcThrowGrenade = null; }
 	}
 	if (nbcThrowActive)
 	{
@@ -435,6 +484,12 @@ NBC_DebrisBottleHold:
 	Loop;
 NBC_DebrisBottleWindup:
 	MOLT A 1 { NBC_AdvanceDebrisOverlay(); }
+	Loop;
+NBC_SmokeHold:
+	NSMH A 1 { NBC_AdvanceDebrisOverlay(); }
+	Loop;
+NBC_FlashHold:
+	NFBH A 1 { NBC_AdvanceDebrisOverlay(); }
 	Loop;
 NBC_DebrisRelease:
 	HGT2 A 1 { NBC_ThrowSelectedDebris(); }

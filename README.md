@@ -133,6 +133,7 @@ Every key below is rebindable under **Options → Customize Controls → New Bri
 | F | flashlight |
 | F1 | how to play: the keys as bound, and the job |
 | G | quick-throw debris: tap for a lob, hold to wind up a harder throw |
+| Y / U | throw a flashbang / a smoke grenade: tap for a lob, hold to throw further |
 | H | cycle the debris type (brick, half brick, concrete, bottle) |
 | Enter | use the selected inventory item (a medkit) |
 | **Q** | squad: talk to ALL / ALPHA / BRAVO |
@@ -361,7 +362,7 @@ The weapon roster is only the packs in `Weapons/`, ported to ZScript with magazi
 |---|---|---|
 | 1 | Fists of Fury, Combat Knife, Machete | — |
 | 2 | Colt .45, Dual Berettas (Dual 92s) | light rounds |
-| 3 | Pump-action shotgun | shells |
+| 3 | Pump-action shotgun, Super Shorty (three-shot sawn-off) | shells |
 | 4 | Micro-Uzi, MP5K-SD (suppressed; altfire cycles auto / burst / semi) | light rounds |
 | 5 | AK-47, M16 (3-round bursts) | rifle rounds |
 | 6 | Molotov cocktail | bottles (max 5) |
@@ -371,6 +372,10 @@ Also in the game:
 - **Thrown debris** (G): bricks, half bricks, concrete chunks and bottles, picked up from rubble piles.
   Built on the FragGrenade pack's throwing code, with no explosion. Your gun drops out of view while the hand
   throws, and comes back up after.
+- **Flashbangs** (Y) **and smoke grenades** (U): pouch items, thrown through the same hand as the debris (hold the
+  key to throw further), or used from the inventory bar. A flashbang dazes the gang members who see it for a few
+  seconds, and whites out your view if you're looking at it close up. Smoke is a twenty-second wall that nobody sees
+  through, either way. Officers carry and throw them too.
 - **Medkits** (40 health; officers carry them too).
 - **Kevlar vests.**
 - **The flashlight** (F): the Flashlight pack's beam and sounds on a key of its own rather than a weapon slot, so
@@ -493,7 +498,7 @@ textures carry no formal licence.
 
 - **Enemies:** DeePayback Enemies by DeeDeeOZ, and the many sprite and sound authors listed in its credits.
 - **Weapons:** the AK47, Colt45, CombatKnife, DualBerettas, FistsOfFury, Flashlight, Machete, MicroUzi,
-  MP5kSD, Molotov, PumpActionShotgun, Vanilla M16 and FragGrenade packs, each with its authors' credits.
+  MP5kSD, Molotov, PumpActionShotgun, Super Shorty, Vanilla M16 and FragGrenade packs, each with its authors' credits.
 - **Corpo Wars** (the project owner's earlier mod): props, furniture, textures, the kit generator and the
   navigation graph, plus the packs it credits. Universal Enhanced AI is MIT
   (`reference/corpowars/LICENSE-UEAI.txt`).

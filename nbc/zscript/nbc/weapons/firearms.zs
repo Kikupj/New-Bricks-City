@@ -713,3 +713,111 @@ Flash:
 	Stop;
 }
 }
+
+// The Super Shorty pack (Weapons/SuperShorty.zip): a three-shot sawn-off pump. Pumps after every shot, loads shell by
+// shell (the trigger cuts a reload short), and a dry gun is pumped after its first shell goes in.
+class NBC_SuperShorty : NBC_ReloadWeapon
+{
+	override int NBC_BaseMagazineSize() { return 3; }
+
+Default
+{
+	Weapon.SlotNumber 3;
+	Weapon.SelectionOrder 1250;
+	Weapon.Kickback 400;
+	Weapon.AmmoType1 "NBC_ShortyMagazine";
+	Weapon.AmmoType2 "Shell";
+	Weapon.AmmoUse1 1;
+	Weapon.AmmoUse2 0;
+	Weapon.AmmoGive1 3;
+	Weapon.AmmoGive2 5;
+	Inventory.PickupMessage "You got the Super Shorty!";
+	Obituary "%o caught both barrels of %k's Super Shorty. Well, all three.";
+	Tag "Super Shorty";
+	Decal "BulletChip";
+	+WEAPON.NOAUTOFIRE;
+}
+
+States
+{
+Spawn:
+	SERC A -1;
+	Stop;
+Ready:
+	SERB A 1 A_WeaponReady(WRF_ALLOWRELOAD);
+	Loop;
+Deselect:
+	TNT1 A 0 NBC_CancelMagazineReload;
+	SERB A 1 A_Lower;
+	SERB AA 0 A_Lower;
+	Loop;
+Select:
+	SERB A 1 A_Raise;
+	SERB AA 0 A_Raise;
+	Loop;
+Fire:
+	TNT1 A 0 NBC_CancelMagazineReload;
+	TNT1 A 0 A_JumpIfInventory("NBC_ShortyMagazine", 1, "FireShot");
+	TNT1 A 0 A_JumpIfInventory("Shell", 1, "Reload");
+	TNT1 A 0 NBC_DryClick;
+	Goto Ready;
+FireShot:
+	SERF A 1 bright { A_GunFlash(); A_StartSound("SuperShorty/Fire", CHAN_WEAPON); A_FireBullets(8.5, 8.5, 9, 8, "NBC_ShellPuff"); }
+	SERF B 1 bright;
+	SERF CD 2;
+	TNT1 A 0 A_JumpIfInventory("NBC_ShortyMagazine", 1, "FirePump");
+	SERB A 4;
+	TNT1 A 0 A_JumpIfInventory("Shell", 1, "Reload");
+	Goto Ready;
+FirePump:
+	SERB A 8;
+	SERB BC 1;
+	SERB D 1 A_StartSound("SuperShorty/PumpBack", CHAN_6);
+	SERB FE 2;
+	SERB D 2 A_StartSound("SuperShorty/PumpForward", CHAN_7);
+	SERB CB 2;
+	SERB A 0 A_ReFire;
+	Goto Ready;
+Reload:
+	TNT1 A 0 A_JumpIf(invoker.NBC_CanReload(), "ReloadBegin");
+	TNT1 A 0 NBC_ReloadReject;
+	Goto Ready;
+ReloadBegin:
+	TNT1 A 0 NBC_BeginMagazineReload;
+	SERB ABCD 1;
+	SERR AB 1;
+ReloadLoop:
+	TNT1 A 0 A_JumpIf(invoker.NBC_CanReload(), "ReloadInsert");
+	Goto ReloadFinish;
+ReloadInsert:
+	TNT1 A 0 A_StartSound("SuperShorty/Load", CHAN_WEAPON);
+	SERR C 2 NBC_AdjustReloadTics(2);
+	SERR D 2 NBC_AdjustReloadTics(2);
+	SERR E 2 { NBC_AdjustReloadTics(2); NBC_LoadOneShell(); }
+	TNT1 A 0 A_JumpIf(invoker.nbcReloadWasEmpty, "ReloadDryPump");
+	SERR B 4 { NBC_AdjustReloadTics(4); A_WeaponReady(WRF_NOBOB | WRF_NOSWITCH | WRF_NOSECONDARY); }
+	Goto ReloadLoop;
+ReloadDryPump:
+	TNT1 A 0 { invoker.nbcReloadWasEmpty = false; }
+	SERR B 3;
+	SERR BA 2;
+	SERB D 1;
+	SERB D 1 A_StartSound("SuperShorty/PumpBack", CHAN_6);
+	SERB F 2;
+	SERB E 1;
+	SERB E 1 A_StartSound("SuperShorty/PumpForward", CHAN_7);
+	SERB D 3;
+	SERR AB 2;
+	SERR B 5;
+	Goto ReloadLoop;
+ReloadFinish:
+	TNT1 A 0 NBC_EndMagazineReload;
+	SERR A 1;
+	SERB DCBA 2;
+	Goto Ready;
+Flash:
+	TNT1 A 2 bright A_Light2;
+	TNT1 A 2 A_Light1;
+	Goto LightDone;
+}
+}

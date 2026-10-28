@@ -8,6 +8,14 @@ alias +nbc_throw "netevent nbc_throw_start"
 alias -nbc_throw "netevent nbc_throw_release"
 defaultbind g +nbc_throw
 defaultbind h "netevent nbc_debris_next"
+addmenukey "Throw a flashbang (hold to throw further)" "+nbc_flashbang"
+addmenukey "Throw a smoke grenade (hold to throw further)" "+nbc_smoke"
+alias +nbc_flashbang "netevent nbc_grenade_start 1"
+alias -nbc_flashbang "netevent nbc_grenade_release"
+alias +nbc_smoke "netevent nbc_grenade_start 2"
+alias -nbc_smoke "netevent nbc_grenade_release"
+defaultbind y +nbc_flashbang
+defaultbind u +nbc_smoke
 alias nbc_debug_weapon "event nbc_debug_weapon"
 alias nbc_kittest "netevent nbc_kittest %1 %2 %3"
 alias nbc_debug_kit "netevent nbc_debug_kit"

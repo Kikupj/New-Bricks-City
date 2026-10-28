@@ -143,15 +143,15 @@ class NBC_DeployMenu : NBC_UI
 		Fill(0, 544, VW, 56, C_PANEL_LO, 0.85);
 		Fill(0, 544, VW, 2, C_AMBER_DIM);
 		Button(ID_BACK, 0, 16, 552, 150, 40, "BACK", true, 18);
-		static const int shown[] = { NBC_Cat.IT_LIGHT, NBC_Cat.IT_SHELL, NBC_Cat.IT_RIFLE, NBC_Cat.IT_MOLOTOV, NBC_Cat.IT_MEDKIT, NBC_Cat.IT_VEST };
-		double x = 190;
+		static const int shown[] = { NBC_Cat.IT_LIGHT, NBC_Cat.IT_SHELL, NBC_Cat.IT_RIFLE, NBC_Cat.IT_MOLOTOV, NBC_Cat.IT_MEDKIT, NBC_Cat.IT_SMOKE, NBC_Cat.IT_FLASH, NBC_Cat.IT_VEST };
+		double x = 180;
 		Text(NewSmallFont, Font.CR_DARKGRAY, x, 556, "IN THE LOCKER", 9);
 		for (int i = 0; i < shown.Size(); i++)
 		{
 			int it = shown[i];
 			Pic(NBC_Cat.ITEM_ICON[it], x, 566, 26, 22);
 			Text(BigFont, dept.locker[it] > 0 ? Font.CR_GOLD : Font.CR_DARKGRAY, x + 30, 570, String.Format("%d", dept.locker[it]), 14);
-			x += 92;
+			x += 67;
 		}
 		bool canGo = !rd.raidActive && rd.caseActive && g && !rm.DistrictTaken(rd, district);
 		Button(ID_ASSAULT, 0, VW - 16 - 190, 552, 190, 40, "READY", canGo, 20, C_AMBER);

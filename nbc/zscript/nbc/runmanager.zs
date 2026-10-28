@@ -208,7 +208,7 @@ class NBC_RunManager : EventHandler
 	// ------------------------------------------------------------ the player's kit
 
 	static const String MAGAZINES[] = { "NBC_ColtMagazine", "NBC_Dual92Magazine", "NBC_PumpMagazine", "NBC_UziMagazine", "NBC_AKMagazine",
-		"NBC_MP5Magazine", "NBC_M16Magazine" };
+		"NBC_MP5Magazine", "NBC_M16Magazine", "NBC_ShortyMagazine" };
 
 	// everything the catalog knows about out of the player's hands (fists, debris and the quick throw stay)
 	static void StripKit(Actor p)
@@ -282,15 +282,21 @@ class NBC_RunManager : EventHandler
 			res.Amount -= load;
 		}
 
-		// pouches: one bottle or one medkit each
-		int bottles = 0, kits = 0;
+		// pouches: one bottle, medkit or grenade each
+		int bottles = 0, kits = 0, smokes = 0, flashes = 0;
 		for (int k = 0; k < dept.pPouch.Size(); k++)
 		{
 			if (dept.pPouch[k] == NBC_Cat.IT_MOLOTOV) bottles++;
 			else if (dept.pPouch[k] == NBC_Cat.IT_MEDKIT) kits++;
+			else if (dept.pPouch[k] == NBC_Cat.IT_SMOKE) smokes++;
+			else if (dept.pPouch[k] == NBC_Cat.IT_FLASH) flashes++;
 		}
 		rd.raidIssued[NBC_Cat.IT_MOLOTOV] = bottles;
 		rd.raidIssued[NBC_Cat.IT_MEDKIT] = kits;
+		rd.raidIssued[NBC_Cat.IT_SMOKE] = smokes;
+		rd.raidIssued[NBC_Cat.IT_FLASH] = flashes;
+		if (smokes > 0) p.GiveInventory("NBC_SmokeGrenade", smokes);
+		if (flashes > 0) p.GiveInventory("NBC_Flashbang", flashes);
 		if (bottles > 0)
 		{
 			p.GiveInventoryType("MolotovCocktail");

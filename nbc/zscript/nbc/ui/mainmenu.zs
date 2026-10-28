@@ -294,24 +294,24 @@ class NBC_HowToPlay : NBC_UI
 		// the keys
 		Panel(16, 70, 420, 470, "KEYS");
 		static const String what[] = {
-			"Move", "Fire", "Reload", "Use / talk", "Jump", "Crouch", "Flashlight", "Throw debris (hold)", "Next debris",
+			"Move", "Fire", "Reload", "Use / talk", "Jump", "Crouch", "Flashlight", "Throw debris (hold)", "Next debris", "Flashbang (hold)", "Smoke grenade (hold)",
 			"Talk to: all / Alpha / Bravo", "Regroup on me", "Hold", "Move there (aim)", "Advance on waypoints", "Rules of engagement",
 			"Go codes X / Y / Z", "Command map" };
 		static const String cmd[] = {
-			"+forward", "+attack", "+reload", "+use", "+jump", "+crouch", "netevent nbc_flashlight", "+nbc_throw", "netevent nbc_debris_next",
+			"+forward", "+attack", "+reload", "+use", "+jump", "+crouch", "netevent nbc_flashlight", "+nbc_throw", "netevent nbc_debris_next", "+nbc_flashbang", "+nbc_smoke",
 			"nbc_cmd_team", "nbc_cmd_follow", "nbc_cmd_hold", "nbc_cmd_move", "nbc_cmd_advance", "nbc_cmd_roe",
 			"nbc_cmd_go_x", "nbc_cmd_map" };
 		for (int i = 0; i < what.Size(); i++)
 		{
-			double y = 104 + i * 25;
-			if (i == 9) Fill(30, y - 5, 392, 1, C_PANEL_HI);
-			Text(NewSmallFont, i >= 9 ? Font.CR_GOLD : Font.CR_GRAY, 30, y, what[i], 11);
+			double y = 104 + i * 22;
+			if (i == 11) Fill(30, y - 5, 392, 1, C_PANEL_HI);
+			Text(NewSmallFont, i >= 11 ? Font.CR_GOLD : Font.CR_GRAY, 30, y, what[i], 11);
 			String k = Keys(cmd[i]);
 			if (i == 0) k = String.Format("%s %s %s %s", Keys("+forward"), Keys("+moveleft"), Keys("+back"), Keys("+moveright"));
-			else if (i == 15) k = String.Format("%s  %s  %s", Keys("nbc_cmd_go_x"), Keys("nbc_cmd_go_y"), Keys("nbc_cmd_go_z"));
+			else if (i == 17) k = String.Format("%s  %s  %s", Keys("nbc_cmd_go_x"), Keys("nbc_cmd_go_y"), Keys("nbc_cmd_go_z"));
 			Text(NewSmallFont, k == "UNBOUND" ? Font.CR_DARKGRAY : Font.CR_WHITE, 422, y, k, 11, 2);
 		}
-		Text(NewSmallFont, Font.CR_DARKGRAY, 30, 104 + 17 * 25, "Weapons: 1 fists and blades, 2 pistols, 3 shotgun, 4 SMG, 5 rifle, 6 Molotov", 10);
+		Text(NewSmallFont, Font.CR_DARKGRAY, 30, 104 + 19 * 22, "Weapons: 1 fists and blades, 2 pistols, 3 shotguns, 4 SMGs, 5 rifles, 6 Molotov", 10);
 
 		// the job
 		double x = 450, w = VW - 16 - x;

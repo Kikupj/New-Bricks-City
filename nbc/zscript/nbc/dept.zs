@@ -17,7 +17,7 @@ class NBC_Cat
 		IT_COLT, IT_DUAL92, IT_PUMP, IT_UZI, IT_AK, IT_MACHETE, IT_KNIFE,
 		IT_LIGHT, IT_SHELL, IT_RIFLE, IT_MOLOTOV, IT_MEDKIT, IT_VEST,
 		// added later, at the end so the numbers saved in rosters and games keep their meaning
-		IT_MP5, IT_M16, IT_COUNT
+		IT_MP5, IT_M16, IT_SHORTY, IT_SMOKE, IT_FLASH, IT_COUNT
 	}
 	enum EKind { K_SIDEARM, K_PRIMARY, K_MELEE, K_AMMO, K_POUCH, K_VEST }
 	enum EClass { C_PATROL, C_BREACHER, C_MARKSMAN, C_MEDIC, C_COUNT }
@@ -33,18 +33,18 @@ class NBC_Cat
 	const PLAYER_POUCHES = 4;
 
 	static const String ITEM_NAME[] = { "Colt .45", "Dual 92s", "Pump Shotgun", "Micro-Uzi", "AK-47", "Machete", "Combat Knife",
-		"Light Rounds", "Shotgun Shells", "Rifle Rounds", "Molotov", "Medkit", "Kevlar Vest", "MP5K-SD", "M16" };
+		"Light Rounds", "Shotgun Shells", "Rifle Rounds", "Molotov", "Medkit", "Kevlar Vest", "MP5K-SD", "M16", "Super Shorty", "Smoke Grenade", "Flashbang" };
 	static const String ITEM_CLASS[] = { "NBC_Colt45", "NBC_Dual92", "NBC_PumpShotgun", "NBC_MicroUzi", "NBC_AK47", "Machete", "CombatKnife",
-		"NBC_LightAmmo", "Shell", "NBC_RifleAmmo", "MolotovAmmo", "NBC_Medkit", "GreenArmor", "NBC_MP5kSD", "NBC_M16" };
+		"NBC_LightAmmo", "Shell", "NBC_RifleAmmo", "MolotovAmmo", "NBC_Medkit", "GreenArmor", "NBC_MP5kSD", "NBC_M16", "NBC_SuperShorty", "NBC_SmokeGrenade", "NBC_Flashbang" };
 	static const int ITEM_KIND[] = { K_SIDEARM, K_SIDEARM, K_PRIMARY, K_PRIMARY, K_PRIMARY, K_MELEE, K_MELEE,
-		K_AMMO, K_AMMO, K_AMMO, K_POUCH, K_POUCH, K_VEST, K_PRIMARY, K_PRIMARY };
+		K_AMMO, K_AMMO, K_AMMO, K_POUCH, K_POUCH, K_VEST, K_PRIMARY, K_PRIMARY, K_PRIMARY, K_POUCH, K_POUCH };
 	static const String ITEM_ICON[] = { "COLTP0", "B92GA0", "XSOTA0", "MUZPA0", "AK4IA0", "MHTEA0", "KNFPA0",
-		"CLIPA0", "SHELA0", "ROCKA0", "MOLPA0", "MEDIA0", "ARM1A0", "MP5GA0", "M16VA0" };
+		"CLIPA0", "SHELA0", "ROCKA0", "MOLPA0", "MEDIA0", "ARM1A0", "MP5GA0", "M16VA0", "SERCA0", "NSMGA0", "NFBGA0" };
 	// what one comes in for at the counter (ammo: per 10 rounds); 0 = not on the requisition list
-	static const int ITEM_SELL[] = { 40, 70, 90, 100, 150, 20, 15, 2, 4, 5, 10, 15, 30, 120, 160 };
-	static const int ITEM_BUY[] = { 0, 0, 0, 0, 0, 0, 0, 6, 10, 12, 30, 40, 90, 0, 0 };
-	static const int ITEM_UNIT[] = { 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1 };
-	static const int ITEM_AMMO[] = { IT_LIGHT, IT_LIGHT, IT_SHELL, IT_LIGHT, IT_RIFLE, -1, -1, -1, -1, -1, -1, -1, -1, IT_LIGHT, IT_RIFLE };
+	static const int ITEM_SELL[] = { 40, 70, 90, 100, 150, 20, 15, 2, 4, 5, 10, 15, 30, 120, 160, 80, 12, 15 };
+	static const int ITEM_BUY[] = { 0, 0, 0, 0, 0, 0, 0, 6, 10, 12, 30, 40, 90, 0, 0, 0, 35, 45 };
+	static const int ITEM_UNIT[] = { 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1 };
+	static const int ITEM_AMMO[] = { IT_LIGHT, IT_LIGHT, IT_SHELL, IT_LIGHT, IT_RIFLE, -1, -1, -1, -1, -1, -1, -1, -1, IT_LIGHT, IT_RIFLE, IT_SHELL, -1, -1 };
 	static const String ITEM_DESC[] = {
 		"Department issue .45. Eight rounds, light ammo.",
 		"A pair of 9mm pistols. Fast and loud, light ammo.",
@@ -60,7 +60,10 @@ class NBC_Cat
 		"Patches 40 health. Officers use theirs below a third.",
 		"Soaks up a share of every hit. One per officer.",
 		"Seized suppressed machine pistol. Light ammo; auto, burst or semi. Its shots raise no alarm.",
-		"Seized assault rifle. Rifle ammo in three-round bursts." };
+		"Seized assault rifle. Rifle ammo in three-round bursts.",
+		"Seized sawn-off pump. Three shells and a ludicrous spread; murder in a hallway.",
+		"Pop it between you and them: a grey wall nobody sees through for twenty seconds.",
+		"A bang and a white-out. Gang members who see it stand dazed for a few seconds." };
 
 	static const String CLASS_NAME[] = { "Patrol", "Breacher", "Marksman", "Paramedic" };
 	static const String CLASS_ROLE[] = {
@@ -115,7 +118,7 @@ class NBC_Cat
 		switch (cls)
 		{
 		case C_PATROL: return item == IT_UZI || item == IT_AK || item == IT_MP5 || item == IT_M16;
-		case C_BREACHER: return item == IT_PUMP;
+		case C_BREACHER: return item == IT_PUMP || item == IT_SHORTY;
 		case C_MARKSMAN: return item == IT_AK || item == IT_M16;
 		case C_MEDIC: return item == IT_UZI || item == IT_COLT || item == IT_DUAL92 || item == IT_MP5;
 		}
@@ -319,6 +322,8 @@ class NBC_Department : Thinker
 		locker[NBC_Cat.IT_MOLOTOV] = 3;
 		locker[NBC_Cat.IT_MEDKIT] = 3;
 		locker[NBC_Cat.IT_VEST] = 1;
+		locker[NBC_Cat.IT_SMOKE] = 3;
+		locker[NBC_Cat.IT_FLASH] = 3;
 		// kits are emptied back first, so nothing is counted twice
 		for (int i = 0; i < roster.Size(); i++)
 		{
@@ -329,10 +334,12 @@ class NBC_Department : Thinker
 		}
 		pPrimary = -1; pSidearm = -1; pMelee = -1; pVest = false;
 		for (int i = 0; i < pPouch.Size(); i++) pPouch[i] = -1;
-		// your own issue, drawn from the locker like everyone else's: the Colt, a medkit and a bottle
+		// your own issue, drawn from the locker like everyone else's: the Colt, a medkit, a bottle, a flashbang and smoke
 		SwapPlayer(pSidearm, NBC_Cat.IT_COLT, NBC_Cat.K_SIDEARM);
 		SetPouch(0, 0, NBC_Cat.IT_MEDKIT);
 		SetPouch(0, 1, NBC_Cat.IT_MOLOTOV);
+		SetPouch(0, 2, NBC_Cat.IT_FLASH);
+		SetPouch(0, 3, NBC_Cat.IT_SMOKE);
 	}
 
 	// a new case: a fresh Bricks, the locker back to issue, everyone out of the hospital
@@ -740,11 +747,11 @@ class NBC_Department : Thinker
 		if (o.kitVest) { Give(NBC_Cat.IT_VEST); o.kitVest = false; }
 	}
 
-	// AUTO kit: best seized primary each officer's class can take, a medkit or Molotov per free pouch, vests
+	// AUTO kit: best seized primary each officer's class can take, a medkit, a Molotov or a grenade per free pouch, vests
 	// to the front of the stack
 	void AutoKit()
 	{
-		static const int prefer[] = { NBC_Cat.IT_M16, NBC_Cat.IT_AK, NBC_Cat.IT_PUMP, NBC_Cat.IT_MP5, NBC_Cat.IT_UZI, NBC_Cat.IT_DUAL92, NBC_Cat.IT_COLT };
+		static const int prefer[] = { NBC_Cat.IT_M16, NBC_Cat.IT_AK, NBC_Cat.IT_PUMP, NBC_Cat.IT_SHORTY, NBC_Cat.IT_MP5, NBC_Cat.IT_UZI, NBC_Cat.IT_DUAL92, NBC_Cat.IT_COLT };
 		for (int s = 0; s < squad.Size(); s++)
 		{
 			let o = OfficerById(squad[s]);
@@ -756,9 +763,16 @@ class NBC_Department : Thinker
 			for (int k = 0; k < o.PouchSlots(); k++)
 			{
 				if (o.kitPouch[k] >= 0) continue;
-				int want = (k % 2 == 0 || o.cls == NBC_Cat.C_MEDIC) ? NBC_Cat.IT_MEDKIT : NBC_Cat.IT_MOLOTOV;
-				if (locker[want] <= 0) want = want == NBC_Cat.IT_MEDKIT ? NBC_Cat.IT_MOLOTOV : NBC_Cat.IT_MEDKIT;
-				SetPouch(o.id, k, want);
+				// a medkit first, then (by class) a Molotov, a flashbang or smoke, whatever the locker still has
+				static const int order[] = { NBC_Cat.IT_MEDKIT, NBC_Cat.IT_MOLOTOV, NBC_Cat.IT_FLASH, NBC_Cat.IT_SMOKE };
+				static const int medicOrder[] = { NBC_Cat.IT_MEDKIT, NBC_Cat.IT_SMOKE, NBC_Cat.IT_MEDKIT, NBC_Cat.IT_FLASH };
+				static const int breachOrder[] = { NBC_Cat.IT_MEDKIT, NBC_Cat.IT_FLASH, NBC_Cat.IT_MOLOTOV, NBC_Cat.IT_SMOKE };
+				for (int t = 0; t < 4; t++)
+				{
+					int i = (k + t) % 4;
+					int want = o.cls == NBC_Cat.C_MEDIC ? medicOrder[i] : o.cls == NBC_Cat.C_BREACHER ? breachOrder[i] : order[i];
+					if (locker[want] > 0) { SetPouch(o.id, k, want); break; }
+				}
 			}
 			if (!o.kitVest && (o.cls == NBC_Cat.C_BREACHER || o.cls == NBC_Cat.C_PATROL)) SetVest(o.id, true);
 		}

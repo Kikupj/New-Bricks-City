@@ -1394,3 +1394,12 @@ MP5kSD/Slap		MP5SLAP
 // ===== Vanilla M16 (Weapons/VanillaM16.zip) =====
 VM16/Fire		M16FIRE
 VM16/FireB		M16FIREB
+
+// ===== Super Shorty (Weapons/SuperShorty.zip) =====
+SuperShorty/Fire		SERBFIR
+SuperShorty/PumpBack	SERBPM1
+SuperShorty/PumpForward	SERBPM2
+SuperShorty/Load		SERBREL
+
+// ===== Smoke grenade (tools/art/make_grenade_art.py) =====
+nbc_smoke_hiss	NBCSMKHS

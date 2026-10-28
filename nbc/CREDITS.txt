@@ -418,6 +418,12 @@ Sounds: Okgo5555
 Sprites: id Software, Luchador (model), adapted by Sgt_Mark_IV
 Sprite Edit: Okgo5555
 
+// ===== Super Shorty (weapon pack, Weapons/SuperShorty.zip) =====
+Code: LossForWords (ported to ZScript for New Bricks City)
+Sounds: Magmacow
+Sprites: Evil People TC, JoeyTD, Joblez, HMNuke93
+Sprite Edit: LossForWords
+
 // ===== Molotov (weapon pack, Weapons/Molotov.zip) =====
 Code: Scientist, Gothic
 GLDefs: Keksdose, Gothic
@@ -522,3 +528,9 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
   (the pilot) from art/Pilot.png, graphics/NBCHELI.png (the helicopter) from art/helicopter.png: art by the
   project owner for New Bricks City (tools/art/import_npc_art.py).
 - TRNSLATE.txt: the officers' plain-clothes recolors of the enemy pack's soldier sprites (our own data).
+
+== Smoke grenades and flashbangs ==
+- sprites/grenades/NSMHA0, NFBHA0, NSMGA0, NFBGA0, NSMTA0-F0, NFBTA0-F0: the FragGrenade pack's grenade (hand, pickup and
+  flight frames; see its credits) recoloured into a smoke canister and a flashbang by tools/art/make_grenade_art.py.
+- sprites/grenades/NSMKA0-D0 (smoke puffs) and sounds/grenades/NBCSMKHS.wav (the canister's hiss): original, generated
+  by tools/art/make_grenade_art.py. The bang is the FragGrenade pack's explosion, pitched up.

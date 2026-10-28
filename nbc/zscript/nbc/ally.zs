@@ -4,7 +4,7 @@
 // issue weapon, the face picks the clothes (a plain-clothes recolor, nbc/TRNSLATE.txt); the kit can swap
 // in a seized gun; rank, aim and perks shape how well they shoot.
 // They follow the player, shoot visible gang members with hitscan in the gun's damage type (never "Enemy"),
-// reload every magazine, use their pouches (medkits when hurt, Molotovs on a bunch of gang members), the
+// reload every magazine, use their pouches (medkits when hurt, Molotovs on a bunch of gang members, flashbangs and smoke), the
 // Paramedic patches the player up, and they never take damage from the player, each other or fire.
 // They take orders (NBC_Orders, Ghost Recon style): their fireteam's order (follow, hold, move, advance along
 // waypoints and wait on go codes) and rules of engagement (recon, assault, suppress). Places are reached over
@@ -25,7 +25,7 @@ class NBC_Ally : Actor
 	Sound fireSound;
 	// pouches (NBC_Cat items, -1 = empty or used) and the medic's timer
 	Array<int> pouch;
-	int healTics, healEvery, medkitHeal, bottleTics;
+	int healTics, healEvery, medkitHeal, bottleTics, nadeTics;
 
 	Actor enemy;
 	int roundsLeft, thinkCount, lostTics, burstLeft;
@@ -111,6 +111,7 @@ class NBC_Ally : Actor
 		case NBC_Cat.IT_MP5:    burst = 4; dmgMin = 7;  dmgMax = 10; magazine = 30; reloadTics = 45; dmgType = 'NBC_Light'; fireSound = "MP5kSD/Fire"; refireTics = 2; return;
 		case NBC_Cat.IT_M16:    burst = 3; dmgMin = 13; dmgMax = 18; magazine = 30; reloadTics = 55; dmgType = 'NBC_Rifle'; fireSound = "VM16/Fire"; return;
 		case NBC_Cat.IT_AK:     burst = 3; dmgMin = 12; dmgMax = 18; magazine = 30; reloadTics = 55; dmgType = 'NBC_Rifle'; fireSound = "Weapons/AK47FIR"; return;
+		case NBC_Cat.IT_SHORTY: burst = 1; pellets = 9; dmgMin = 5; dmgMax = 9; magazine = 3; reloadTics = 60; dmgType = 'NBC_Shell'; fireSound = "SuperShorty/Fire"; refireTics = 18; return;
 		case NBC_Cat.IT_PUMP:   burst = 1; pellets = 8; dmgMin = 5; dmgMax = 8; magazine = 6; reloadTics = 70; dmgType = 'NBC_Shell'; fireSound = "weapons/Xshotgf"; refireTics = 20; return;
 		case NBC_Cat.IT_COLT:   burst = 2; dmgMin = 10; dmgMax = 15; magazine = 8;  reloadTics = 35; dmgType = 'NBC_Light'; fireSound = "Weapon/COLTFIRE"; refireTics = 8; return;
 		case NBC_Cat.IT_DUAL92: burst = 4; dmgMin = 7;  dmgMax = 10; magazine = 30; reloadTics = 50; dmgType = 'NBC_Light'; fireSound = "B92FIRE"; refireTics = 3; return;
@@ -180,6 +181,7 @@ class NBC_Ally : Actor
 		Vector3 to = mo.pos + (0, 0, mo.height * 0.5) - (pos + (0, 0, gunZ));
 		double dist = to.Length();
 		if (dist < 1) return true;
+		if (NBC_Grenades.SmokeBetween(pos + (0, 0, gunZ), mo.pos + (0, 0, mo.height * 0.5))) return false;    // can't see through smoke
 		FLineTraceData t;
 		LineTrace(VectorAngle(to.x, to.y), dist + 8, -VectorAngle(to.xy.Length(), to.z), 0, gunZ, 0, 0, t);
 		if (t.HitType == TRACE_HitActor) return t.HitActor == mo || IsGangMember(t.HitActor);
@@ -236,6 +238,7 @@ class NBC_Ally : Actor
 			}
 		}
 		if (bottleTics > 0) bottleTics -= 4;
+		if (nadeTics > 0) nadeTics -= 4;
 
 		// the team's orders (NBC_Orders); a new order resets where we hold and the path
 		let rd = NBC_RunData.Find();
@@ -261,6 +264,7 @@ class NBC_Ally : Actor
 		{
 			angle = AngleTo(enemy);
 			if (roe != NBC_Orders.ROE_RECON && TryBottle(p)) return;
+			if (TryGrenade(p, roe)) return;
 			burstLeft = burst + (roe == NBC_Orders.ROE_SUPPRESS ? 3 : 0);
 			SetStateLabel("Missile");
 			return;
@@ -475,6 +479,53 @@ class NBC_Ally : Actor
 		b.Vel3DFromAngle(b.Speed, b.angle, -th);
 		A_StartSound("Weapons/Molotov/Throw", CHAN_WEAPON);
 		return true;
+	}
+
+	// Grenades (grenades.zs). A flashbang into a knot of them at a door's length (not on weapons-tight recon, and
+	// not with you close to the bang); smoke between us and them when this officer's hurt or the squad's pinned.
+	bool TryGrenade(Actor p, int roe)
+	{
+		if (nadeTics > 0 || !enemy) return false;
+		double d = Distance2D(enemy);
+		int k = PouchOf(NBC_Cat.IT_FLASH);
+		if (k >= 0 && roe != NBC_Orders.ROE_RECON && d > 128 && d < 448 && (!p || p.Distance2D(enemy) > 320))
+		{
+			int near = 0;
+			let it = BlockThingsIterator.Create(enemy, 220);
+			while (it.Next()) if (it.thing != enemy && IsGangMember(it.thing) && enemy.Distance2D(it.thing) < 220) near++;
+			if (near >= 1 || health * 100 < maxHp * 60)
+			{
+				pouch[k] = -1;
+				nadeTics = 35 * 8;
+				Lob("NBC_FlashbangThrown", enemy.pos);
+				NBC_Orders.Say(String.Format("%s: Flashbang out!", GetTag()), Font.CR_WHITE);
+				return true;
+			}
+		}
+		k = PouchOf(NBC_Cat.IT_SMOKE);
+		bool pinned = lastHitBy && level.maptime - lastHitTic < 35 * 2 && health * 100 < maxHp * 75;
+		if (k >= 0 && d > 192 && (health * 100 < maxHp * 45 || pinned))
+		{
+			pouch[k] = -1;
+			nadeTics = 35 * 10;
+			Lob("NBC_SmokeGrenadeThrown", pos + (AngleToVector(AngleTo(enemy), min(d * 0.45, 288)), 0));
+			NBC_Orders.Say(String.Format("%s: Popping smoke!", GetTag()), Font.CR_GRAY);
+			return true;
+		}
+		return false;
+	}
+
+	// a lob at 30 degrees, as fast as it needs to be to land there
+	void Lob(class<Actor> cls, Vector3 at)
+	{
+		let b = Spawn(cls, pos + (0, 0, 40), ALLOW_REPLACE);
+		if (!b) return;
+		b.target = self;
+		b.angle = VectorAngle(at.x - pos.x, at.y - pos.y);
+		double d = max(32, (at.xy - pos.xy).Length());
+		double g = b.Gravity * level.Gravity / 800.0;
+		b.Vel3DFromAngle(clamp(sqrt(d * g / sin(60)), 6, 24), b.angle, -30);
+		A_StartSound("FragGrenade/throw", CHAN_WEAPON);
 	}
 
 	// Lost or stuck: step in quietly behind the player (out of their view if there's room). True if done.

@@ -64,7 +64,7 @@ class NBC_StatusBar : BaseStatusBar
 		// the pouches and the debris, in the middle
 		let pawn = NBC_Player(mo);
 		int kits = mo.CountInv("NBC_Medkit"), bottles = mo.CountInv("MolotovAmmo");
-		double x = -58;
+		double x = -88;
 		if (kits > 0)
 		{
 			DrawImage("MEDIA0", (x, -4), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (14, 14));
@@ -75,6 +75,19 @@ class NBC_StatusBar : BaseStatusBar
 		{
 			DrawImage("MOLPA0", (x, -4), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (14, 16));
 			Say(nbcBigFont, BigFont, String.Format("%d", bottles), (x + 9, -BAR_H + 9), cb | DI_TEXT_ALIGN_LEFT, Font.CR_ORANGE, 9);
+		}
+		// the grenades, with their keys
+		static const String nades[] = { "NBC_Flashbang", "NBC_SmokeGrenade" };
+		static const String nadeIcons[] = { "NFBGA0", "NSMGA0" };
+		static const String nadeKeys[] = { "+nbc_flashbang", "+nbc_smoke" };
+		for (int i = 0; i < 2; i++)
+		{
+			x += 30;
+			int n = mo.CountInv(nades[i]);
+			if (n <= 0) continue;
+			DrawImage(nadeIcons[i], (x, -4), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (10, 18));
+			Say(nbcBigFont, BigFont, String.Format("%d", n), (x + 8, -BAR_H + 9), cb | DI_TEXT_ALIGN_LEFT, i == 0 ? Font.CR_WHITE : Font.CR_GRAY, 9);
+			Say(nbcSmallFont, NewSmallFont, NBC_KeyName(nadeKeys[i]), (x + 8, -BAR_H + 19), cb | DI_TEXT_ALIGN_LEFT, Font.CR_DARKGRAY, 4);
 		}
 		if (pawn)
 		{
@@ -244,6 +257,16 @@ class NBC_StatusBar : BaseStatusBar
 				Fill(team == NBC_Orders.TEAM_ALPHA ? Color(255, 79, 195, 217) : Color(255, 242, 169, 59), x + 14, sy, 6, 6);
 				DrawString(nbcSmallFont, team == NBC_Orders.TEAM_ALPHA ? "A" : "B", (x + 15, sy), DI_TEXT_ALIGN_LEFT, Font.CR_BLACK, scale: (0.24, 0.24));
 			}
+	}
+
+	// the first key bound to a command, upper case (empty if unbound)
+	String NBC_KeyName(String cmd)
+	{
+		int k1, k2;
+		[k1, k2] = Bindings.GetKeysForCommand(cmd);
+		if (!k1 && !k2) return "";
+		String n = Bindings.NameKeys(k1 ? k1 : k2, 0, false);
+		return n.MakeUpper();
 	}
 
 	override void Draw(int state, double TicFrac)

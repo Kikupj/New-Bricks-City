@@ -104,6 +104,21 @@ Default
 States { Spawn: TNT1 A -1; Stop; }
 }
 
+class NBC_ShortyMagazine : Ammo
+{
+Default
+{
+	Inventory.Amount 0;
+	Inventory.MaxAmount 3;
+	Inventory.InterHubAmount 3;
+	Ammo.BackpackAmount 0;
+	Ammo.BackpackMaxAmount 3;
+	+INVENTORY.UNDROPPABLE;
+	+INVENTORY.UNTOSSABLE;
+}
+States { Spawn: TNT1 A -1; Stop; }
+}
+
 class NBC_ReloadWeapon : Weapon
 {
 	bool nbcReloading;
