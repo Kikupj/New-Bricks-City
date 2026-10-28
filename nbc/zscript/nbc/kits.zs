@@ -32,15 +32,48 @@ class NBC_KitRunner : EventHandler
 			testFloor = true;
 			seed = CVar.GetCVar("nbc_kitseed").GetInt();
 			v = CVar.GetCVar("nbc_kitvariant").GetInt();
+			let sw = NBC_KitSweep.Find();
+			if (sw && sw.seed) { seed = sw.seed; v = sw.variant; }
 			if (seed == 0) seed = NBC_RunManager.NewSeed() & 0x7fffffff;
 			if (v < 0 || v >= kit.VariantCount()) v = (seed >>> 3) % kit.VariantCount();
 		}
 		kit.Generate(seed, v);
 		insertPending = true;
+		if (testFloor && (CVar.GetCVar("nbc_kitsweep").GetInt() > 0 || NBC_KitSweep.Find())) kit.Summary();
+	}
+
+	// a kit door's face: use opens it (see NBC_KitDoor)
+	override void WorldLinePreActivated(WorldEvent e)
+	{
+		Line ln = e.ActivatedLine;
+		if (!ln || ln.special != NBC_KitDoor.USE_SPECIAL) return;
+		let it = ThinkerIterator.Create("NBC_KitDoor");
+		NBC_KitDoor d;
+		while (d = NBC_KitDoor(it.Next()))
+		{
+			if (d.panel != ln.Index()) continue;
+			e.ShouldActivate = false;
+			d.Toggle(e.Thing);
+			return;
+		}
 	}
 
 	override void WorldTick()
 	{
+		// testing: nbc_kitsweep N regenerates the floor N more times, the next seed and variant each time
+		if (testFloor && kit && !insertPending && level.maptime == 8)
+		{
+			let sw = NBC_KitSweep.Get();
+			if (sw.left < 0) sw.left = CVar.GetCVar("nbc_kitsweep").GetInt();
+			if (sw.left > 0)
+			{
+				sw.left--;
+				sw.seed = kit.seed0 + 1;
+				sw.variant = (kit.variant + 1) % kit.VariantCount();
+				level.ChangeLevel(level.MapName, 0, CHANGELEVEL_NOINTERMISSION);
+				return;
+			}
+		}
 		if (!insertPending || !kit) return;
 		let pm = players[consoleplayer].mo;
 		if (!pm) return;
@@ -88,101 +121,115 @@ class NBC_KitRunner : EventHandler
 	}
 }
 
+// testing: where nbc_kitsweep has got to (it lives across the level changes it makes)
+class NBC_KitSweep : Thinker
+{
+	int left, seed, variant;
+	static NBC_KitSweep Find() { return NBC_KitSweep(ThinkerIterator.Create("NBC_KitSweep", STAT_STATIC).Next()); }
+	static NBC_KitSweep Get()
+	{
+		let sw = Find();
+		if (!sw) { sw = new("NBC_KitSweep"); sw.ChangeStatNum(STAT_STATIC); sw.left = -1; }
+		return sw;
+	}
+}
+
 // ---------------------------------------------------------------- doors
-// A door in a kit doorway strip (tag doorTag). Use opens it from either side (a line special on both faces,
-// which monsters can also trigger); an officer walking up opens it too; it shuts again a few seconds after
-// the doorway is clear, never on anyone. Built on Corpo Wars' CW_Door without its locks, passes and hacking.
+// A door in a kit doorway. The opening is fixed; the door is a panel across it, the door art hung as the mid
+// texture of one face of the doorway strip, that slides up into the lintel (the mid texture scrolls up and is
+// clipped by the opening). Shut, that face blocks walking, shots and sight. Use opens it from either side (the
+// face carries a no-op special that NBC_KitRunner.WorldLinePreActivated catches, so monsters that use walls
+// open it too); an officer or a gang member walking up opens it; it shuts again a few seconds after the doorway
+// is clear, never on anyone.
 class NBC_KitDoor : Actor
 {
-	int doorTag;
-	double shutZ, openZ;
+	int panel;                  // the line the door hangs on (an index: lines survive saves as indexes)
+	double frac;                // 0 shut .. 1 open
+	double doorH;
 	int doorIdx;
 	int idle;
-	bool isOpen, primed;
-	// NBC: the faces on the taller side of a doorway: open, the gap over the door shows the room's wall, not door art
-	Array<Side> transom;
-	Array<TextureID> transomArt;
-	Array<double> transomSX, transomSY;
+	bool isOpen;
+	TextureID art;
+	double artH;
 
-	const SPEED = 48;
-	const USE_SPECIAL = 47;        // Ceiling_MoveToValue
-	const PRIME_TICS = 12;         // the carved strip starts open; the door shuts itself silently after this
+	const SLIDE_TICS = 14;
 	const CLOSE_AFTER = 35 * 4;
+	const USE_SPECIAL = 173;    // NoiseAlert: never runs, the event handler eats the activation
+	const SHUT_FLAGS = Line.ML_BLOCKING | Line.ML_BLOCKSIGHT | Line.ML_BLOCKHITSCAN | Line.ML_BLOCKPROJECTILE;
 
 	Default { +NOBLOCKMAP; +NOGRAVITY; +NOSECTOR; +DONTSPLASH; Radius 8; Height 8; }
 
-	override void PostBeginPlay()
+	// hang the door on the doorway face nearest `face` (a point in the room the door faces)
+	void Hang(Vector2 face, String tex, double h)
 	{
-		Super.PostBeginPlay();
-		Sector strip = level.PointInSector(pos.xy);
-		if (strip) { strip.seqType = -1; strip.SeqName = 'NBCDoorSilent'; }   // no looping ceiling grind
-		SetUsable();
-		isOpen = true;
-	}
-
-	// both long faces of the doorway strip open the door when used (players) or bumped (monsters)
-	void SetUsable()
-	{
+		panel = -1; doorH = h;
 		Sector strip = level.PointInSector(pos.xy);
 		if (!strip) return;
+		double bd = 1e9;
 		for (int l = 0; l < strip.lines.Size(); l++)
 		{
 			Line ln = strip.lines[l];
 			if (!ln.sidedef[1] || ln.delta.Length() < 40) continue;   // the two door faces, not the 16u jambs
-			ln.special = USE_SPECIAL;
-			ln.args[0] = doorTag; ln.args[1] = SPEED; ln.args[2] = abs(int(openZ)); ln.args[3] = openZ < 0 ? 1 : 0;
-			ln.activation = SPAC_Use | SPAC_UseBack | SPAC_MUse;
-			ln.flags |= Line.ML_REPEAT_SPECIAL | Line.ML_MONSTERSCANACTIVATE;
+			double d = ((ln.v1.p + ln.v2.p) / 2 - face).Length();
+			if (d < bd) { bd = d; panel = ln.Index(); }
 		}
+		if (panel < 0) return;
+		Line ln = level.lines[panel];
+		art = TexMan.CheckForTexture(tex, TexMan.Type_Any);
+		if (!art.IsValid()) art = TexMan.CheckForTexture("DOOR3", TexMan.Type_Any);
+		int tw, th;
+		[tw, th] = TexMan.GetSize(art);
+		artH = max(th, 1);
+		double len = ln.delta.Length();
+		for (int z = 0; z < 2; z++)
+		{
+			Side sd = ln.sidedef[z];
+			sd.SetTexture(Side.mid, art);
+			if (tw > 0) sd.SetTextureXScale(Side.mid, tw / len);
+			sd.SetTextureYScale(Side.mid, artH / h);
+			sd.SetTextureYOffset(Side.mid, 0);
+		}
+		ln.flags &= ~Line.ML_WRAP_MIDTEX;
+		ln.flags |= Line.ML_DONTPEGBOTTOM | SHUT_FLAGS;      // the door stands on the floor
+		ln.special = USE_SPECIAL;
+		ln.activation = SPAC_Use | SPAC_UseBack;
+		ln.flags |= Line.ML_REPEAT_SPECIAL | Line.ML_MONSTERSCANACTIVATE;
 	}
 
-	double CurTop() { return level.PointInSector(pos.xy).ceilingplane.ZAtPoint(pos.xy); }
-	bool IsShut() { return CurTop() <= shutZ + 4; }
+	bool IsShut() { return !isOpen && frac <= 0; }
 
-	void FindTransoms()
+	// Use (the player), a wall-using monster, or someone walking up
+	void Toggle(Actor user)
 	{
-		Sector strip = level.PointInSector(pos.xy);
-		if (!strip) return;
-		for (int l = 0; l < strip.lines.Size(); l++)
-		{
-			Line ln = strip.lines[l];
-			if (!ln.sidedef[1] || ln.delta.Length() < 40) continue;
-			for (int z = 0; z < 2; z++)
-			{
-				Side sd = ln.sidedef[z];
-				if (sd.sector == strip || sd.sector.ceilingplane.ZAtPoint(sd.sector.centerspot) <= openZ + 1) continue;
-				transom.Push(sd); transomArt.Push(sd.GetTexture(Side.top));
-				transomSX.Push(sd.GetTextureXScale(Side.top)); transomSY.Push(sd.GetTextureYScale(Side.top));
-			}
-		}
-	}
-
-	void SetTransoms(bool open)
-	{
-		for (int k = 0; k < transom.Size(); k++)
-		{
-			Side sd = transom[k];
-			sd.SetTexture(Side.top, open ? sd.GetTexture(Side.bottom) : transomArt[k]);
-			sd.SetTextureXScale(Side.top, open ? 1 : transomSX[k]);
-			sd.SetTextureYScale(Side.top, open ? 1 : transomSY[k]);
-		}
+		if (panel < 0) return;
+		if (!isOpen) SetDoor(true);
+		else if (user && user.player && frac >= 1 && !Occupied()) SetDoor(false);
 	}
 
 	void SetDoor(bool open)
 	{
-		if (!primed) FindTransoms();
-		SetTransoms(open);
-		double z = open ? openZ : shutZ;
-		level.ExecuteSpecial(USE_SPECIAL, null, null, false, doorTag, SPEED, abs(int(z)), z < 0 ? 1 : 0);
-		if (primed) DoorSound(open);
-		primed = true;
+		if (open == isOpen) return;
 		isOpen = open;
 		idle = 0;
+		Line ln = level.lines[panel];
+		if (!open)
+		{
+			ln.flags |= SHUT_FLAGS;
+			for (int z = 0; z < 2; z++) ln.sidedef[z].SetTexture(Side.mid, art);
+		}
+		A_StartSound(open ? "doors/dr1_open" : "doors/dr1_clos", CHAN_BODY, 0, open ? 0.45 : 0.35, 2.2, frandom(0.85, 1.1));
 	}
 
-	void DoorSound(bool open)
+	// slide the panel: the art scrolls up and the lintel clips it
+	void Slide()
 	{
-		A_StartSound(open ? "doors/dr1_open" : "doors/dr1_clos", CHAN_BODY, 0, open ? 0.45 : 0.35, 2.2, frandom(0.85, 1.1));
+		Line ln = level.lines[panel];
+		double was = frac;
+		frac = clamp(frac + (isOpen ? 1.0 : -1.0) / SLIDE_TICS, 0, 1);
+		if (frac == was) return;
+		for (int z = 0; z < 2; z++) ln.sidedef[z].SetTextureYOffset(Side.mid, frac * artH);
+		if (isOpen && frac > 0.6) ln.flags &= ~SHUT_FLAGS;
+		if (frac >= 1) for (int z = 0; z < 2; z++) ln.sidedef[z].SetTexture(Side.mid, TexMan.CheckForTexture("-", TexMan.Type_Any));
 	}
 
 	// anyone (or anything solid) standing in the doorway
@@ -198,14 +245,15 @@ class NBC_KitDoor : Actor
 		return false;
 	}
 
-	// an officer at the door: allies don't press Use, so the door opens for them
-	bool OfficerWaiting()
+	// an officer or a gang member at the door: allies don't press Use and not every monster uses walls
+	bool SomeoneWaiting()
 	{
-		let it = BlockThingsIterator.CreateFromPos(pos.x, pos.y, pos.z, 64, 72, false);
+		let it = BlockThingsIterator.CreateFromPos(pos.x, pos.y, pos.z, 64, 64, false);
 		while (it.Next())
 		{
-			let a = NBC_Ally(it.thing);
-			if (a && a.health > 0 && a.Distance2D(self) < 72) return true;
+			let a = it.thing;
+			if (a.health <= 0 || a.player || !(a.bIsMonster || a is "NBC_Ally")) continue;
+			if (a.Distance2D(self) < a.radius + 40) return true;
 		}
 		return false;
 	}
@@ -213,33 +261,19 @@ class NBC_KitDoor : Actor
 	override void Tick()
 	{
 		Super.Tick();
-		if (!primed)
+		if (panel < 0) return;
+		Slide();
+		if (!isOpen)
 		{
-			if (GetAge() >= PRIME_TICS) SetDoor(false);
+			if (level.maptime % 4 == 0 && SomeoneWaiting()) SetDoor(true);
 			return;
 		}
-		bool shut = IsShut();
-		if (shut && !isOpen)
+		if (++idle >= CLOSE_AFTER && level.maptime % 8 == 0)
 		{
-			if (level.maptime % 8 == 0 && OfficerWaiting()) SetDoor(true);
-			return;
-		}
-		if (!shut && !isOpen)
-		{
-			// opened by a line special (the player's Use, a monster's bump)
-			isOpen = true;
-			idle = 0;
-			DoorSound(true);
-			return;
-		}
-		if (isOpen && ++idle >= CLOSE_AFTER && level.maptime % 8 == 0)
-		{
-			if (Occupied()) idle = CLOSE_AFTER - 35;
+			if (Occupied() || SomeoneWaiting()) idle = CLOSE_AFTER - 35;
 			else SetDoor(false);
 		}
 	}
-
-	States { Spawn: TNT1 A -1; Stop; }
 }
 
 // ---------------------------------------------------------------- lights

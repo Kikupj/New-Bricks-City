@@ -679,21 +679,25 @@ class NBC_KitGen play
 		if (a < 0 || b < 0 || a == b) return;
 		double f = max(rF[a], rF[b]);
 		double c = min(CeilOf(a), CeilOf(b));
-		// NBC: a street door is an open entrance: a door whose ceiling slides up into a building face drags its
-		// art up the whole facade, so from outside it's an archway with the facade above
-		if (lKind[k] == E_DOOR && IsOut(a) != IsOut(b)) lKind[k] = E_ARCH;
 		switch (lKind[k])
 		{
 		case E_DOOR:
 		{
-			double top = c;          // NBC: opens to the lower ceiling, so no door art hangs over the doorway
+			// NBC: the opening never moves. The door is a panel (the door art as a mid texture) across it that
+			// slides up into the lintel, so nothing drags door art up a wall or a facade. A street door's
+			// opening runs up to the ground-floor line, so the facade above it lines up with its neighbours:
+			// the panel faces the street, a fanlight over it.
+			bool street = IsOut(a) != IsOut(b);
+			double top = min(c, f + DOOR_H);
+			if (street && GroundFloorH() > top) top = min(c, GroundFloorH());
 			Segs(ei, ej, vert, 1, 1, f, top);
 			SetEdgeState(ei, ej, vert, 1);
 			let dr = NBC_KitDoor(Actor.Spawn("NBC_KitDoor", ((lX[k], lY[k]), f)));
 			if (dr)
 			{
-				dr.doorTag = vert ? VTag(ei, ej, 1) : HTag(ei, ej, 1);
-				dr.shutZ = f; dr.openZ = top; dr.doorIdx = doors.Size();
+				bool faceA = !street || IsOut(a);
+				dr.Hang(faceA ? CellCenter(ei, ej) : CellCenter(i2, j2), doorTex, DOOR_H);
+				dr.doorIdx = doors.Size();
 				doors.Push(dr);
 			}
 			break;
@@ -776,14 +780,15 @@ class NBC_KitGen play
 		if (secRole[s] == 4) { int idx = secIdx[s]; return At(idx % NX, idx / NX); }
 		return -1;
 	}
-	bool IsDoorStrip(int s)
+
+	// NBC: a building face: the lit-window facades (CWN*) have a storey every 32 texels, so they're scaled up to
+	// an 80-unit storey next to a 56-unit person
+	const FACADE_SCALE = 0.4;
+	void Facade(Side sd, int part, String name)
 	{
-		if (secRole[s] != 2 && secRole[s] != 3) return false;
-		if (secK[s] != 1 && Three(secRole[s] == 2 ? rowh[secIdx[s] / NX] : colw[secIdx[s] % NX])) return false;
-		int idx = secIdx[s], ei = idx % NX, ej = idx / NX;
-		bool vert = secRole[s] == 2;
-		for (int k = 0; k < lI.Size(); k++) if (lI[k] == ei && lJ[k] == ej && (lVert[k] == 1) == vert && lKind[k] == E_DOOR) return true;
-		return false;
+		sd.SetTexture(part, Tx(name));
+		double sc = name.Left(3) == "CWN" ? FACADE_SCALE : 1.0;
+		sd.SetTextureXScale(part, sc); sd.SetTextureYScale(part, sc);
 	}
 
 	TextureID Tx(String name, String fallback = "CWCONCW")
@@ -923,7 +928,7 @@ class NBC_KitGen play
 				int si = sd.sector.Index();
 				if (secRole[si] == 5 && (bandWalls.Size() || BandWall((ln.v1.p + ln.v2.p) / 2) != edgeTex))
 				{
-					sd.SetTexture(Side.mid, Tx(BandWall((ln.v1.p + ln.v2.p) / 2), edgeTex));
+					Facade(sd, Side.mid, BandWall((ln.v1.p + ln.v2.p) / 2));
 					ln.flags |= Line.ML_DONTPEGBOTTOM;       // windows line up from the pavement
 					continue;
 				}
@@ -941,26 +946,6 @@ class NBC_KitGen play
 				{
 					int r = roomOf[secIdx[s]];
 					if (r < 0) continue;
-					if (IsDoorStrip(o))
-					{
-						sd.SetTexture(Side.top, door);
-						// NBC: the art is pinned to the room's ceiling and squeezed onto the shut opening (floor to that
-						// ceiling), so it stays still while the door slides up and never repeats up the wall
-						ln.flags |= Line.ML_DONTPEGTOP;
-						int tw, th;
-						[tw, th] = TexMan.GetSize(door);
-						double len = ln.delta.Length();
-						Sector ss = sd.sector;
-						double hgt = ss.ceilingplane.ZAtPoint(ss.centerspot) - level.sectors[o].floorplane.ZAtPoint(level.sectors[o].centerspot);
-						if (tw > 0 && th > 0 && len > 0 && hgt > 8)
-						{
-							sd.SetTextureXScale(Side.top, tw / len);
-							sd.SetTextureYScale(Side.top, th / hgt);
-						}
-						sd.SetTextureYOffset(Side.top, 0);
-						sd.SetTexture(Side.bottom, Tx(rWallT[r]));
-						continue;
-					}
 					String t = rWallT[r];
 					if (IsOut(r))
 					{
@@ -971,7 +956,15 @@ class NBC_KitGen play
 						else if (far >= 0) t = rWallT[r];
 						else t = (fc >= 0 && cellFac[fc].Length()) ? cellFac[fc] : edgeTex;
 					}
-					sd.SetTexture(Side.top, Tx(IsOut(r) ? UpperFacade(t) : t)); sd.SetTexture(Side.bottom, Tx(t));
+					if (IsOut(r))
+					{
+						// NBC: from outside, every face above the ground floor hangs from the sky line, so the
+						// storeys line up across strips, posts and door lintels
+						Facade(sd, Side.top, UpperFacade(t));
+						ln.flags |= Line.ML_DONTPEGTOP;
+					}
+					else sd.SetTexture(Side.top, Tx(t));
+					sd.SetTexture(Side.bottom, Tx(t));
 				}
 				else if (rs >= 2 && ro >= 2)
 				{
@@ -1349,6 +1342,18 @@ class NBC_KitGen play
 		pm.SetOrigin((insertPos, FloorAt(insertPos)), false);
 		pm.angle = insertAng;
 		pm.vel = (0, 0, 0);
+	}
+
+	// NBC: one line for nbc_kitsweep: the plan's size, and any room nobody can reach
+	void Summary()
+	{
+		int rooms = 0, ndoors = 0, lost = 0;
+		Array<int> depth;
+		Reach(At(CellI(insertPos.x), CellJ(insertPos.y)), depth, true);
+		for (int r = 0; r < rtype.Size(); r++) if (CellCount(r)) { rooms++; if (depth[r] < 0 && !Has(r, RF_WATER)) lost++; }
+		for (int k = 0; k < lKind.Size(); k++) if (lKind[k] == E_DOOR) ndoors++;
+		Console.Printf("Kit sweep: %s %s seed %d: %d rooms, %d doors, %d entries, %d spawn spots, %d unreachable, in %s, out %s",
+			MapOfKit(kit), VariantName(), seed0, rooms, ndoors, enX.Size(), spotX.Size(), lost, insertName, enName[exitIdx]);
 	}
 
 	// one line per room and entry, for nbc_debug_kit

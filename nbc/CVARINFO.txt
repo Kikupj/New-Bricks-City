@@ -2,3 +2,4 @@
 server int nbc_seed = 0;   // non-zero: every new case uses this seed (reproduce a case)
 server noarchive int nbc_kitseed = 0;      // kit maps loaded outside a raid (nbc_kittest, +map NBC_K2): layout seed, 0 = random
 server noarchive int nbc_kitvariant = -1;  // ... and variant, -1 = picked from the seed
+server noarchive int nbc_kitsweep = 0;     // testing: regenerate this kit map N more times (seed + 1, variants in turn), printing each plan

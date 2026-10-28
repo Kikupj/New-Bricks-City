@@ -22,6 +22,9 @@ class NBC_KitRoof : NBC_KitGen
 		Grid(14, 9);
 		doorTex = "CWDOORF"; jambTex = "SUPPORT3"; edgeTex = "ADBRICK";
 	}
+	// the sky line over the roof: just over the huts (88-96), so they read as low huts with sky above them,
+	// not as walls standing up to the default 384
+	override double SkyH() { return 128; }
 	override bool EdgeOpen(int r) { return IsOut(r); }
 	override String EdgeRail(int r) { return "CWRAIL2"; }
 	override double FenceH(int a, int b) { return 36; }     // rails at the gap's edge: 1.1 m, and they block

@@ -50,12 +50,12 @@ FACADES = ["CWNRESA", "CWNRESB", "CWNRESC", "CWNRESA", "CWNRESB", "CWNTOWA", "CW
 
 # name: (column widths west->east, row heights south->north). Keep in sync with the kits' Setup().
 GRIDS = {
-    # tower floor: stair cores at both ends (4.7 m), 12 flat bays (3.9 m); rows: south window rooms (3.9 m),
-    # south inner rooms (3 m), corridor (2.2 m), north inner rooms, north window rooms
-    "NBC_KT": ([176] + [144] * 12 + [176], [144, 112, 80, 112, 144]),
-    # street, two-sided: cross street, sidewalk, 12 lots, side passage; rows: the canal walk, south back rooms,
-    # south shops, south sidewalk, road, north sidewalk, 4 north lot rows, the north alley, the Wall
-    "NBC_KS": ([224, 112] + [176] * 12 + [128], [128, 176, 176, 112, 256, 128, 176, 176, 176, 176, 128, 160]),
+    # tower floor: stair cores at both ends (5.2 m), 12 flat bays (4.8 m); rows: south window rooms (4.8 m),
+    # south inner rooms (3.5 m), corridor (2.6 m), north inner rooms, north window rooms
+    "NBC_KT": ([192] + [176] * 12 + [192], [176, 128, 96, 128, 176]),
+    # street: an even grid of 128 (3.5 m) cells; the kit lays its own roads, blocks and parcels on it, and
+    # the top row is the Wall
+    "NBC_KS": ([128] * 22, [128] * 17),
     # basement: a 16 x 12 grid of 128 cells
     "NBC_KB": ([128] * 16, [128] * 12),
     # roofs: 14 x 9 cells of 160
@@ -123,7 +123,7 @@ def scenery(name, X, Y, hole, sectors, edge_tex, edge_light, edge_mid, things):
         i0, w, q = M + 32, 352, 48
         xe, yn = X + R - 420, Y + R - 420
         bx0, bx1 = 0, 224
-        wat = dict(floor=z - 112, ceil=sky, ftex="CWWATER", ctex="F_SKY1", light=120, tag=0)
+        wat = dict(floor=z - 112, ceil=sky, ftex="FWATER1", ctex="F_SKY1", light=120, tag=0)
         quay = dict(floor=z - 56, ceil=sky, ftex="CWCONCF", ctex="F_SKY1", light=120, tag=0)
         deck = dict(floor=z, ceil=sky, ftex="CWASPH", ctex="F_SKY1", light=128, tag=0)
         pieces = [

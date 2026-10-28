@@ -1,8 +1,9 @@
 // The tower floor (PLAN.md §4.4, §6.7, M2c): one storey of a brick housing tower in the Bricks.
 //
-// Template NBC_KT (tools/make_kit_maps.py): 14 columns (a stair core of 176 at each end, 12 flat bays of 144)
-// by 5 rows (south windows 144, south inner 112, corridor 80, north inner 112, north windows 144).
-// Real scale against the 56-unit people (PLAN.md §4.4): ceilings 80 (2.5 m), 96 in the penthouse, doors 68 x 48.
+// Template NBC_KT (tools/make_kit_maps.py): 14 columns (a stair core of 192 at each end, 12 flat bays of 176)
+// by 5 rows (south windows 176, south inner 128, corridor 96, north inner 128, north windows 176).
+// Real scale against the 56-unit people (PLAN.md §4.4): bays 4.8 m, ceilings 88 (2.8 m), 104 in the penthouse,
+// doors 68 x 48. Flats are two bays or more, so no room is a cupboard.
 //
 //   row 4  N window rooms: living rooms, bedrooms (windows onto the city)    trash chute | laundry
 //   row 3  N inner rooms: hall, kitchen, bathroom                             lift lobby  (cols 6-7)
@@ -35,10 +36,10 @@ class NBC_KitTower : NBC_KitGen
 
 	override void Setup()
 	{
-		colw.Push(176);
-		for (int i = 0; i < 12; i++) colw.Push(144);
-		colw.Push(176);
-		static const int RW[] = { 144, 112, 80, 112, 144 };
+		colw.Push(192);
+		for (int i = 0; i < 12; i++) colw.Push(176);
+		colw.Push(192);
+		static const int RW[] = { 176, 128, 96, 128, 176 };
 		for (int j = 0; j < RW.Size(); j++) rowh.Push(RW[j]);
 		Grid(colw.Size(), rowh.Size());
 		doorTex = "ADDOOR3"; jambTex = "ADGREY2"; edgeTex = "ADBRICK";
@@ -76,10 +77,10 @@ class NBC_KitTower : NBC_KitGen
 		bool rough = variant == V_GANG || variant == V_GUTTED;
 		String wall = lux ? "ADMARBL" : (rough ? "CWWALLD" : "CWWALL1");
 		String carpet = lux ? "ADFMARB" : (rough ? "CWCONCF" : "CWCARP1");
-		int flatC = lux ? 96 : 80;          // flat ceilings: 2.5 m, 3 m in the penthouse
+		int flatC = lux ? 104 : 88;         // flat ceilings: 2.8 m, 3.3 m in the penthouse
 		switch (t)
 		{
-		case T_CORR:     return Room(t, RF_PATROL | (rough ? RF_RUBBLE : 0), 0, 80, rough ? 104 : 136, lux ? "CWCARP2" : "CWCONCF", "CWCEILT", lux ? "ADGREYW" : (rough ? "CWWALLD" : "ADGREYW"), "the corridor");
+		case T_CORR:     return Room(t, RF_PATROL | (rough ? RF_RUBBLE : 0), 0, 88, rough ? 104 : 136, lux ? "CWCARP2" : "CWCONCF", "CWCEILT", lux ? "ADGREYW" : (rough ? "CWWALLD" : "ADGREYW"), "the corridor");
 		case T_STAIR:    return Room(t, RF_NOGUARD, 0, 96, 120, "CWSTAIF", "ADFLUOR", "ADGREY2", "the stairwell");
 		case T_LOBBY:    return Room(t, RF_CIV, 0, lux ? 100 : 88, 152, lux ? "ADFMARB" : "CWTILEF", "CWCEILL", "CWELEVD", "the lift lobby");
 		case T_CHUTE:    return Room(t, RF_RUBBLE, 0, flatC, 96, "CWCONCF", "ADFLUOR", "CWWALLD", "the trash chute");
@@ -177,7 +178,7 @@ class NBC_KitTower : NBC_KitGen
 		case V_GANG: case V_GUTTED: return Rand(2, 3);
 		}
 		int roll = Rand(0, 99);
-		return roll < 15 ? 1 : (roll < 50 ? 2 : (roll < 85 ? 3 : 4));
+		return roll < 45 ? 2 : (roll < 85 ? 3 : 4);
 	}
 
 	// Flats across columns c0..c1, window rooms on row `outer`, inner rooms (with the front doors) on `inner`.
