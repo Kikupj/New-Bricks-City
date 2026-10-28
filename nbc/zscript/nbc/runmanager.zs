@@ -1233,6 +1233,7 @@ class NBC_RunManager : EventHandler
 			int alive = 0, off = 0;
 			for (int i = 0; i < crew.Size(); i++) if (crew[i] && crew[i].health > 0) { alive++; if (crew[i].FindInventory("NBC_OffGuard")) off++; }
 			Console.Printf("  raid: %s, event %d, %d of the crew standing, %d off guard, block awake %d", NBC_Clock.WindowLine(rd.raidWindow), rd.raidEvent, alive, off, blockAwake);
+		}
 		for (int d = 0; d < districtMaps.Size(); d++)
 		{
 			int gi = d < rd.districtGang.Size() ? rd.districtGang[d] : -1;
