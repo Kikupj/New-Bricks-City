@@ -40,6 +40,7 @@ __pycache__/
 /tools/Obsidian/addons/*
 !/tools/Obsidian/addons/NewBricksCity/
 !/tools/Obsidian/make_bricks.ps1
+!/tools/Obsidian/make_bricks.sh
 !/tools/Obsidian/export_maps.py
 !/tools/Obsidian/inspect_udmf.py
 !/tools/Obsidian/make_cw_fabs.py

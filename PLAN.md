@@ -467,6 +467,10 @@ How the smoke test works:
 
 ### 4.4 Levels: "the Bricks"
 
+**Decision (owner, 2026-10-28): levels come from Obsidian again.** Obsidian has proven level architecture, and its Urban theme with the right settings makes good maps. Obsidian is the base: we finish the New Bricks City theme (`tools/Obsidian/addons/NewBricksCity/`) so every Doom prefab and texture it uses is swapped for New Bricks City prefabs and textures, and modify Obsidian's output as far as we can. Maps are generated outside the game into the district pool; that's fine. The in-game kits (below, M2b/M2c) are kept as loadable test maps (`nbc_kittest`) but no longer extended. The milestone is **M2d**.
+
+*Superseded (2026-10-28): the two decisions below.*
+
 **Decision (owner, 2026-10-27): levels go back to our own architecture.** The goal is levels that look as true to the setting as possible, and Obsidian can't get there:
 - **Obsidian builds Doom levels.** It joins abstract rooms with lifts, odd-shaped halls and arenas. A city theme can re-skin that, but it can't produce an apartment block's logic: stacked identical floors, a corridor with flats on both sides, two stair cores, an elevator, fire escapes, real room sizes.
 - **Its maps are built outside the game** into a fixed pool, so the case seed can't shape them, and every rebuild is a manual step.
@@ -660,6 +664,13 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 - **Roof** (`NBC_KR`): parapets, the stair hut and lift machine room, water tanks, plank bridges to the next tower.
 
 ---
+
+### M2d — Back to Obsidian: finish the New Bricks City theme — 🔧 IN PROGRESS (2026-10-28)
+**Decision (owner, 2026-10-28):** Obsidian is the level base (§4.4). Steps:
+1. **Build Obsidian in the cloud** so maps can be generated and checked here. ✅ A console-only source build of Obsidian 20 (github.com/obsidian-level-maker/Obsidian) runs `tools/Obsidian/make_bricks.sh`, the Linux twin of `make_bricks.ps1`; a level builds in about 4 seconds.
+2. **Raids run on Obsidian districts again:** restore the M2 district pool (`nbc/districts.txt` lists NBC_CT maps; the RunManager replaces Obsidian's monsters with the gang). The kits leave the raid pool but stay loadable.
+3. **Finish the theme:** find every Doom prefab and texture still reaching the maps (screenshots and `inspect_udmf.py`) and swap it for a New Bricks City one: wall and floor textures, doors, wall decor and light fixtures, techbase and hell props, liquids, skies.
+4. **Settings:** start from the Urban settings the owner found good, then tune for city blocks.
 
 ### M3 — The case and raid loop (the heart of the roguelite)
 *Note (2026-10-27): M2's vertical slice already delivers the core of this (RunData, the RunManager, gangs.txt, Officer Down, the case ending), and M2b moves it onto the kits. What remains: the full multi-block raid on the kits (approach → staging flat → 2 floors → leader's floor), Cash, the results screen, Backing's strike, debug commands and save/load checks. Reuse the slice's code rather than rewriting it.*

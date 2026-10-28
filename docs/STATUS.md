@@ -2,9 +2,17 @@
 
 Codex: read this first, then `AGENTS.md`, then the milestone you were given in `PLAN.md`. Update this file at the end of every milestone.
 
-**Current milestone: M2c** (the Bricks kit layouts, written from scratch) is built and verified on a Linux build of UZDoom 5.0.3; it needs the owner's playtest (see "Needs playtest"). **Next: M3** (the case and raid loop).
+**Current milestone: M2d** (back to Obsidian: finish the New Bricks City theme, PLAN.md §4.4). Obsidian builds in the cloud now; next are putting raids back on the Obsidian districts and swapping the Doom prefabs and textures still left. The kits (M2b/M2c) are kept as test maps only. **Then: M3** (the case and raid loop).
 
 ## Done
+
+### M2d — Back to Obsidian — 🔧 IN PROGRESS (2026-10-28, by Claude)
+- **Owner decision:** Obsidian is the level base again; finish the `nbc_bricks` theme rather than the kits.
+- **Obsidian in the cloud:** a console-only source build of Obsidian 20 from github.com/obsidian-level-maker/Obsidian (`/home/user/obsidian-src`, build steps at the top of `tools/Obsidian/make_bricks.sh`). `tools/Obsidian/make_bricks.sh` is the Linux twin of `make_bricks.ps1` (same overrides; starts from `tools/Obsidian/CONFIG.txt` if present, else Obsidian's defaults). The addon loads unchanged on Obsidian 20: a single level builds in about 4 s, all wall textures and 99% of flats from `nbc/textures`.
+- **Viewing builds:** load the build WAD after `nbc` and `+map MAP01`. Under xvfb, **use the GL renderer** (`+vid_rendermode 4`): the software renderer crashed (signal 11) a few seconds into an Obsidian map.
+- **Seen in a first build (seed 42 and an unseeded one):** streets with brick facades and lit windows, voxel cars, Corpo Wars room sets. Doom leftovers still visible: marble-and-wood wall panels with torch sconces, a red Doom-style door, techbase computer columns, grey techbase halls.
+- **Last kit work (committed before the switch, `3819f07`):** sliding panel doors, a street-plan generator on an even grid, roomier towers, low roof huts, animated canal water, and `nbc_kitsweep N` (regenerate a test floor N times, one summary line each).
+
 
 ### M0 — Repo, toolchain and asset import (2026-10-26, by Claude)
 - A git repo with `.gitignore`. (Since committed: M0/M0b, M1–M1c and M2 each have a commit.)
