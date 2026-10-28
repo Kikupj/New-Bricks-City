@@ -48,15 +48,18 @@ class NBC_UI : GenericMenu
 		Super.Init(parent);
 		DontDim = true;
 		DontBlur = true;
-		menuactive = Menu.OnNoPause;     // netevents have to run while a screen is open
+		if (KeepsRunning()) menuactive = Menu.OnNoPause;     // netevents have to run while a screen is open
 		registering = true;
 	}
+
+	// false: the game pauses while the screen is up, like any menu (help, credits: they change nothing)
+	virtual bool KeepsRunning() { return true; }
 
 	override void Ticker()
 	{
 		Super.Ticker();
 		ticks++;
-		if (menuactive == Menu.On) menuactive = Menu.OnNoPause;
+		if (menuactive == Menu.On && KeepsRunning()) menuactive = Menu.OnNoPause;
 	}
 
 	// ------------------------------------------------------------ coordinates
@@ -146,10 +149,15 @@ class NBC_UI : GenericMenu
 		Text(BigFont, Font.CR_WHITE, x + w / 2, y + (h - size) / 2, s, size, 1);
 	}
 
+	// the small font reads small next to the stencil titles (owner feedback): it's drawn a size up everywhere
+	const SMALL_GROW = 1.15;
+	static double Grow(Font f, double size) { return f == NewSmallFont ? size * NBC_UI.SMALL_GROW : size; }
+
 	// size: the text's height on the canvas. align 0 left, 1 center, 2 right
 	double Text(Font f, int cr, double x, double y, String s, double size = 12, int align = 0, double alpha = 1.0)
 	{
 		if (!f || s == "") return 0;
+		size = Grow(f, size);
 		// a leading $ would make the engine look the text up in the string table ("$620" -> "620")
 		if (s.Left(1) == "$") s = "\c-" .. s;
 		double k = size / max(1, f.GetHeight());
@@ -166,7 +174,7 @@ class NBC_UI : GenericMenu
 		if (sign && v >= 0) s = "+" .. s;
 		return Text(NewSmallFont, cr, x, y, s, size, align);
 	}
-	double TextWidth(Font f, String s, double size) { return f ? f.StringWidth(s) * size / max(1, f.GetHeight()) : 0; }
+	double TextWidth(Font f, String s, double size) { return f ? f.StringWidth(s) * Grow(f, size) / max(1, f.GetHeight()) : 0; }
 
 	// text wrapped to a width; returns the height used
 	double Wrap(Font f, int cr, double x, double y, double w, String s, double size = 11, double lineGap = 3)
@@ -181,12 +189,12 @@ class NBC_UI : GenericMenu
 			if (line != "" && TextWidth(f, test, size) > w)
 			{
 				Text(f, cr, x, yy, line, size);
-				yy += size + lineGap;
+				yy += Grow(f, size) + lineGap;
 				line = words[i];
 			}
 			else line = test;
 		}
-		if (line != "") { Text(f, cr, x, yy, line, size); yy += size + lineGap; }
+		if (line != "") { Text(f, cr, x, yy, line, size); yy += Grow(f, size) + lineGap; }
 		return yy - y;
 	}
 
@@ -257,8 +265,12 @@ class NBC_UI : GenericMenu
 		if (accent >= 0 && enabled) Fill(x, y, 4, h, accent);
 		// the stencil font has no dollar sign: prices go in the small font, a size up
 		bool money = label.IndexOf("$") >= 0;
-		double ls = money ? size * 1.15 : size;
-		Text(money ? NewSmallFont : BigFont, enabled ? (f ? Font.CR_GOLD : Font.CR_WHITE) : Font.CR_DARKGRAY, x + w / 2, y + (h - ls) / 2 + 1, label, ls, 1);
+		Font lf = money ? NewSmallFont : BigFont;
+		// a label that won't fit shrinks to the button
+		double fit = TextWidth(lf, label, size);
+		if (fit > w - 14) size *= (w - 14) / fit;
+		double ls = Grow(lf, size);
+		Text(lf, enabled ? (f ? Font.CR_GOLD : Font.CR_WHITE) : Font.CR_DARKGRAY, x + w / 2, y + (h - ls) / 2 + 1, label, size, 1);
 		if (enabled) Region(id, arg, x, y, w, h);
 		if (f) FocusFrame(x, y, w, h);
 		return f;

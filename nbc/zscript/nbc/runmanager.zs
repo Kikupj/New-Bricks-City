@@ -60,8 +60,10 @@ class NBC_RunManager : EventHandler
 
 		let rd = NBC_RunData.Get();
 		let dept = NBC_Department.Get();
+		if (IsRaidMap(rd)) NBC_Music.Start(NBC_Music.ForRaid(rd));
 		if (IsHub())
 		{
+			NBC_Music.Start(NBC_Music.ForHub(rd));
 			// the kit lives in the Evidence Locker between raids (it was checked in when the raid map unloaded)
 			let p = players[consoleplayer].mo;
 			if (p) StripKit(p);
@@ -1257,17 +1259,45 @@ class NBC_RunManager : EventHandler
 
 	// ------------------------------------------------------------ overlay: announcements, officer down
 
+	// The overlay is laid out on a 960x600 canvas, scaled to fit the screen and centred (like the precinct screens);
+	// text is drawn in screen pixels with that same scale, so boxes and the text in them line up on any screen.
+	ui double ovK, ovX, ovY;
+
+	ui void OvLayout()
+	{
+		double w = Screen.GetWidth(), h = Screen.GetHeight();
+		ovK = max(0.01, min(w / 960.0, h / 600.0));
+		ovX = (w - 960 * ovK) / 2;
+		ovY = (h - 600 * ovK) / 2;
+	}
+
+	// size: the text's height on the canvas; align 0 left, 1 centre, 2 right
+	ui double OvText(Font f, int cr, double x, double y, String s, double size, int align = 0, double alpha = 1.0)
+	{
+		if (s == "") return 0;
+		if (s.Left(1) == "$") s = "\c-" .. s;
+		double k = size / max(1, f.GetHeight());
+		double w = f.StringWidth(s) * k;
+		if (align == 1) x -= w / 2;
+		else if (align == 2) x -= w;
+		Screen.DrawText(f, cr, ovX + x * ovK, ovY + y * ovK, s, DTA_ScaleX, k * ovK, DTA_ScaleY, k * ovK, DTA_Alpha, alpha);
+		return w;
+	}
+
+	ui void OvFill(int c, double alpha, double x, double y, double w, double h)
+	{
+		Screen.Dim(c, alpha, int(ovX + x * ovK), int(ovY + y * ovK), max(1, int(w * ovK)), max(1, int(h * ovK)));
+	}
+
 	override void RenderOverlay(RenderEvent e)
 	{
 		let rd = NBC_RunData.Find();
-		int vw = 960, vh = 600;
+		OvLayout();
 		if (rd && rd.officerDown && rd.raidActive)
 		{
 			double t = 1.0 - officerDownTics / double(OFFICER_DOWN_TICS);
 			Screen.Dim(0x600000, clamp(0.35 + t * 0.6, 0, 0.95), 0, 0, Screen.GetWidth(), Screen.GetHeight());
-			String s = "OFFICER DOWN";
-			Screen.DrawText(BigFont, Font.CR_RED, (vw - BigFont.StringWidth(s)) / 2, vh / 2 - 12, s,
-				DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true);
+			OvText(BigFont, Font.CR_RED, 480, 280, "OFFICER DOWN", 40, 1);
 			return;
 		}
 
@@ -1276,47 +1306,47 @@ class NBC_RunManager : EventHandler
 			double alpha = min(1.0, announceTics / 35.0);
 			Array<String> lines;
 			announceText.Split(lines, "\n");
+			// long lines wrap to the canvas
+			Array<String> wrapped;
+			double k = 15.0 / max(1, NewSmallFont.GetHeight());
 			for (int i = 0; i < lines.Size(); i++)
-				Screen.DrawText(NewSmallFont, Font.CR_GOLD, (vw - NewSmallFont.StringWidth(lines[i])) / 2, 220 + i * 16, lines[i],
-					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
+			{
+				BrokenLines bl = NewSmallFont.BreakLines(lines[i], int(880 / k));
+				for (int j = 0; j < bl.Count(); j++) wrapped.Push(bl.StringAt(j));
+			}
+			double h = wrapped.Size() * 19 + 14;
+			OvFill(0x05080C, 0.55 * alpha, 40, 206, 880, h);
+			for (int i = 0; i < wrapped.Size(); i++)
+				OvText(NewSmallFont, Font.CR_GOLD, 480, 213 + i * 19, wrapped[i], 15, 1, alpha);
 		}
 
 		// at the HQ: a raid waiting on the pilot
 		if (rd && rd.readyDistrict >= 0 && IsHub())
-		{
-			String r = String.Format("RAID READY: %s.  Talk to Rook (the pilot) to go.", TurfTitle(rd.readyDistrict));
-			Screen.DrawText(NewSmallFont, Font.CR_GOLD, (vw - NewSmallFont.StringWidth(r)) / 2, 24, r,
-				DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true);
-		}
+			OvText(NewSmallFont, Font.CR_GOLD, 480, 22, String.Format("RAID READY: %s.  Talk to Rook (the pilot) to go.", TurfTitle(rd.readyDistrict)), 15, 1);
 
 		// someone talking: name, line, a portrait if they have one, and what Use does next
 		if (speakTics > 0 && speakText != "")
 		{
 			double alpha = min(1.0, speakTics / 20.0);
-			int bw = 620, bx = (vw - bw) / 2, by = 404, bh = 84;
-			double k = Screen.GetHeight() / double(vh);
-			double ox = (Screen.GetWidth() - vw * k) / 2;
-			Screen.Dim(0x05080C, 0.78 * alpha, int(ox + bx * k), int(by * k), int(bw * k), int(bh * k));
-			Screen.Dim(0xF2A93B, 0.9 * alpha, int(ox + bx * k), int(by * k), int(bw * k), max(1, int(2 * k)));
-			int tx = bx + 12;
+			double bw = 720, bx = (960 - bw) / 2, by = 392, bh = 112;
+			OvFill(0x05080C, 0.8 * alpha, bx, by, bw, bh);
+			OvFill(0xF2A93B, 0.9 * alpha, bx, by, bw, 2);
+			double tx = bx + 16;
 			if (speakFace != "")
 			{
 				TextureID t = TexMan.CheckForTexture(speakFace, TexMan.Type_Any);
 				if (t.IsValid())
-					Screen.DrawTexture(t, false, bx + 10, by + 10, DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true,
-						DTA_DestWidth, 64, DTA_DestHeight, 64, DTA_Alpha, alpha);
-				tx = bx + 84;
+					Screen.DrawTexture(t, false, ovX + (bx + 12) * ovK, ovY + (by + 14) * ovK, DTA_DestWidthF, 84 * ovK, DTA_DestHeightF, 84 * ovK,
+						DTA_LeftOffsetF, 0., DTA_TopOffsetF, 0., DTA_Alpha, alpha);
+				tx = bx + 110;
 			}
-			Screen.DrawText(NewSmallFont, Font.CR_GOLD, tx, by + 10, speakName, DTA_VirtualWidth, vw, DTA_VirtualHeight, vh,
-				DTA_KeepRatio, true, DTA_Alpha, alpha);
-			// the line, wrapped to the box
-			BrokenLines bl = NewSmallFont.BreakLines(speakText, bx + bw - 12 - tx);
+			OvText(NewSmallFont, Font.CR_GOLD, tx, by + 12, speakName, 16, 0, alpha);
+			// the line, wrapped to the box (three lines at most)
+			double size = 15, k = size / max(1, NewSmallFont.GetHeight());
+			BrokenLines bl = NewSmallFont.BreakLines(speakText, int((bx + bw - 16 - tx) / k));
 			for (int i = 0; i < bl.Count() && i < 3; i++)
-				Screen.DrawText(NewSmallFont, Font.CR_WHITE, tx, by + 28 + i * 14, bl.StringAt(i), DTA_VirtualWidth, vw, DTA_VirtualHeight, vh,
-					DTA_KeepRatio, true, DTA_Alpha, alpha);
-			if (speakHint != "")
-				Screen.DrawText(NewSmallFont, Font.CR_DARKGRAY, bx + bw - 12 - NewSmallFont.StringWidth(speakHint), by + bh - 16, speakHint,
-					DTA_VirtualWidth, vw, DTA_VirtualHeight, vh, DTA_KeepRatio, true, DTA_Alpha, alpha);
+				OvText(NewSmallFont, Font.CR_WHITE, tx, by + 36 + i * 19, bl.StringAt(i), size, 0, alpha);
+			if (speakHint != "") OvText(NewSmallFont, Font.CR_DARKGRAY, bx + bw - 14, by + bh - 20, speakHint, 12, 2, alpha);
 		}
 	}
 }

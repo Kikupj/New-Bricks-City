@@ -21,6 +21,9 @@ class NBC_Player : PlayerPawn
 Default
 {
 	Player.DisplayName "New Bricks City Officer";
+	// eye level with the officers and the gang (owner feedback: Doom's 41 sat low); shots leave from about the eyes
+	Player.ViewHeight 50;
+	Player.AttackZOffset 20;
 	Player.StartItem "FistsOfFury";
 	Player.StartItem "NBC_Colt45";
 	Player.StartItem "NBC_DebrisSatchel";

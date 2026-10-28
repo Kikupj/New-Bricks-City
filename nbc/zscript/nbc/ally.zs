@@ -36,6 +36,9 @@ class NBC_Ally : Actor
 	Array<double> rtx, rty;
 	Actor lastHitBy;
 	NBC_SteerPoint steer;
+	// following: where this officer was when the last 3-second window opened (stuck in the pathing?)
+	Vector2 winPos;
+	int winTics, winSeenAt, stuckWins;
 
 	Default
 	{
@@ -274,7 +277,17 @@ class NBC_Ally : Actor
 	}
 	void ClearRoute() { rtx.Clear(); rty.Clear(); rtAt = 0; }
 
+	// Officers never block you, or each other (owner report: the squad blocked the player); gang members and
+	// walls still stop them.
+	override bool CanCollideWith(Actor other, bool passive)
+	{
+		if (other && (other.player || other is "NBC_Ally")) return false;
+		return Super.CanCollideWith(other, passive);
+	}
+
 	// regroup on the player: straight at them while in sight, over the graph when not, a quiet catch-up when lost
+	// or stuck: more than two steps behind and next to no ground covered in 3 seconds (twice in a row when they
+	// can see you: a ledge or a gap in between), they step in behind you
 	void Follow(Actor p, double mul)
 	{
 		double d = Distance2D(p);
@@ -285,6 +298,22 @@ class NBC_Ally : Actor
 			if (lostTics >= 105) { CatchUp(p); lostTics = 0; return; }
 		}
 		else lostTics = 0;
+
+		if (level.maptime - winSeenAt > 12) { winPos = pos.xy; winTics = 0; stuckWins = 0; }     // a fresh start after a fight
+		winSeenAt = level.maptime;
+		winTics += 4;
+		if (winTics >= 105)
+		{
+			bool stuck = d > FOLLOW_DIST * 2 && (pos.xy - winPos).Length() < 48;
+			stuckWins = stuck ? stuckWins + 1 : 0;
+			winPos = pos.xy;
+			winTics = 0;
+			if (stuckWins >= (see ? 2 : 1))
+			{
+				stuckWins = 0;
+				if (CatchUp(p)) { ClearRoute(); return; }
+			}
+		}
 
 		if (d <= FOLLOW_DIST)
 		{
@@ -421,18 +450,21 @@ class NBC_Ally : Actor
 		return true;
 	}
 
-	// Lost for 3 seconds: step in quietly behind the player.
-	void CatchUp(Actor p)
+	// Lost or stuck: step in quietly behind the player (out of their view if there's room). True if done.
+	bool CatchUp(Actor p)
 	{
 		static const double offsets[] = { 180, 150, 210, 120, 240, 90, 270 };
 		Vector3 old = pos;
 		for (int i = 0; i < offsets.Size(); i++)
 		{
 			Vector2 at = p.pos.xy + AngleToVector(p.angle + offsets[i], 80 + slot * 24);
-			SetOrigin((at, p.GetZAt(at.x, at.y, 0, GZF_ABSOLUTEPOS)), false);
-			if (TestMobjLocation() && CheckSight(p)) { angle = p.angle; return; }
+			double z = p.GetZAt(at.x, at.y, 0, GZF_ABSOLUTEPOS);
+			if (abs(z - p.pos.z) > 32) continue;
+			SetOrigin((at, z), false);
+			if (TestMobjLocation() && CheckSight(p)) { angle = p.angle; winPos = pos.xy; return true; }
 		}
 		SetOrigin(old, false);
+		return false;
 	}
 
 	void A_AllyAim()

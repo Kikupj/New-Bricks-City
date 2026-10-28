@@ -56,7 +56,8 @@ dialogue, image and sound in the mod is original.
 
 ## How a case plays
 
-1. **New Game** starts you at Checkpoint 9, the precinct. Captain Harrow, Rook the pilot and your officers
+1. **New Game** (pick how hard the Bricks hit back: Rookie, Patrol, Detective or Internal Affairs) starts you at
+   Checkpoint 9, the precinct. Captain Harrow, Rook the pilot and your officers
    who are fit for duty are there; talk to them with Use. Use the **raid board** (or the captain) to open a
    case. A seed deals the four gangs across eight districts.
 2. **Plan a raid.** Pick a district on the raid board. Its dossier shows the gang, its leader, its tier,
@@ -130,6 +131,7 @@ Every key below is rebindable under **Options → Customize Controls → New Bri
 | E | use (the raid board, the lockers, the squad-room sofa, doors) |
 | 1-6 | weapon slots: 1 melee, 2 pistols, 3 shotgun, 4 SMG, 5 rifle, 6 Molotov |
 | F | flashlight |
+| F1 | how to play: the keys as bound, and the job |
 | G | quick-throw debris: tap for a lob, hold to wind up a harder throw |
 | H | cycle the debris type (brick, half brick, concrete, bottle) |
 | Enter | use the selected inventory item (a medkit) |
@@ -152,6 +154,8 @@ Every officer is a person, Hamburger Hill / XCOM style:
 
 - **A name, a face and their own clothes.** There are 144 pixel portraits (no two alike on the roster), and
   each officer's sprite wears one of eight plain-clothes outfits, the same on raids and at the HQ.
+- **They never block you** (or each other) and, when one gets stuck or left behind while following you, they
+  step in behind you.
 - **A class:**
 
   | Class | Issue weapon | Role |
@@ -282,6 +286,14 @@ board flags its district.
 
 All the screens share one look (slate-blue panels, amber selection, stencil titles), and their layouts
 follow Hamburger Hill's:
+
+- **The title and main menu:** the New Bricks City splash, with NEW GAME, LOAD, OPTIONS, HOW TO PLAY, CREDITS and
+  QUIT along the bottom (RESUME and SAVE in a game). The engine's own option, load and save screens and its
+  yes / no boxes wear the same colours.
+- **The HUD:** one bar along the bottom: your face, health and vest; your pouches and the debris; the weapon,
+  its magazine and the reserve.
+- **Music:** the title, Checkpoint 9 (a different track each day) and every raid have their own; a raid's track
+  follows the hour it goes in at.
 
 - **The precinct terminal** opens at the raid board, the lockers or the squad-room sofa:
   - **Raid board:** the districts and their gangs, a dossier, plan a raid, close the day, start a new case.

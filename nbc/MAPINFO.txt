@@ -4,6 +4,70 @@ gameinfo
 	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager", "NBC_Orders"
 	PlayerClasses = "NBC_Player"
 	StatusBarClass = "NBC_StatusBar"
+	// the title: the splash (tools/art/make_title_art.py) stays up behind the main menu; no demo loop
+	TitlePage = "NBCTITLE"
+	TitleTime = 32767
+	TitleMusic = "NBCO03"
+	AdvisoryTime = 0
+	// the menus in the precinct's colours (zscript/nbc/ui/): slate dim, gold selection, our message box and help
+	DimColor = "0a0e13"
+	DimAmount = 0.72
+	BlurAmount = 0
+	MenuFontColor_Title = "Gold"
+	MenuFontColor_Label = "White"
+	MenuFontColor_Value = "Gold"
+	MenuFontColor_Action = "Gray"
+	MenuFontColor_Header = "Orange"
+	MenuFontColor_Highlight = "Gold"
+	MenuFontColor_Selection = "Orange"
+	MenuSliderColor = "Gold"
+	MessageBoxClass = "NBC_MessageBox"
+	HelpMenuClass = "NBC_HowToPlay"
+	QuitMessages = "Internal Affairs will be glad to hear it. Hand in your badge?",
+		"The Stoop Kings are throwing a party in your honour. Leave anyway?",
+		"Rook's got the bird warmed up for nothing. Quit?",
+		"Thirty days, Detective. The clock doesn't stop for you. Walk away?",
+		"The captain said you'd quit. Prove him right?",
+		"The Bricks will still be here tomorrow. So will they. Quit?"
+}
+
+// How hard the Bricks hit back (the New Game screen, zscript/nbc/ui/mainmenu.zs). Every skill fills the maps
+// the same way: the raid code sets the crew, not the map's skill flags.
+clearskills
+skill rookie
+{
+	AmmoFactor = 1.5
+	DamageFactor = 0.5
+	SpawnFilter = Normal
+	Name = "Rookie"
+	Key = "r"
+}
+
+skill patrol
+{
+	SpawnFilter = Normal
+	Name = "Patrol"
+	Key = "p"
+	DefaultSkill
+}
+
+skill detective
+{
+	DamageFactor = 1.25
+	MonsterHealth = 1.15
+	SpawnFilter = Normal
+	Name = "Detective"
+	Key = "d"
+}
+
+skill internalaffairs
+{
+	DamageFactor = 1.6
+	MonsterHealth = 1.3
+	AmmoFactor = 0.75
+	SpawnFilter = Normal
+	Name = "Internal Affairs"
+	Key = "i"
 }
 
 // NBC map things use DoomEdNums from 26000 (10600-10803 are the voxel cars).
@@ -34,6 +98,7 @@ episode NBC_HUB
 map NBC_HUB "Checkpoint 9"
 {
 	levelnum = 1
+	music = "NBCA04"
 	sky1 = "CITYSKY", 0
 	nointermission
 	next = "NBC_HUB"

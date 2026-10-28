@@ -353,8 +353,9 @@ class NBC_Terminal : NBC_UI
 			if (!down)
 			{
 				double cy = y + 206, cw = (w - 40 - 3 * 6) / 4;
-				Text(NewSmallFont, Font.CR_GRAY, x + 20, cy, "BY THE CLOCK", 10);
-				Text(NewSmallFont, Font.CR_DARKGRAY, x + w - 20, cy, g.hours, 9, 2);
+				double lw = Text(NewSmallFont, Font.CR_GRAY, x + 20, cy, "BY THE CLOCK", 10) + 14;
+				double room = w - 40 - lw, hw = TextWidth(NewSmallFont, g.hours, 9);
+				Text(NewSmallFont, Font.CR_DARKGRAY, x + w - 20, cy + 1, g.hours, hw > room ? 9 * room / hw : 9, 2);
 				for (int k = 0; k < NBC_Clock.W_COUNT; k++)
 				{
 					double cx = x + 20 + k * (cw + 6);

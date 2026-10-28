@@ -1,54 +1,113 @@
-// Reload-aware magazine readout layered over the stock Doom HUD.
-class NBC_StatusBar : DoomStatusBar
+// The HUD (polish pass, 2026-10-28): Doom's status bar and marine face are gone. One bar along the bottom in the
+// precinct screens' colours (Hamburger Hill's bottom bar): your portrait (the face you picked), health and vest on
+// the left; your pouches and the debris in the middle; the weapon, its magazine and the reserve on the right.
+// Above it: the case and raid readout and the squad strip top left, the threat ring, the radio log.
+class NBC_StatusBar : BaseStatusBar
 {
-	HUDFont nbcAmmoFont;
+	HUDFont nbcBigFont;
 	HUDFont nbcSmallFont;
+
+	const BAR_H = 26;
 
 	override void Init()
 	{
 		Super.Init();
-		Font fnt = "HUDFONT_DOOM";
-		nbcAmmoFont = HUDFont.Create(fnt, fnt.GetCharWidth("0"), Mono_CellLeft, 1, 1);
+		SetSize(0, 320, 200);       // the bar sits over the view: no strip of the screen kept for it
+		nbcBigFont = HUDFont.Create(BigFont);
 		nbcSmallFont = HUDFont.Create(NewSmallFont);
 	}
 
-	void DrawNBCWeaponAmmo()
-	{
-		if (!CPlayer || !CPlayer.ReadyWeapon || !nbcSmallFont) return;
-		NBC_ReloadWeapon weapon = NBC_ReloadWeapon(CPlayer.ReadyWeapon);
-		if (!weapon) return;
+	static Color Hex(int c, int a = 255) { return Color(a, (c >> 16) & 255, (c >> 8) & 255, c & 255); }
 
-		Inventory magazineItem = weapon.Ammo1;
-		Inventory reserveItem = weapon.Ammo2;
-		int magazine = magazineItem ? magazineItem.Amount : 0;
-		int capacity = magazineItem ? magazineItem.MaxAmount : 0;
-		int reserve = reserveItem ? reserveItem.Amount : 0;
-		int color = magazine == 0 || magazine * 4 <= capacity ? Font.CR_RED :
-			(magazine * 2 <= capacity ? Font.CR_YELLOW : Font.CR_UNTRANSLATED);
-		String ammoText = FormatNumber(magazine, 0) .. " / " .. FormatNumber(reserve, 0);
-		// bottom right, above the stock ammo counter
-		DrawString(nbcSmallFont, "MAG " .. ammoText, (-4, -58), DI_TEXT_ALIGN_RIGHT, color, scale: (0.5, 0.5));
-		if (magazine == 0)
-			DrawString(nbcSmallFont, "RELOAD", (-4, -66), DI_TEXT_ALIGN_RIGHT, Font.CR_RED, scale: (0.5, 0.5));
+	// text a given height in HUD units
+	void Say(HUDFont f, Font fnt, String s, Vector2 pos, int flags, int cr, double height, double alpha = 1.0)
+	{
+		double k = height / max(1, fnt.GetHeight());
+		DrawString(f, s, pos, flags, cr, alpha, scale: (k, k));
 	}
 
-	void DrawNBCDebris()
+	void DrawNBCBar()
 	{
-		if (!CPlayer || !CPlayer.mo || !nbcSmallFont) return;
-		NBC_Player pawn = NBC_Player(CPlayer.mo);
-		if (!pawn) return;
-		int selected = pawn.NBC_GetSelectedDebris();
-		String icon = "BRKPA0";
-		String label = "BRICK";
-		switch (selected)
+		if (!CPlayer || !CPlayer.mo) return;
+		let mo = CPlayer.mo;
+		int lb = DI_SCREEN_LEFT_BOTTOM, rb = DI_SCREEN_RIGHT_BOTTOM, cb = DI_SCREEN_CENTER_BOTTOM;
+
+		// the bar
+		Fill(Hex(0x080B10, 215), 0, -BAR_H, 4000, BAR_H, lb);
+		Fill(Hex(0x8A5E1E, 255), 0, -BAR_H, 4000, 1, lb);
+		Fill(Hex(0x8A5E1E, 255), -4000, -BAR_H, 4000, 1, rb);
+		Fill(Hex(0x080B10, 215), -4000, -BAR_H, 4000, BAR_H, rb);
+
+		// you: the portrait, red when you're hurt; health and the vest
+		let dept = NBC_Department.Find();
+		int hp = max(0, mo.health);
+		TextureID face = TexMan.CheckForTexture(dept ? dept.PlayerPortrait() : "NBCPVANC", TexMan.Type_Any);
+		Fill(Hex(0x3D5064), 2, -BAR_H + 2, 24, 24, lb);
+		if (face.IsValid())
+			DrawTexture(face, (3, -BAR_H + 3), lb | DI_ITEM_LEFT_TOP, 1.0, (22, 22), (1, 1), STYLE_Translucent,
+				hp < 35 ? Color(255, 255, 120, 120) : Color(255, 255, 255, 255));
+		int hc = hp < 35 ? Font.CR_RED : (hp < 70 ? Font.CR_GOLD : Font.CR_WHITE);
+		Say(nbcBigFont, BigFont, String.Format("%d", hp), (30, -BAR_H + 3), lb | DI_TEXT_ALIGN_LEFT, hc, 13);
+		Say(nbcSmallFont, NewSmallFont, "HEALTH", (30, -BAR_H + 17), lb | DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, 4);
+		double frac = clamp(hp / 100.0, 0, 1);
+		Fill(Hex(0x1F2B38), 30, -4, 44, 2, lb);
+		Fill(hp < 35 ? Hex(0xC8352B) : (hp < 70 ? Hex(0xF2A93B) : Hex(0x58B04A)), 30, -4, 44 * frac, 2, lb);
+		let armor = mo.FindInventory("BasicArmor");
+		int ap = armor ? armor.Amount : 0;
+		if (ap > 0)
 		{
-		case NBC_DEBRIS_HALF_BRICK: icon = "HBRKA0"; label = "HALF"; break;
-		case NBC_DEBRIS_CONCRETE: icon = "CNCKA0"; label = "CONCRETE"; break;
-		case NBC_DEBRIS_BOTTLE: icon = "MOLPA0"; label = "BOTTLE"; break;
+			DrawImage("ARM1A0", (90, -5), lb | DI_ITEM_CENTER_BOTTOM, 1.0, (14, 12));
+			Say(nbcBigFont, BigFont, String.Format("%d", ap), (100, -BAR_H + 7), lb | DI_TEXT_ALIGN_LEFT, Font.CR_LIGHTBLUE, 9);
+			Say(nbcSmallFont, NewSmallFont, "VEST", (100, -BAR_H + 17), lb | DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, 4);
 		}
-		DrawImage(icon, (-4, -40), DI_ITEM_RIGHT_BOTTOM, scale: (0.6, 0.6));
-		String count = FormatNumber(pawn.NBC_GetDebrisCount(selected), 0) .. " / " .. FormatNumber(pawn.NBC_GetDebrisCarryLimit(), 0);
-		DrawString(nbcSmallFont, label .. " " .. count, (-20, -48), DI_TEXT_ALIGN_RIGHT, Font.CR_TAN, scale: (0.5, 0.5));
+
+		// the pouches and the debris, in the middle
+		let pawn = NBC_Player(mo);
+		int kits = mo.CountInv("NBC_Medkit"), bottles = mo.CountInv("MolotovAmmo");
+		double x = -58;
+		if (kits > 0)
+		{
+			DrawImage("MEDIA0", (x, -4), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (14, 14));
+			Say(nbcBigFont, BigFont, String.Format("%d", kits), (x + 9, -BAR_H + 9), cb | DI_TEXT_ALIGN_LEFT, Font.CR_WHITE, 9);
+		}
+		x += 30;
+		if (bottles > 0)
+		{
+			DrawImage("MOLPA0", (x, -4), cb | DI_ITEM_CENTER_BOTTOM, 1.0, (14, 16));
+			Say(nbcBigFont, BigFont, String.Format("%d", bottles), (x + 9, -BAR_H + 9), cb | DI_TEXT_ALIGN_LEFT, Font.CR_ORANGE, 9);
+		}
+		if (pawn)
+		{
+			int sel = pawn.NBC_GetSelectedDebris();
+			int n = pawn.NBC_GetDebrisCount(sel);
+			static const String icons[] = { "BRKPA0", "HBRKA0", "CNCKA0", "MOLPA0" };
+			static const String names[] = { "BRICK", "HALF BRICK", "CONCRETE", "BOTTLE" };
+			x += 34;
+			DrawImage(icons[clamp(sel, 0, 3)], (x, -6), cb | DI_ITEM_CENTER_BOTTOM, n > 0 ? 1.0 : 0.35, (16, 12));
+			Say(nbcBigFont, BigFont, String.Format("%d/%d", pawn.NBC_GetTotalDebris(), pawn.NBC_GetDebrisCarryLimit()), (x + 10, -BAR_H + 9),
+				cb | DI_TEXT_ALIGN_LEFT, n > 0 ? Font.CR_TAN : Font.CR_DARKGRAY, 9);
+			Say(nbcSmallFont, NewSmallFont, names[clamp(sel, 0, 3)] .. " (G)", (x + 10, -BAR_H + 19), cb | DI_TEXT_ALIGN_LEFT, Font.CR_GRAY, 4);
+		}
+
+		// the weapon: its picture, the magazine and the reserve
+		let w = CPlayer.ReadyWeapon;
+		if (!w) return;
+		DrawInventoryIcon(w, (-118, -BAR_H / 2), rb | DI_ITEM_CENTER, 1.0, (40, 20));
+		int item = NBC_Cat.ItemOfClass(w.GetClass());
+		String wname = item >= 0 ? NBC_Cat.ITEM_NAME[item] : w.GetTag();
+		Say(nbcSmallFont, NewSmallFont, wname.MakeUpper(), (-4, -BAR_H + 2), rb | DI_TEXT_ALIGN_RIGHT, Font.CR_GRAY, 5);
+		let rw = NBC_ReloadWeapon(w);
+		if (rw && rw.Ammo1 && rw.Ammo2)
+		{
+			int mag = rw.Ammo1.Amount, cap = rw.Ammo1.MaxAmount, res = rw.Ammo2.Amount;
+			int mc = mag == 0 || mag * 4 <= cap ? Font.CR_RED : (mag * 2 <= cap ? Font.CR_GOLD : Font.CR_WHITE);
+			Say(nbcSmallFont, NewSmallFont, String.Format("/ %d", res), (-4, -BAR_H + 13), rb | DI_TEXT_ALIGN_RIGHT, Font.CR_GRAY, 8);
+			Say(nbcBigFont, BigFont, String.Format("%d", mag), (-34, -BAR_H + 9), rb | DI_TEXT_ALIGN_RIGHT, mc, 14);
+			if (mag == 0 && (level.maptime / 12) % 2)
+				Say(nbcBigFont, BigFont, "RELOAD (R)", (0, -BAR_H - 12), cb | DI_TEXT_ALIGN_CENTER, Font.CR_RED, 8);
+		}
+		else if (w.Ammo1)
+			Say(nbcBigFont, BigFont, String.Format("%d", w.Ammo1.Amount), (-34, -BAR_H + 9), rb | DI_TEXT_ALIGN_RIGHT, Font.CR_ORANGE, 14);
 	}
 
 	// Case and raid readout, top left (PLAN M2 vertical slice).
@@ -156,8 +215,7 @@ class NBC_StatusBar : DoomStatusBar
 		if (state != HUD_StatusBar && state != HUD_Fullscreen) return;
 		// our readouts use fullscreen HUD space in both modes: negative coordinates count from the bottom right
 		BeginHUD();
-		DrawNBCWeaponAmmo();
-		DrawNBCDebris();
+		DrawNBCBar();
 		DrawNBCCase();
 		DrawThreatRing();
 		DrawSquadLog();

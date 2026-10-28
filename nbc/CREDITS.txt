@@ -489,6 +489,12 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
   tools/art/make_vehicle_art.py. In the field the vehicles are the Voxel Vehicles Pack (credited above).
 - maps/NBC_RF01-08.wad: rooftop maps generated with Obsidian and the New Bricks City theme.
 
+== Title and music ==
+- graphics/NBCTITLE.png, NBCTITLB.png (the title splash and its blurred side fill): the project owner's art
+  (art/new_brick_city_menu_screen.png), cropped and scaled by tools/art/make_title_art.py.
+- music/NBCA01-10, NBCA01B, NBCA02B, NBCA05B, NBCO02-11, NBCTACT (.mid): the MIDI pack supplied by the project owner
+  (Midis.zip, kept as art/music/), renamed to 8-character lumps by tools/art/import_music.py.
+
 == Time of day ==
 - textures/nbc/NBCSKYMR.png, NBCSKYDY.png, NBCSKYDK.png (the morning, afternoon and dusk skylines): recoloured
   from Corpo Wars' night skyline (textures/cw/CITYSKY.png, the project owner's) by tools/art/make_sky_variants.py.

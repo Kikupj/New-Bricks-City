@@ -1,0 +1,13 @@
+// The main menu (zscript/nbc/ui/mainmenu.zs): NBC_MainMenu draws the splash and its own buttons in the precinct
+// screens' look. The items below are what the engine expects a main menu to hold; NBC_MainMenu doesn't draw them.
+ListMenu "MainMenu"
+{
+	Class "NBC_MainMenu"
+	Size Clean
+	Font "BigFont", "White", "Gold"
+	TextItem "New Game", "n", "PlayerclassMenu"
+	TextItem "Load Game", "l", "LoadGameMenu"
+	TextItem "Save Game", "s", "SaveGameMenu"
+	TextItem "Options", "o", "OptionsMenu"
+	TextItem "Quit Game", "q", "QuitMenu"
+}
