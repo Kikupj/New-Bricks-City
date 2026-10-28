@@ -138,6 +138,25 @@ class NBC_Gangs
 		}
 	}
 
+	// The helicopter's rooftop map for each district (nbc/rooftops.txt: "district-map rooftop-map" per line),
+	// in district order; "" where a district has none.
+	static void LoadRooftops(Array<String> maps, out Array<String> roofs)
+	{
+		roofs.Clear();
+		for (int i = 0; i < maps.Size(); i++) roofs.Push("");
+		Array<String> lines, w;
+		ReadText("rooftops.txt").Split(lines, "\n");
+		for (int i = 0; i < lines.Size(); i++)
+		{
+			String line = lines[i];
+			int cut = line.IndexOf("//");
+			if (cut >= 0) line = line.Left(cut);
+			Tokenize(line, w);
+			if (w.Size() < 2) continue;
+			for (int d = 0; d < maps.Size(); d++) if (maps[d] ~== w[0]) roofs[d] = w[1];
+		}
+	}
+
 	// A choice spawner (RandomSpawner) resolved to the actor it would spawn, by its drop list weights.
 	static play class<Actor> Resolve(String className, NBC_RunData rd)
 	{

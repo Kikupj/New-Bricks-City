@@ -255,7 +255,10 @@ class NBC_UI : GenericMenu
 		Fill(x, y, w, 2, enabled ? C_PANEL_HI : C_PANEL);
 		Fill(x, y + h - 2, w, 2, C_PANEL_LO);
 		if (accent >= 0 && enabled) Fill(x, y, 4, h, accent);
-		Text(BigFont, enabled ? (f ? Font.CR_GOLD : Font.CR_WHITE) : Font.CR_DARKGRAY, x + w / 2, y + (h - size) / 2 + 1, label, size, 1);
+		// the stencil font has no dollar sign: prices go in the small font, a size up
+		bool money = label.IndexOf("$") >= 0;
+		double ls = money ? size * 1.15 : size;
+		Text(money ? NewSmallFont : BigFont, enabled ? (f ? Font.CR_GOLD : Font.CR_WHITE) : Font.CR_DARKGRAY, x + w / 2, y + (h - ls) / 2 + 1, label, ls, 1);
 		if (enabled) Region(id, arg, x, y, w, h);
 		if (f) FocusFrame(x, y, w, h);
 		return f;

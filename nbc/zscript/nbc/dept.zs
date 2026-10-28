@@ -212,7 +212,7 @@ class NBC_Officer
 // ---------------------------------------------------------------- the after-action report
 class NBC_Report
 {
-	enum EOutcome { OUT_TAKEN, OUT_RETREAT, OUT_DOWN }
+	enum EOutcome { OUT_TAKEN, OUT_RETREAT, OUT_DOWN, OUT_CRASH }
 	int outcome;
 	String title, place, gang, grade, dayLine;
 	int kills, playerKills, crewTotal, healthLost, timeSecs, cashRaid, bounty, sold, balance;
@@ -223,6 +223,9 @@ class NBC_Report
 	Array<bool> offPromote;
 	// what the raid brought back to the locker (net), item and count
 	Array<int> lootItem, lootCount;
+	// what happened to the motorcade, and how the squad went in (NBC_Motor.MODE_*)
+	Array<String> notes;
+	int mode;
 
 	enum EOffState { OS_FIT, OS_WOUNDED, OS_CRITICAL, OS_KIA }
 }
@@ -243,7 +246,11 @@ class NBC_Department : Thinker
 	NBC_Report report;
 	bool reportPending;
 	int reportSerial;
-	int rosterVersion;                  // bumped on every roster change (the UI writes the CVars)
+	int rosterVersion;
+	// the motor pool (garage.zs): vehicles, the motorcade's insertion; your own face (any of the portraits)
+	Array<NBC_Vehicle> garage;
+	int nextVehicle, insertion;
+	int playerFace;                  // bumped on every roster change (the UI writes the CVars)
 	bool loaded;
 
 	static NBC_Department Get()
@@ -274,6 +281,9 @@ class NBC_Department : Thinker
 		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) locker.Push(0);
 		// the officers who survived your last game (nbc_roster), else the department's first four
 		LoadRoster(CVar.GetCVar("nbc_roster").GetString(), CVar.GetCVar("nbc_memorial").GetString());
+		playerFace = CVar.GetCVar("nbc_avatar").GetInt();
+		if (playerFace < 0 || playerFace >= NBC_Cat.FACES) playerFace = NBC_Cat.VANCE_FACE;
+		ResetGarage(null);
 		if (!roster.Size())
 		{
 			Recruit(NBC_Cat.C_PATROL, null, true);
@@ -325,10 +335,92 @@ class NBC_Department : Thinker
 			o.health = o.MaxHealth();
 		}
 		ResetLocker();
+		ResetGarage(NBC_RunData.Find());
 		AutoSquad();
 		reportPending = false;
 		rosterVersion++;
 	}
+
+	// ------------------------------------------------------------ the motor pool
+	// a new case: the department's own panel van and an unmarked sedan (seats for you and four)
+	void ResetGarage(NBC_RunData rd)
+	{
+		garage.Clear();
+		nextVehicle = 1;
+		insertion = NBC_Motor.INS_STREET;
+		AddVehicle(NBC_Motor.V_VAN, rd).rolling = true;
+		AddVehicle(NBC_Motor.V_SEDAN, rd).rolling = true;
+	}
+
+	NBC_Vehicle AddVehicle(int type, NBC_RunData rd)
+	{
+		let v = new("NBC_Vehicle");
+		v.id = nextVehicle++;
+		v.type = clamp(type, 0, NBC_Motor.V_COUNT - 1);
+		v.cond = 100;
+		v.plate = String.Format("%c%c-%d%d", 65 + Roll(rd, 0, 25), 65 + Roll(rd, 0, 25), Roll(rd, 1, 9), Roll(rd, 0, 9));
+		garage.Push(v);
+		return v;
+	}
+
+	clearscope NBC_Vehicle VehicleById(int id) const
+	{
+		for (int i = 0; i < garage.Size(); i++) if (garage[i].id == id) return garage[i];
+		return null;
+	}
+
+	// a vehicle counts for this insertion: ready, and flies for the roofs or drives for the street
+	clearscope bool Fits(NBC_Vehicle v, int ins) const
+	{
+		return v && v.Ready() && (NBC_Motor.Flies(v.type) == (ins == NBC_Motor.INS_ROOFTOP));
+	}
+	// seats in the motorcade as picked (you included)
+	clearscope int Seats(int ins) const
+	{
+		int n = 0;
+		for (int i = 0; i < garage.Size(); i++) if (garage[i].rolling && Fits(garage[i], ins)) n += garage[i].Seats();
+		return n;
+	}
+	clearscope int SeatsNeeded() const { return squad.Size() + 1; }
+	clearscope bool HasHeli() const
+	{
+		for (int i = 0; i < garage.Size(); i++) if (garage[i].type == NBC_Motor.V_HELI && garage[i].Ready()) return true;
+		return false;
+	}
+	// the helicopter going in (rooftop insertions take one)
+	clearscope NBC_Vehicle RollingHeli() const
+	{
+		for (int i = 0; i < garage.Size(); i++) if (garage[i].rolling && Fits(garage[i], NBC_Motor.INS_ROOFTOP)) return garage[i];
+		return null;
+	}
+
+	// pick enough of the right vehicles: the roomiest first; a rooftop insertion takes the best helicopter
+	void AutoMotorcade()
+	{
+		for (int i = 0; i < garage.Size(); i++) garage[i].rolling = false;
+		if (insertion == NBC_Motor.INS_ROOFTOP)
+		{
+			NBC_Vehicle best = null;
+			for (int i = 0; i < garage.Size(); i++)
+				if (Fits(garage[i], insertion) && (!best || garage[i].cond > best.cond)) best = garage[i];
+			if (best) best.rolling = true;
+			return;
+		}
+		for (int pass = 0; pass < NBC_Motor.MAX_VEHICLES && Seats(insertion) < SeatsNeeded(); pass++)
+		{
+			NBC_Vehicle best = null;
+			for (int i = 0; i < garage.Size(); i++)
+			{
+				let v = garage[i];
+				if (v.rolling || !Fits(v, insertion)) continue;
+				if (!best || v.Seats() > best.Seats() || (v.Seats() == best.Seats() && v.cond > best.cond)) best = v;
+			}
+			if (!best) break;
+			best.rolling = true;
+		}
+	}
+
+	clearscope String PlayerPortrait() const { return NBC_Cat.Face(playerFace); }
 
 	bool Take(int item, int n = 1)
 	{
@@ -388,7 +480,7 @@ class NBC_Department : Thinker
 		for (int t = 0; t < 30; t++)
 		{
 			int f = Roll(rd, 0, NBC_Cat.FACES - 1);
-			if (f == NBC_Cat.VANCE_FACE) continue;
+			if (f == NBC_Cat.VANCE_FACE || f == playerFace) continue;
 			bool used = false;
 			for (int i = 0; i < roster.Size() && !used; i++) if (roster[i].face == f) used = true;
 			if (!used) return f;
@@ -438,7 +530,8 @@ class NBC_Department : Thinker
 	enum EOp
 	{
 		OP_SQUAD_TOGGLE = 1, OP_SQUAD_AUTO, OP_PRIMARY, OP_POUCH, OP_VEST, OP_SIDEARM, OP_MELEE,
-		OP_PROMOTE, OP_RECRUIT, OP_SELL, OP_BUY, OP_DISMISS, OP_REPORT_SEEN, OP_AUTO_KIT, OP_TEAM
+		OP_PROMOTE, OP_RECRUIT, OP_SELL, OP_BUY, OP_DISMISS, OP_REPORT_SEEN, OP_AUTO_KIT, OP_TEAM,
+		OP_AVATAR, OP_BUY_VEHICLE, OP_REPAIR, OP_SELL_VEHICLE, OP_ROLL, OP_INSERTION, OP_AUTO_MOTORCADE
 	}
 
 	// a: officer id (0 = you) for kit ops; b/c: the value
@@ -508,6 +601,48 @@ class NBC_Department : Thinker
 		}
 		case OP_REPORT_SEEN: reportPending = false; return;
 		case OP_AUTO_KIT: AutoKit(); return;
+		case OP_AVATAR:
+			if (b >= 0 && b < NBC_Cat.FACES) { playerFace = b; rosterVersion++; }
+			return;
+		case OP_BUY_VEHICLE:
+		{
+			if (!rd || b < 0 || b >= NBC_Motor.V_COUNT || garage.Size() >= NBC_Motor.MAX_VEHICLES) return;
+			int price = NBC_Motor.TYPE_PRICE[b];
+			if (rd.cash < price) return;
+			rd.cash -= price;
+			AddVehicle(b, rd);
+			return;
+		}
+		case OP_REPAIR:
+		{
+			let v = VehicleById(a);
+			if (!v || !rd) return;
+			int cost = NBC_Motor.RepairCost(v.type, v.cond);
+			if (cost <= 0 || rd.cash < cost) return;
+			rd.cash -= cost;
+			v.cond = 100;
+			return;
+		}
+		case OP_SELL_VEHICLE:
+		{
+			let v = VehicleById(a);
+			if (!v || !rd || garage.Size() <= 1) return;
+			rd.cash += NBC_Motor.SellValue(v.type, v.cond);
+			garage.Delete(garage.Find(v));
+			return;
+		}
+		case OP_ROLL:
+		{
+			let v = VehicleById(a);
+			if (v && (v.rolling || Fits(v, insertion))) v.rolling = !v.rolling;
+			return;
+		}
+		case OP_INSERTION:
+			if (b == NBC_Motor.INS_ROOFTOP && !HasHeli()) return;
+			insertion = clamp(b, NBC_Motor.INS_STREET, NBC_Motor.INS_ROOFTOP);
+			AutoMotorcade();
+			return;
+		case OP_AUTO_MOTORCADE: AutoMotorcade(); return;
 		case OP_TEAM:
 		{
 			let o = OfficerById(a);

@@ -9,7 +9,7 @@ class NBC_DeployMenu : NBC_UI
 	enum EId
 	{
 		ID_BACK = 1, ID_ASSAULT, ID_ROSTER, ID_MEMBER, ID_YOU, ID_AUTO, ID_AUTOKIT, ID_SLOT, ID_BENCH,
-		ID_PICK, ID_UNEQUIP, ID_PICK_CLOSE, ID_TEAM
+		ID_PICK, ID_UNEQUIP, ID_PICK_CLOSE, ID_TEAM, ID_FACE
 	}
 	// kit slots
 	enum ESlot { S_PRIMARY, S_SIDEARM, S_MELEE, S_VEST, S_POUCH }    // S_POUCH + n for pouch n
@@ -74,6 +74,7 @@ class NBC_DeployMenu : NBC_UI
 		case ID_MEMBER: if (arg >= 0 && arg < dept.squad.Size()) kitWho = dept.squad[arg]; return;
 		case ID_TEAM: if (arg >= 0 && arg < dept.squad.Size()) Send(NBC_Department.OP_TEAM, dept.squad[arg]); return;
 		case ID_YOU: kitWho = 0; return;
+		case ID_FACE: NBC_FacePicker.Open(self); return;
 		case ID_AUTO: Send(NBC_Department.OP_SQUAD_AUTO); return;
 		case ID_AUTOKIT: Send(NBC_Department.OP_AUTO_KIT); return;
 		case ID_BENCH:
@@ -197,12 +198,13 @@ class NBC_DeployMenu : NBC_UI
 		// you
 		bool fy = IsFocus(ID_YOU, 0) && registering;
 		Inset(x + 14, 104, w - 28, 76, kitWho == 0 ? C_AMBER : -1);
-		Pic("NBCPVANC", x + 20, 110, 64, 64);
+		Pic(dept.PlayerPortrait(), x + 20, 110, 64, 64);
 		Text(BigFont, fy ? Font.CR_GOLD : Font.CR_WHITE, x + 94, 114, "DET. VANCE", 16);
 		Text(NewSmallFont, Font.CR_GRAY, x + 94, 136, "You. Undercover, leading the raid.", 10);
 		Text(NewSmallFont, Font.CR_GOLD, x + 94, 154, KitLine(dept.pPrimary, dept.pSidearm), 10);
 		Region(ID_YOU, 0, x + 14, 104, w - 28, 76);
 		if (fy) FocusFrame(x + 14, 104, w - 28, 76);
+		Button(ID_FACE, 0, x + w - 14 - 58, 108, 52, 18, "FACE", true, 9);
 
 		// four slots
 		for (int s = 0; s < NBC_Cat.SQUAD_SLOTS; s++)
@@ -239,7 +241,7 @@ class NBC_DeployMenu : NBC_UI
 		Panel(x, 66, w, 452, "KIT");
 		let o = KitOfficer(dept);
 		Inset(x + 14, 104, 72, 72);
-		Pic(o ? o.Portrait() : "NBCPVANC", x + 18, 108, 64, 64);
+		Pic(o ? o.Portrait() : dept.PlayerPortrait(), x + 18, 108, 64, 64);
 		Text(BigFont, Font.CR_WHITE, x + 96, 108, o ? o.RankedName().MakeUpper() : "DET. VANCE", 15);
 		Text(NewSmallFont, Font.CR_GOLD, x + 96, 128, o ? String.Format("%s  -  %d HP  -  aim %d", o.ClassName(), o.MaxHealth(), o.Aim()) : "Detective", 10);
 		if (o)

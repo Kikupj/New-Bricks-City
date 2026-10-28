@@ -9,3 +9,4 @@ NBC_Outfit4 = "112:127=[74,88,134]:[10,12,24]", "192:207=[64,62,60]:[10,10,10]" 
 NBC_Outfit5 = "112:127=[180,152,110]:[36,28,18]", "192:207=[62,74,98]:[10,12,18]"      // tan coat, dark jeans
 NBC_Outfit6 = "112:127=[84,82,86]:[10,10,12]", "192:207=[104,104,72]:[18,18,12]"       // black, olive trousers
 NBC_Outfit7 = "112:127=[104,124,156]:[16,20,30]", "192:207=[58,56,54]:[8,8,8]"         // denim jacket, black trousers
+NBC_Burnt = "0:255=%[0.0,0.0,0.0]:[0.55,0.48,0.42]"                                  // the shot-down helicopter's wreck (NBC_RunManager.CrashSite)

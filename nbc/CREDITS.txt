@@ -484,6 +484,11 @@ Grounded movement: adapted from "Build Movement" v2 by Pato Fanatico, after Nash
 - graphics/portraits/NBCPF000-143.png and NBCPVANC.png: cut from the project owner's "Pixel Mercenary Portrait
   Grid 1-6" sheets (art/), added for New Bricks City (tools/art/import_npc_art.py).
 
+== Motor pool ==
+- graphics/NBCVSEDN.png, NBCVVAN.png, NBCVTRUK.png: original pixel art for New Bricks City, drawn by
+  tools/art/make_vehicle_art.py. In the field the vehicles are the Voxel Vehicles Pack (credited above).
+- maps/NBC_RF01-08.wad: rooftop maps generated with Obsidian and the New Bricks City theme.
+
 == HQ characters ==
 - sprites/npcs/NCAPA0-G0.png (the captain, standing and smoking) from art/PMC-boss*.png, sprites/npcs/NPLTA0.png
   (the pilot) from art/Pilot.png, graphics/NBCHELI.png (the helicopter) from art/helicopter.png: art by the

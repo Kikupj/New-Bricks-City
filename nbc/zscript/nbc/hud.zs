@@ -77,6 +77,14 @@ class NBC_StatusBar : DoomStatusBar
 			else lead = "Leader: unknown";
 			DrawString(nbcSmallFont, lead, (3, y), DI_TEXT_ALIGN_LEFT, lc, scale: (0.4, 0.4));
 			y += 7;
+			// shot down: the ambush round the wreck
+			if (rd.raidMode == NBC_Motor.MODE_CRASH)
+			{
+				String cs = rd.crashClear ? "CRASH SITE: the way out is clear - get to the exit" :
+					String.Format("CRASH SITE: hold out (wave %d of %d)", rd.crashWave, NBC_Motor.CRASH_WAVES);
+				DrawString(nbcSmallFont, cs, (3, y), DI_TEXT_ALIGN_LEFT, rd.crashClear ? Font.CR_GREEN : Font.CR_ORANGE, scale: (0.4, 0.4));
+				y += 7;
+			}
 			int left = 0;
 			for (int i = 0; i < rm.crew.Size(); i++) if (rm.crew[i] && rm.crew[i].health > 0) left++;
 			DrawString(nbcSmallFont, String.Format("Crew left %d", left), (3, y), DI_TEXT_ALIGN_LEFT, Font.CR_LIGHTBLUE, scale: (0.4, 0.4));

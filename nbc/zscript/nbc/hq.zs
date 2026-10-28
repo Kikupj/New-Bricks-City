@@ -175,13 +175,17 @@ class NBC_Pilot : NBC_HQNpc
 	{
 		let rd = NBC_RunData.Find();
 		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
+		let dept = NBC_Department.Find();
 		if (rd && rd.readyDistrict >= 0 && rm)
-			return String.Format("Bird's fueled for %s. Say the word.", rm.TurfTitle(rd.readyDistrict));
+			return dept && dept.insertion == NBC_Motor.INS_ROOFTOP && dept.HasHeli() ?
+				String.Format("Bird's fueled for %s. Say the word.", rm.TurfTitle(rd.readyDistrict)) :
+				String.Format("Motorcade's gassed up for %s. Say the word.", rm.TurfTitle(rd.readyDistrict));
 		if (!rd || !rd.caseActive) return "No case, no flight. The captain's got the files.";
+		if (dept && !dept.HasHeli()) return "No bird in the motor pool, so I drive. Get us a helicopter and I'll put you on the roofs.";
 		static const String idle[] = {
 			"Nothing on the board for me, Detective. Plan a raid and I'll warm her up.",
 			"She's held together with tape and prayers, but she flies.",
-			"I can put you on a roof or in a yard. Getting you out is the hard part." };
+			"I can put you on a roof. Getting you out past their guns is the hard part." };
 		return idle[random[nbchq](0, 2)];
 	}
 

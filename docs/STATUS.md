@@ -6,6 +6,28 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### M7c (part) — The motor pool, insertions, the crash landing; your own face — 🔧 BUILT, NEEDS PLAYTEST (2026-10-28, by Claude)
+- **Owner request:** let the player change their portrait; a motorcade where you buy and manage vehicles; a helicopter can start a raid on a rooftop (with a risk of being shot down, which starts a crash-landing survival ambush); land vehicles insert on the street.
+- **Your face:** YOUR FACE in the squad room, or FACE on your deploy card, opens a picker of all 144 portraits (faces an officer has are taken; VANCE'S OWN goes back). Kept between games in `nbc_avatar`; new officers never get your face.
+- **The motor pool** (`garage.zs`, the terminal's new MOTOR POOL tab): buy, repair and sell vehicles; up to 8. They belong to the case like the locker; a case starts with a panel van and an unmarked sedan.
+
+  | Vehicle | Seats (you included) | Price | On a raid |
+  |---|---|---|---|
+  | Unmarked sedan | 2 | $350 | a motorcade of sedans only: 15% fewer of them on the block |
+  | Panel van | 4 | $800 | room for the stack |
+  | Armored truck | 5 | $2,200 | officers take 15% less damage; never wears down |
+  | Helicopter | 5 | $4,000 | rooftop insertion: 20% fewer of them; can be shot down |
+
+  Land vehicles lose 4-14% condition a raid (8 more if you didn't take the block), a helicopter 2-8%; under 30% a vehicle is in the shop until repaired ((100 - condition) × price / 250); at 0 it's a write-off. Selling pays half its value times its condition.
+- **Rolling out** (Rook's screen, `ui/wheelsup.zs`, now the motorcade): INSERTION STREET or ROOFTOP (needs a helicopter that's not in the shop), the garage as cards to pick (AUTO picks enough seats), SEATS x / y NEEDED (everyone going in has to fit; ROLL OUT / WHEELS UP is off until they do), the shoot-down risk for a rooftop insertion (6% + 4% × gang tier + 6% × alert + a quarter of the helicopter's damage, 5-60%), the squad.
+- **Street insertion:** the raid runs on the district map; the vehicles that rolled out park behind your start (the voxel vehicle pack: a dark-blue modern car, a van, the armored truck).
+- **Rooftop insertion:** the raid runs on the district's rooftop map, `NBC_RF01-08` ("<district> Rooftops"; Obsidian's rooftops environment, built with `make_bricks.sh --name roofs --length episode --seed 3131 --theme nbc_rooftops` and exported with the new `export_maps.py --prefix NBC_RF --pair-with NBC_CT`, which writes `nbc/rooftops.txt` and `nbc/mapinfo/nbc_rf_maps.txt`).
+- **Shot down** (the case RNG, at roll-out): the raid runs on the street map from a crash site out in the open (away from the exit and the leader, the case RNG picks it); the burning wreck (the voxel helicopter, burnt) lies by you; you lose 15-35 health (never below 30), each officer 15-40% of theirs. Four ambush waves (3 + 2 × tier + alert each, out of sight 700-2,400 units off, coming for you) every 25 s from 10 s in; 30 s after the last, "the way to the exit is clear". The leader is still there to topple. Walk out alive and it's SHOT DOWN - SURVIVED (no strike, the gang's alert goes up); the helicopter is gone either way. The HUD shows the wave.
+- **The report** lists what happened to the motorcade (rounds taken, the shop, write-offs, the helicopter lost).
+- **Art:** `tools/art/make_vehicle_art.py` draws the sedan, van and truck side views (`NBCVSEDN`, `NBCVVAN`, `NBCVTRUK`) to match the owner's helicopter.
+- Testing: `netevent nbc_debug_cash <n>`; `netevent nbc_deploy <district> <force>` (1: never shot down, 2: shot down).
+- **Verified (scripted runs under Xvfb, software renderer):** the motor pool tab (the starting van and sedan; a helicopter bought, $6,000 to $2,000); the roll-out screen with ROOFTOP picked (risk 14%, seats 5 / 5); the face picker and a face change. A forced shoot-down: the crash HUD line, wave 1 then 2 of 4, health 67% then 59%, crew 18 then 24 then 29. A rooftop raid on NBC_RF05 (23 crew), the report and day 2. A street raid on NBC_CT05 (31 crew): the retreat report shows the van's and sedan's wear notes. The parked vehicles weren't in view in the street screenshot, so `ParkMotorcade` now tries a ring of spots round the start (behind first, level floor, in sight) and the developer line counts what parked. `check_lumps` 0 new problems.
+
 ### M8 (part) — People at Checkpoint 9; the pilot starts the raid — 🔧 BUILT, NEEDS PLAYTEST (2026-10-28, by Claude)
 - **Owner request:** use the new squad portraits and the pilot and police-captain billboards in the HQ, have NPCs spawn there, and make the pilot the confirmation step that starts a raid.
 - **Portraits:** the owner's six "Pixel Mercenary Portrait Grid" sheets (`art/`) are cut into 144 officer portraits, `graphics/portraits/NBCPF000-143` (96×96), by `tools/art/import_npc_art.py`. Face 10 is Det. Vance (`NBCPVANC`) and never rolled for an officer; new officers get a face nobody on the roster has. The generated faces and `tools/art/make_portraits.py` are retired. Outfits on the street still follow the face (`NBC_Outfit` = face × 3 mod 8).
@@ -229,6 +251,7 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 - `python tools\build_pk3.py` → `dist\NewBricksCity.pk3`, 9,103 files, 41.5 MB. It boots and loads NBC_TEST with no errors.
 
 ## Needs playtest (owner)
+- **The motor pool and insertions:** buy a helicopter (`netevent nbc_debug_cash 5000` helps), raid from the roofs (do the NBC_RF maps play as rooftops: start, crew, leader, exit?), get shot down (`netevent nbc_deploy <d> 2`): is the crash site sensible (out in the open, not inside a wall), is the ambush survivable and tense, is the wreck's fire visible on a real GPU? Do the parked vehicles sit sensibly behind the start on each district? Tune prices, wear and the shoot-down odds. Pick your face; does it stay after quitting?
 - **The HQ people:** do the captain and pilot billboards stand at the right size and height on a real GPU (scale 0.68 / 0.7, feet on the floor), and in good spots? Do officers stand clear of the furniture? Talk to each (Use, then Use again). Plan a raid (READY), talk to the pilot, WHEELS UP. Is the portrait set right for every officer (no repeats on a full roster)?
 - **Squad orders** (a raid with the squad): Q / Z / C / V / N / B / J-K-L / M as listed under "Done". Do they go where you send them through doors, stairs and lifts on every environment (the graph doesn't know about lifts or doors that need opening)? Does RECON keep them quiet until a fight starts, does SUPPRESS pin the gang? Is the command map readable and quick enough to use in real time, and should it pause instead? Do the threat ring and the radio log help?
 - **The squad's look:** do the portraits and the recolored sprites read as a ragtag plain-clothes department in a near-future Bricks, not a modern police or military unit? The sprites' builds still come from the pack (the specop's full-face mask and goggles, the sniper's one-colour coverall); say if any of them should be swapped or recolored further.

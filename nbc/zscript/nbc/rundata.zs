@@ -48,6 +48,12 @@ class NBC_RunData : Thinker
 	Array<int> wpTeam, wpGo;
 	Array<double> wpX, wpY, wpZ;
 	Array<bool> goCalled;
+	// how the squad went in (the motor pool, garage.zs): street, rooftop, or shot down on the way to the roofs;
+	// the vehicles that rolled out; the crash site's ambush
+	int raidMode;
+	Array<int> raidVehicles;
+	int crashWave, crashNext;
+	bool crashClear;
 
 	static NBC_RunData Get()
 	{
@@ -148,6 +154,9 @@ class NBC_RunData : Thinker
 		raidIssued.Clear();
 		raidOffTeam.Clear();
 		NBC_Orders.Reset(self);
+		raidMode = NBC_Motor.MODE_STREET;
+		raidVehicles.Clear();
+		crashWave = 0; crashNext = 0; crashClear = false;
 	}
 
 	clearscope int TeamOfSlot(int slot) const

@@ -8,3 +8,4 @@ server noarchive int nbc_kitsweep = 0;     // testing: regenerate this kit map N
 server string nbc_roster = "";
 server string nbc_memorial = "";
 server noarchive bool nbc_navdebug = false;   // show the squad navigation graph (nodes) and its build time when a raid starts
+server int nbc_avatar = -1;       // your portrait (a face number; -1 = Det. Vance's own), kept between games

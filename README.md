@@ -61,8 +61,10 @@ dialogue, image and sound in the mod is original.
    how alert it is, how many are on the block and what works on them.
 3. **Deploy.** Choose up to four officers, split them into fireteams ALPHA and BRAVO, and fit everyone out
    (you included) from the Evidence Locker. Press **READY** to lock in the plan.
-4. **Wheels up.** Walk to Rook, the pilot, and talk to them. The wheels-up check shows where you're going and
-   who's going in. **WHEELS UP** starts the raid.
+4. **Roll out.** Walk to Rook, the pilot, and talk to them. Choose the insertion and the motorcade:
+   **STREET** (land vehicles, the raid starts on the street) or **ROOFTOP** (a helicopter: the raid starts on the
+   district's roofs, but it can be shot down, and a crash landing turns into a survival ambush round the wreck).
+   The vehicles' seats have to carry everyone. **ROLL OUT** / **WHEELS UP** starts the raid.
 5. **The raid.** You land in the district with your squad behind you. The game clears the map's own
    monsters and fills it with the holding gang. The leader waits near the exit with escorts, and
    reinforcements come once most of the crew is down. Command the squad, take down the leader and leave
@@ -166,6 +168,7 @@ Every officer is a person, Hamburger Hill / XCOM style:
   spends two. An officer who goes down might be pulled out alive (CRITICAL, four days). The odds are
   better on a block you took and better for higher ranks. Otherwise they're **killed in the line of
   duty**: their kit is lost and their name goes on the memorial wall.
+- **Your own face:** pick any portrait for Det. Vance (YOUR FACE in the squad room, FACE on the deploy screen).
 - **The roster** holds up to 16 officers, recruited for cash between raids. Officers who survive carry
   over to your next game (`nbc_roster` and `nbc_memorial` CVars).
 
@@ -217,6 +220,25 @@ The precinct is a place with people in it:
   room on their service file. Officers in the hospital aren't there.
 - **The raid board, the lockers and the squad-room sofa** open the precinct terminal.
 
+## The motor pool
+
+Raids roll out as a motorcade. Buy, repair and sell vehicles at the terminal's **MOTOR POOL** tab; a case starts
+with a panel van and an unmarked sedan.
+
+| Vehicle | Seats (you included) | Price | On a raid |
+|---|---|---|---|
+| Unmarked sedan | 2 | $350 | low profile: a sedans-only motorcade means fewer of them on the block |
+| Panel van | 4 | $800 | room for the stack |
+| Armored truck | 5 | $2,200 | officers take less damage; never wears down |
+| Helicopter | 5 | $4,000 | rooftop insertion, fewer of them up there; can be shot down |
+
+- **Street insertions** park the motorcade behind your start on the district map.
+- **Rooftop insertions** fly you onto the district's own rooftop map (`NBC_RF01-08`). The shoot-down risk (shown
+  before you go) grows with the gang's tier and alert and the helicopter's damage.
+- **Shot down:** you come down in the street, hurt, next to the burning wreck, and the gang sends four waves at
+  the crash site. Hold out until the way to the exit is clear and walk out. The helicopter is gone.
+- Vehicles wear down on raids, go to the shop under 30% condition and are written off at 0.
+
 ## The precinct screens
 
 All the screens share one look (slate-blue panels, amber selection, stencil titles), and their layouts
@@ -228,12 +250,13 @@ follow Hamburger Hill's:
     promote, recruit, bench and dismiss.
   - **Evidence locker:** every weapon, round and piece of gear you hold, with what's checked out to kits,
     sell for cash or requisition supplies.
+  - **Motor pool:** the garage (condition, seats, ready or in the shop), repair, sell, and the dealer.
   - **Memorial:** the officers lost in the line of duty.
 - **Deploy:** the roster, the squad (you plus four, AUTO, ALPHA/BRAVO badges) and the kit of whoever is
   selected. Each slot opens a picker showing what's left in the locker. The bottom bar shows the locker
   totals, BACK and READY.
-- **Wheels up** (talk to the pilot): the helicopter, the district and gang, everyone going in, and WHEELS UP /
-  CHANGE PLAN / NOT YET.
+- **Roll out** (talk to the pilot): the district, STREET or ROOFTOP insertion with the shoot-down risk, the
+  motorcade (pick vehicles, seats needed), everyone going in, and ROLL OUT / WHEELS UP, CHANGE PLAN, NOT YET.
 - **After-action report:** the outcome title, a stats table and letter grade, each officer's portrait
   with kills and KIA / CRITICAL / WOUNDED / PROMOTION stamps, the loot tiles, the cash, and CONTINUE.
 
@@ -267,6 +290,9 @@ ship as `nbc/maps/NBC_CT01-08.wad`. `nbc/districts.txt` is the pool the raid boa
 | NBC_CT06 | Cypress Playground | park |
 | NBC_CT07 | Carver Towers | housing towers |
 | NBC_CT08 | Arden Street | streets |
+
+Each district also has a rooftop map for helicopter insertions, `NBC_RF01-08` ("<district> Rooftops"), paired in
+`nbc/rooftops.txt`.
 
 Other maps:
 
@@ -315,6 +341,7 @@ nbc/                    the mod, loaded as a folder (-file nbc); build_pk3.py zi
 tools/                  launcher, smoke tests, lump checks, PK3 build, map builders, Obsidian pipeline
   Obsidian/             make_bricks.ps1/.sh, export_maps.py, addons/NewBricksCity/ (the Obsidian theme)
   art/import_npc_art.py the officer portraits and the HQ characters, from the owner's art in art/
+  art/make_vehicle_art.py the motor pool's land vehicles
   import/               one-time import scripts (kept as a record; never re-run)
 art/                    source art: the debris sprites' pxl file, the portrait sheets, the captain, pilot and helicopter
 docs/STATUS.md          what's done, verified and waiting on a playtest
@@ -337,6 +364,7 @@ AGENTS.md               the rules for anyone (or any AI agent) working on the co
 | `CW_NavGraph` | `cw/nav.zs` | The navigation graph built from the map's geometry; Dijkstra routes. |
 | `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results and the command map. |
 | `NBC_StatusBar` | `hud.zs` | The magazine and debris readouts, the raid readout, the squad strip, the threat ring, the radio log. |
+| `NBC_Motor`, `NBC_Vehicle` | `garage.zs` | The vehicle catalog, the garage's vehicles, seats, wear, the shoot-down risk, the crash site's fire. |
 | `NBC_HQNpc` and kin | `hq.zs` | The captain, the pilot and the officers at Checkpoint 9: talk lines, the pilot's wheels-up step. |
 | `NBC_Player` | `player.zs` | The player class: weapon slots, flashlight, quick throw, the OFFICER DOWN intercept. |
 | `NBC_Gangs` | `gangs.zs` | Reads `gangs.txt` and `districts.txt`; gang damage profiles. |
@@ -355,6 +383,8 @@ underground, subway), with per-building facades.
 powershell -File tools\Obsidian\make_bricks.ps1                                   # Windows, the GUI build's obsidian.exe
 tools/Obsidian/make_bricks.sh --length episode --seed 2026 --limit 8             # Linux, a console source build
 tools/Obsidian/make_bricks.sh --theme nbc_rooftops --length single --no-export   # try one environment
+tools/Obsidian/make_bricks.sh --name roofs --length episode --seed 3131 --theme nbc_rooftops --no-export
+python3 tools/Obsidian/export_maps.py tools/Obsidian/out/roofs.wad --prefix NBC_RF --pair-with NBC_CT --limit 8   # the rooftop set
 ```
 
 `export_maps.py` splits a build into `nbc/maps/NBC_CTxx.wad` and writes `nbc/mapinfo/city_maps.txt` and
@@ -376,8 +406,10 @@ Debug netevents, from the console:
 | Command | Effect |
 |---|---|
 | `netevent nbc_debug_case` | print the case, the roster, the locker, the teams' orders and every officer |
-| `netevent nbc_terminal <0-3>` | open the precinct terminal on a tab |
+| `netevent nbc_terminal <0-4>` | open the precinct terminal on a tab |
 | `netevent nbc_debug_clear <n>` | on a raid: down the leader and n of the crew (0 = all) |
+| `netevent nbc_debug_cash <n>` | add seized cash |
+| `netevent nbc_deploy <district> <force>` | start a raid now (force 1: never shot down, 2: shot down) |
 | `nbc_seed <n>` | every new case uses this seed |
 | `nbc_navdebug 1` | show the squad navigation graph's nodes |
 | `nbc_kittest <kit> <variant> <seed>` | generate a kit test floor |

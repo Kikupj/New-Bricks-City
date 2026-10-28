@@ -40,7 +40,8 @@ class NBC_ResultsMenu : NBC_UI
 
 		// the title
 		String title = rep.outcome == NBC_Report.OUT_TAKEN ? String.Format("%s TAKEN", rep.place.MakeUpper())
-			: (rep.outcome == NBC_Report.OUT_DOWN ? "OFFICER DOWN" : String.Format("RETREAT FROM %s", rep.place.MakeUpper()));
+			: (rep.outcome == NBC_Report.OUT_DOWN ? "OFFICER DOWN" : (rep.outcome == NBC_Report.OUT_CRASH ? "SHOT DOWN" :
+			String.Format("RETREAT FROM %s", rep.place.MakeUpper())));
 		double tsize = 40;
 		while (tsize > 22 && TextWidth(BigFont, title, tsize) > VW - 40) tsize -= 2;
 		Text(BigFont, Font.CR_BLACK, VW / 2 + 3, 15, title, tsize, 1, 0.7);
@@ -115,7 +116,10 @@ class NBC_ResultsMenu : NBC_UI
 		Inset(mx, 388, mw, 62);
 		Text(BigFont, Font.CR_WHITE, mx + mw / 2, 396, "BALANCE", 14, 1);
 		MoneyText(Font.CR_GOLD, mx + mw / 2, 416, rep.balance, 24, 1);
-		Wrap(NewSmallFont, Font.CR_WHITE, mx, 462, mw, rep.dayLine, 12, 4);
+		double ny = 458 + Wrap(NewSmallFont, Font.CR_WHITE, mx, 458, mw, rep.dayLine, 12, 3);
+		// the motorcade
+		for (int i = 0; i < rep.notes.Size() && ny < 520; i++)
+			ny += Wrap(NewSmallFont, Font.CR_ORANGE, mx, ny, mw, rep.notes[i], 10, 2);
 
 		bool promo = false;
 		for (int i = 0; i < rep.offPromote.Size(); i++) if (rep.offPromote[i]) promo = true;

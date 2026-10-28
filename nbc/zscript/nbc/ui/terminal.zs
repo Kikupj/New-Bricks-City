@@ -2,24 +2,26 @@
 //   BOARD     the case: the districts, who holds them, a dossier; open a case, plan a raid, close the day
 //   SQUAD     the roster as people: portraits, rank, XP, stats, perks; promote, recruit, dismiss
 //   ARMORY    the Evidence Locker: everything seized and issued; sell it, or requisition supplies
+//   MOTOR POOL the department's vehicles (garage.zs): buy, repair, sell
 //   MEMORIAL  the officers lost in the line of duty
 // The raid board in the hub opens it on BOARD, the lockers on ARMORY (NBC_RunManager.menuTab).
 
 class NBC_Terminal : NBC_UI
 {
-	enum ETab { TAB_BOARD, TAB_SQUAD, TAB_ARMORY, TAB_MEMORIAL, TAB_COUNT }
+	enum ETab { TAB_BOARD, TAB_SQUAD, TAB_ARMORY, TAB_MOTOR, TAB_MEMORIAL, TAB_COUNT }
 	enum EId
 	{
 		ID_TAB = 1, ID_CLOSE, ID_DISTRICT, ID_PLAN, ID_NEWCASE, ID_ENDDAY,
 		ID_OFFICER, ID_PROMOTE, ID_SQUAD, ID_DISMISS, ID_RECRUIT, ID_RECRUIT_CLASS, ID_PERK,
-		ID_ITEM, ID_SELL, ID_BUY, ID_YES, ID_NO, ID_SCROLL
+		ID_ITEM, ID_SELL, ID_BUY, ID_YES, ID_NO, ID_SCROLL,
+		ID_FACE, ID_VEHICLE, ID_REPAIR, ID_VSELL, ID_VBUY
 	}
 	enum EPopup { POP_NONE, POP_PROMOTE, POP_RECRUIT, POP_DISMISS, POP_ENDDAY, POP_NEWCASE }
 
 	int tab, popup;
-	int selDistrict, selOfficer, selItem, memScroll;
+	int selDistrict, selOfficer, selItem, memScroll, selVehicle;
 
-	static const String TAB_NAME[] = { "RAID BOARD", "SQUAD ROOM", "EVIDENCE LOCKER", "MEMORIAL" };
+	static const String TAB_NAME[] = { "RAID BOARD", "SQUAD ROOM", "EVIDENCE LOCKER", "MOTOR POOL", "MEMORIAL" };
 
 	// officer: an officer id to open the squad room on (an officer in the HQ was talked to), 0 = none
 	static void Open(int tab, int officer = 0)
@@ -57,6 +59,7 @@ class NBC_Terminal : NBC_UI
 		}
 		else if (tab == TAB_SQUAD) { focusId = ID_OFFICER; focusArg = selOfficer; focusSet = true; }
 		else if (tab == TAB_ARMORY) { focusId = ID_ITEM; focusArg = selItem; focusSet = true; }
+		else if (tab == TAB_MOTOR) { focusId = ID_VEHICLE; focusArg = selVehicle; focusSet = true; }
 	}
 
 	override void SwitchTab(int dir)
@@ -141,6 +144,11 @@ class NBC_Terminal : NBC_UI
 			}
 			return;
 		case ID_ITEM: selItem = arg; return;
+		case ID_FACE: NBC_FacePicker.Open(self); return;
+		case ID_VEHICLE: selVehicle = arg; return;
+		case ID_REPAIR: Send(NBC_Department.OP_REPAIR, selVehicle); return;
+		case ID_VSELL: Send(NBC_Department.OP_SELL_VEHICLE, selVehicle); return;
+		case ID_VBUY: Send(NBC_Department.OP_BUY_VEHICLE, 0, arg); return;
 		case ID_SELL: Send(NBC_Department.OP_SELL, 0, selItem); return;
 		case ID_BUY: Send(NBC_Department.OP_BUY, 0, selItem); return;
 		}
@@ -174,12 +182,12 @@ class NBC_Terminal : NBC_UI
 		double tx = 16;
 		for (int i = 0; i < TAB_COUNT; i++)
 		{
-			double w = 196;
+			double w = 158;
 			bool on = tab == i;
 			bool f = IsFocus(ID_TAB, i) && registering;
 			Fill(tx, 64, w, 34, on ? C_PANEL : 0x141C26);
 			Fill(tx, 64, w, 2, on ? C_AMBER : C_PANEL_HI);
-			Text(BigFont, on ? Font.CR_GOLD : (f ? Font.CR_WHITE : Font.CR_GRAY), tx + w / 2, 75, TAB_NAME[i], 12, 1);
+			Text(BigFont, on ? Font.CR_GOLD : (f ? Font.CR_WHITE : Font.CR_GRAY), tx + w / 2, 76, TAB_NAME[i], 10.5, 1);
 			Region(ID_TAB, i, tx, 64, w, 34);
 			if (f) FocusFrame(tx, 64, w, 34);
 			tx += w + 6;
@@ -191,6 +199,7 @@ class NBC_Terminal : NBC_UI
 		case TAB_BOARD: DrawBoard(); break;
 		case TAB_SQUAD: DrawSquad(); break;
 		case TAB_ARMORY: DrawArmory(); break;
+		case TAB_MOTOR: DrawMotorPool(); break;
 		case TAB_MEMORIAL: DrawMemorial(); break;
 		}
 		Hints("ARROWS / MOUSE  select     ENTER / CLICK  use     Q / E  switch tabs     ESC  back");
@@ -404,6 +413,10 @@ class NBC_Terminal : NBC_UI
 		}
 		bool canHire = rd && rd.caseActive && dept.roster.Size() < 16;
 		Button(ID_RECRUIT, 0, 30, 500, 200, 36, "RECRUIT", canHire, 15, C_GREEN);
+		// your own face (any portrait nobody on the roster has)
+		Inset(392, 496, 44, 44);
+		Pic(dept.PlayerPortrait(), 394, 498, 40, 40);
+		Button(ID_FACE, 0, 442, 500, 110, 36, "YOUR FACE", true, 12);
 		if (!(rd && rd.caseActive)) Text(NewSmallFont, Font.CR_DARKGRAY, 244, 512, "Recruiting needs an open case (cash).", 10);
 
 		// the file on the selected officer
@@ -572,6 +585,66 @@ class NBC_Terminal : NBC_UI
 			for (int k = 0; k < o.kitPouch.Size(); k++) if (o.kitPouch[k] == it) n++;
 		}
 		return n;
+	}
+
+	// ------------------------------------------------------------ MOTOR POOL
+
+	void DrawMotorPool()
+	{
+		let dept = NBC_Department.Find();
+		let rd = NBC_RunData.Find();
+		if (!dept) return;
+		if (focusId == ID_VEHICLE) selVehicle = focusArg;
+		let sel = dept.VehicleById(selVehicle);
+		if (!sel && dept.garage.Size()) { sel = dept.garage[0]; selVehicle = sel.id; }
+
+		// the garage
+		Panel(16, 108, 560, 440, "GARAGE");
+		Text(NewSmallFont, Font.CR_GRAY, 560, 118, String.Format("%d / %d vehicles", dept.garage.Size(), NBC_Motor.MAX_VEHICLES), 11, 2);
+		for (int i = 0; i < dept.garage.Size(); i++)
+		{
+			let v = dept.garage[i];
+			double x = 30 + (i % 2) * 268, y = 140 + (i / 2) * 100;
+			bool f = IsFocus(ID_VEHICLE, v.id) && registering;
+			Inset(x, y, 260, 92, v.id == selVehicle ? C_AMBER_DIM : -1);
+			Pic(NBC_Motor.TYPE_ART[v.type], x + 6, y + 8, 112, 56, v.Ready() ? 1.0 : 0.5, !v.Ready());
+			Text(BigFont, f ? Font.CR_GOLD : Font.CR_WHITE, x + 126, y + 8, NBC_Motor.TYPE_SHORT[v.type], 13);
+			Text(NewSmallFont, Font.CR_GRAY, x + 126, y + 26, v.plate, 10);
+			Text(NewSmallFont, Font.CR_GRAY, x + 126, y + 40, String.Format("%d seats", v.Seats()), 10);
+			Text(NewSmallFont, v.Ready() ? Font.CR_GREEN : Font.CR_RED, x + 126, y + 54, v.Ready() ? "READY" : "IN THE SHOP", 10);
+			Bar(x + 6, y + 72, 248, 12, v.cond / 100.0, v.cond >= 60 ? C_GREEN : (v.cond >= NBC_Motor.SHOP_BELOW ? C_AMBER : C_RED), 10);
+			Region(ID_VEHICLE, v.id, x, y, 260, 92);
+			if (f) FocusFrame(x, y, 260, 92);
+		}
+
+		// the selected vehicle, then the dealer
+		double x = 588, w = VW - 16 - x;
+		Panel(x, 108, w, 440, "VEHICLE");
+		bool open = rd && rd.caseActive;
+		if (sel)
+		{
+			Inset(x + 16, 136, 150, 76);
+			Pic(NBC_Motor.TYPE_ART[sel.type], x + 20, 140, 142, 68);
+			Text(BigFont, Font.CR_WHITE, x + 176, 138, NBC_Motor.TYPE_NAME[sel.type].MakeUpper(), 13);
+			Text(NewSmallFont, Font.CR_GRAY, x + 176, 156, String.Format("Plate %s  -  %d seats  -  %d%%", sel.plate, sel.Seats(), sel.cond), 10);
+			Wrap(NewSmallFont, Font.CR_WHITE, x + 176, 172, w - 192, NBC_Motor.TYPE_PERK[sel.type], 9, 2);
+			int cost = NBC_Motor.RepairCost(sel.type, sel.cond);
+			Button(ID_REPAIR, 0, x + 16, 222, (w - 40) / 2, 30, cost > 0 ? String.Format("REPAIR  $%d", cost) : "REPAIRED",
+				open && cost > 0 && rd.cash >= cost, 11, C_GREEN);
+			Button(ID_VSELL, 0, x + 24 + (w - 40) / 2, 222, (w - 40) / 2, 30, String.Format("SELL  $%d", NBC_Motor.SellValue(sel.type, sel.cond)),
+				open && dept.garage.Size() > 1, 11, C_RED);
+		}
+		Text(BigFont, Font.CR_GRAY, x + 16, 266, "DEALER", 12);
+		for (int t = 0; t < NBC_Motor.V_COUNT; t++)
+		{
+			double y = 284 + t * 64;
+			Inset(x + 16, y, w - 32, 58);
+			Pic(NBC_Motor.TYPE_ART[t], x + 20, y + 6, 80, 40);
+			Text(NewSmallFont, Font.CR_WHITE, x + 108, y + 6, NBC_Motor.TYPE_NAME[t], 11);
+			Text(NewSmallFont, Font.CR_GRAY, x + 108, y + 22, String.Format("%d seats", NBC_Motor.TYPE_SEATS[t]), 10);
+			bool can = open && rd.cash >= NBC_Motor.TYPE_PRICE[t] && dept.garage.Size() < NBC_Motor.MAX_VEHICLES;
+			Button(ID_VBUY, t, x + w - 32 - 110, y + 12, 110, 32, String.Format("BUY $%d", NBC_Motor.TYPE_PRICE[t]), can, 10, C_GREEN);
+		}
 	}
 
 	// ------------------------------------------------------------ MEMORIAL

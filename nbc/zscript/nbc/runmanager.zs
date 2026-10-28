@@ -27,6 +27,7 @@ class NBC_RunManager : EventHandler
 
 	Array<NBC_GangDef> gangs;
 	Array<String> districtMaps, districtTitles, districtEnvs;
+	Array<String> roofMaps;             // the helicopter's rooftop map per district (nbc/rooftops.txt)
 
 	// raid bookkeeping (this map only)
 	bool raidSetUp, reinforced, exitFound;
@@ -34,7 +35,7 @@ class NBC_RunManager : EventHandler
 	Vector3 exitPos;
 	Actor leader;
 	Array<Actor> crew, squad;
-	Array<NBC_Spot> spareSpots;
+	Array<NBC_Spot> spareSpots, allSpots;
 
 	// messages
 	String announceText;
@@ -52,6 +53,7 @@ class NBC_RunManager : EventHandler
 	{
 		NBC_Gangs.LoadGangs(gangs);
 		NBC_Gangs.LoadDistricts(districtMaps, districtTitles, districtEnvs);
+		NBC_Gangs.LoadRooftops(districtMaps, roofMaps);
 		if (e.IsSaveGame) return;
 
 		let rd = NBC_RunData.Get();
@@ -457,7 +459,7 @@ class NBC_RunManager : EventHandler
 		// 5. the crew: the game sets the count, not Obsidian
 		static const int baseCount[] = { 22, 18, 16 };
 		int alert = rd.gangAlert.Size() > rd.raidGang ? rd.gangAlert[rd.raidGang] : 0;
-		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert));
+		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * InsertionCrewFactor(rd));
 		want = min(want, cand.Size());
 		int placed = 0, k = 0;
 		while (placed < want && k < cand.Size())
@@ -469,6 +471,7 @@ class NBC_RunManager : EventHandler
 			if (a) { crew.Push(a); placed++; }
 		}
 		for (; k < cand.Size(); k++) spareSpots.Push(cand[k]);
+		allSpots.Copy(spots);
 		startCount = crew.Size();
 
 		// 6. your kit, then the squad in behind you
@@ -480,17 +483,199 @@ class NBC_RunManager : EventHandler
 			let a = NBC_Ally(Actor.Spawn("NBC_Ally", p.pos, NO_REPLACE));
 			if (!a) continue;
 			a.Equip(o, s);
+			if (RolledOut(rd, NBC_Motor.V_TRUCK)) a.takeMul *= 0.85;     // they rode in armored
 			a.CatchUp(p);
 			squad.Push(a);
 		}
 
-		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers. Exit %s.",
+		// 7. how you got here: the motorcade parks behind you, or the helicopter came down
+		int parked = rd.raidMode == NBC_Motor.MODE_STREET ? ParkMotorcade(p, rd) : 0;
+
+		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers, %d vehicles parked. Exit %s.",
 			level.MapName, kit ? kit.VariantName() : TurfEnv(rd.raidDistrict), g.name, spots.Size(), startCount,
-			leader ? "leader" : "no leader", squad.Size(), exitFound ? "found" : "not found (far spot)");
+			leader ? "leader" : "no leader", squad.Size(), parked, exitFound ? "found" : "not found (far spot)");
 		String title = TurfTitle(rd.raidDistrict);
 		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
-		Announce(String.Format("%s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
-			title, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
+		if (rd.raidMode == NBC_Motor.MODE_CRASH) { CrashSite(p, rd, g); return; }
+		String how = rd.raidMode == NBC_Motor.MODE_ROOF ? "Rook puts you down on the roofs. " : "";
+		Announce(String.Format("%s%s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
+			how, title, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
+	}
+
+	// ------------------------------------------------------------ the motorcade (garage.zs)
+
+	// after a raid: the motorcade takes its knocks; a shot-down helicopter is gone
+	void Wear(NBC_RunData rd, NBC_Department dept, NBC_Report rep, bool taken)
+	{
+		for (int i = 0; i < rd.raidVehicles.Size(); i++)
+		{
+			let v = dept.VehicleById(rd.raidVehicles[i]);
+			if (!v) continue;
+			int was = v.cond;
+			if (rd.raidMode == NBC_Motor.MODE_CRASH && NBC_Motor.Flies(v.type)) v.cond = 0;
+			else if (v.type == NBC_Motor.V_TRUCK) continue;
+			else if (NBC_Motor.Flies(v.type)) v.cond -= rd.Rand(2, 8);
+			else v.cond -= rd.Rand(4, 14) + (taken ? 0 : 8);
+			if (v.cond <= 0)
+			{
+				rep.notes.Push(rd.raidMode == NBC_Motor.MODE_CRASH && NBC_Motor.Flies(v.type) ?
+					String.Format("The %s went down in the Bricks. It's gone.", v.Name()) : String.Format("The %s is a write-off.", v.Name()));
+				dept.garage.Delete(dept.garage.Find(v));
+				continue;
+			}
+			if (v.cond < NBC_Motor.SHOP_BELOW) { v.rolling = false; rep.notes.Push(String.Format("The %s needs the shop (%d%%).", v.Name(), v.cond)); }
+			else if (was - v.cond >= 10) rep.notes.Push(String.Format("The %s took some rounds (%d%%).", v.Name(), v.cond));
+		}
+		// a raid used up a seat? pick again for the next one
+		if (dept.Seats(dept.insertion) < dept.SeatsNeeded()) dept.AutoMotorcade();
+	}
+
+	clearscope bool RolledOut(NBC_RunData rd, int type) const
+	{
+		let dept = NBC_Department.Find();
+		if (!dept) return false;
+		for (int i = 0; i < rd.raidVehicles.Size(); i++)
+		{
+			let v = dept.VehicleById(rd.raidVehicles[i]);
+			if (v && v.type == type) return true;
+		}
+		return false;
+	}
+
+	// fewer of them where they aren't looking: the roofs, or a motorcade of plain sedans
+	double InsertionCrewFactor(NBC_RunData rd)
+	{
+		if (rd.raidMode == NBC_Motor.MODE_ROOF) return 0.8;
+		if (rd.raidMode != NBC_Motor.MODE_STREET || !rd.raidVehicles.Size()) return 1.0;
+		let dept = NBC_Department.Find();
+		for (int i = 0; i < rd.raidVehicles.Size(); i++)
+		{
+			let v = dept ? dept.VehicleById(rd.raidVehicles[i]) : null;
+			if (v && v.type != NBC_Motor.V_SEDAN) return 1.0;
+		}
+		return 0.85;
+	}
+
+	// the vehicles that brought you, parked behind the start (where there's room)
+	// Each vehicle takes the first clear spot it can see from the start, behind you first, then round the sides.
+	int ParkMotorcade(Actor p, NBC_RunData rd)
+	{
+		let dept = NBC_Department.Find();
+		if (!dept) return 0;
+		static const double turn[] = { 180, 150, 210, 120, 240, 90, 270, 60, 300, 30, 330, 0 };
+		static const double dist[] = { 160, 260, 380, 520 };
+		int n = 0;
+		for (int i = 0; i < rd.raidVehicles.Size(); i++)
+		{
+			let v = dept.VehicleById(rd.raidVehicles[i]);
+			if (!v) continue;
+			class<Actor> cls = NBC_Motor.TYPE_ACTOR[v.type];
+			if (!cls) continue;
+			bool parked = false;
+			for (int r = 0; r < dist.Size() && !parked; r++)
+			{
+				for (int t = 0; t < turn.Size() && !parked; t++)
+				{
+					Vector2 at = p.pos.xy + Actor.AngleToVector(p.angle + turn[t], dist[r]);
+					if (!level.IsPointInLevel((at, p.pos.z))) continue;
+					double fz = p.GetZAt(at.x, at.y, 0, GZF_ABSOLUTEPOS);
+					if (abs(fz - p.floorz) > 24) continue;
+					let car = Actor.Spawn(cls, (at, fz), NO_REPLACE);
+					if (!car) break;
+					if (!car.TestMobjLocation() || !p.CheckSight(car)) { car.Destroy(); continue; }
+					car.angle = p.angle;
+					parked = true;
+					n++;
+				}
+			}
+		}
+		return n;
+	}
+
+	// Shot down: the helicopter comes down somewhere out in the open, away from the exit and the leader; everyone's
+	// hurt; the gang converges on the wreck in waves (CrashTick) until the way out is clear.
+	void CrashSite(Actor p, NBC_RunData rd, NBC_GangDef g)
+	{
+		Array<NBC_Spot> ok;
+		for (int i = 0; i < allSpots.Size(); i++)
+		{
+			Vector3 at = allSpots[i].pos;
+			Sector sec = level.PointInSector(at.xy);
+			if (sec.GetTexture(Sector.ceiling) != skyflatnum) continue;
+			if (exitFound && (at.xy - exitPos.xy).Length() < 1200) continue;
+			if (leader && (at.xy - leader.pos.xy).Length() < 1024) continue;
+			bool crowded = false;
+			for (int c = 0; c < crew.Size() && !crowded; c++) if (crew[c] && (crew[c].pos.xy - at.xy).Length() < 384) crowded = true;
+			if (!crowded) ok.Push(allSpots[i]);
+		}
+		if (ok.Size())
+		{
+			Vector3 at = ok[rd.Rand(0, ok.Size() - 1)].pos;
+			p.SetOrigin(at, false);
+			p.angle = rd.Rand(0, 7) * 45;
+		}
+		// the wreck, burning, a little way off
+		for (int t = 0; t < 8; t++)
+		{
+			Vector2 w = p.pos.xy + Actor.AngleToVector(p.angle + t * 45, 170);
+			let wreck = Actor.Spawn(NBC_Motor.TYPE_ACTOR[NBC_Motor.V_HELI], (w, p.GetZAt(w.x, w.y, 0, GZF_ABSOLUTEPOS)), NO_REPLACE);
+			if (!wreck) break;
+			if (!wreck.TestMobjLocation()) { wreck.Destroy(); continue; }
+			wreck.angle = p.angle + 70;
+			wreck.A_SetTranslation("NBC_Burnt");
+			Actor.Spawn("NBC_WreckFire", wreck.pos);
+			break;
+		}
+		// everyone took the landing hard
+		if (p.player) p.player.health = p.health = max(30, p.health - rd.Rand(15, 35));
+		for (int s = 0; s < squad.Size(); s++)
+		{
+			let a = NBC_Ally(squad[s]);
+			if (!a) continue;
+			a.health = max(10, a.health - a.maxHp * rd.Rand(15, 40) / 100);
+			a.CatchUp(p);
+		}
+		rd.crashWave = 0;
+		rd.crashNext = level.maptime + 35 * 10;
+		Announce(String.Format("MAYDAY! The bird's down in %s.\nThey'll come for the wreck. Hold out until the way to the exit is clear.",
+			TurfTitle(rd.raidDistrict)), 35 * 8);
+	}
+
+	// the ambush round the wreck: waves out of sight, coming for you; after the last, the way out is clear
+	void CrashTick(NBC_RunData rd, Actor p)
+	{
+		if (rd.crashClear) return;
+		let g = GangAt(rd.raidGang);
+		if (!g) return;
+		if (rd.crashWave >= NBC_Motor.CRASH_WAVES)
+		{
+			if (level.maptime >= rd.crashNext)
+			{
+				rd.crashClear = true;
+				Announce("Radio: a unit's holding the street to the exit. Move, now!", 35 * 6);
+			}
+			return;
+		}
+		if (level.maptime < rd.crashNext) return;
+		int alert = rd.raidGang < rd.gangAlert.Size() ? rd.gangAlert[rd.raidGang] : 0;
+		int n = min(10, 3 + 2 * g.tier + alert);
+		int sent = 0;
+		for (int t = 0; t < allSpots.Size() * 2 && sent < n; t++)
+		{
+			NBC_Spot sp = allSpots[rd.Rand(0, allSpots.Size() - 1)];
+			double d = (sp.pos.xy - p.pos.xy).Length();
+			if (d < 700 || d > 2400) continue;
+			let a = SpawnMember(PickRoster(g, rd, rd.Rand(1, 2)), sp.pos, g, rd, g.health);
+			if (!a) continue;
+			if (a.CheckSight(p)) { a.Destroy(); continue; }
+			a.target = p;
+			a.SetStateLabel("See");
+			crew.Push(a);
+			sent++;
+		}
+		rd.crashWave++;
+		rd.crashNext = level.maptime + 35 * (rd.crashWave >= NBC_Motor.CRASH_WAVES ? 30 : 25);
+		Announce(String.Format("Wave %d of %d: %d of them closing on the wreck.", rd.crashWave, NBC_Motor.CRASH_WAVES, sent), 35 * 3);
 	}
 
 	String PickRoster(NBC_GangDef g, NBC_RunData rd, int tier)
@@ -552,6 +737,7 @@ class NBC_RunManager : EventHandler
 		}
 
 		if (level.maptime % 35 != 0) return;
+		if (rd.raidMode == NBC_Motor.MODE_CRASH) CrashTick(rd, p);
 
 		// gang members notice the officers too (the pack's enemies only look for players)
 		for (int i = crew.Size() - 1; i >= 0; i--)
@@ -752,12 +938,21 @@ class NBC_RunManager : EventHandler
 			rd.cash += rd.raidBounty;
 			rep.bounty = rd.raidBounty;
 		}
+		else if (rd.raidMode == NBC_Motor.MODE_CRASH)
+		{
+			// shot down and walked out: no strike for that
+			rep.outcome = NBC_Report.OUT_CRASH;
+			rep.title = "SHOT DOWN - SURVIVED";
+			if (gi >= 0 && gi < rd.gangAlert.Size()) rd.gangAlert[gi] = min(3, rd.gangAlert[gi] + 1);
+		}
 		else
 		{
 			rep.outcome = NBC_Report.OUT_RETREAT;
 			rep.title = "RETREAT";
 			if (gi >= 0 && gi < rd.gangAlert.Size()) rd.gangAlert[gi] = min(3, rd.gangAlert[gi] + 1);
 		}
+		rep.mode = rd.raidMode;
+		Wear(rd, dept, rep, taken);
 		rep.cashRaid = rd.cash - cashAtStart - rep.bounty;
 		rep.balance = rd.cash;
 
@@ -787,14 +982,15 @@ class NBC_RunManager : EventHandler
 	{
 		if (e.Name ~== "nbc_debug_case") { DebugCase(); return; }
 		if (e.Name ~== "nbc_debug_clear") { DebugClear(e.Args[0]); return; }
+		if (e.Name ~== "nbc_debug_cash") { let rd = NBC_RunData.Get(); rd.cash += e.Args[0]; return; }   // testing
 		if (e.Name.Left(9) ~== "nbc_dept.")
 		{
 			// "nbc_dept.<op>" a b c (SendNetworkEvent carries three numbers; the op rides in the name)
 			NBC_Department.Get().Apply(e.Name.Mid(9).ToInt(), e.Args[0], e.Args[1], e.Args[2], NBC_RunData.Get());
 			return;
 		}
-		if (e.Name ~== "nbc_deploy") { Deploy(e.Args[0]); return; }
-		if (e.Name ~== "nbc_terminal") { menuKind = MK_TERMINAL; menuTab = e.Args[0]; menuOfficer = 0; menuRequests++; return; }   // netevent nbc_terminal <tab 0-3>
+		if (e.Name ~== "nbc_deploy") { Deploy(e.Args[0], e.Args[1]); return; }
+		if (e.Name ~== "nbc_terminal") { menuKind = MK_TERMINAL; menuTab = e.Args[0]; menuOfficer = 0; menuRequests++; return; }   // netevent nbc_terminal <tab 0-4>
 		if (e.Name ~== "nbc_ready") { Ready(e.Args[0]); return; }
 		if (!(e.Name ~== "nbc_board")) return;
 		let rd = NBC_RunData.Get();
@@ -827,21 +1023,48 @@ class NBC_RunManager : EventHandler
 	}
 
 	// WHEELS UP at the pilot (or netevent nbc_deploy <district> for testing): the squad as picked goes in with you
-	void Deploy(int d)
+	// force (testing, netevent nbc_deploy <district> <force>): 1 = no shoot-down, 2 = shot down
+	void Deploy(int d, int force = 0)
 	{
 		let rd = NBC_RunData.Get();
 		let dept = NBC_Department.Get();
 		if (!rd.caseActive || rd.raidActive || !IsHub() || d < 0 || d >= districtMaps.Size()) return;
-		if (!DistrictGang(rd, d) || DistrictTaken(rd, d)) return;
+		let g = DistrictGang(rd, d);
+		if (!g || DistrictTaken(rd, d)) return;
 		if (!LevelInfo.MapExists(districtMaps[d]))
 		{
 			Console.Printf("\cgnbc: district map %s is missing (tools/Obsidian/make_bricks).", districtMaps[d]);
 			return;
 		}
+		// the motorcade: the vehicles have to seat everyone
+		dept.PruneSquad();
+		int ins = dept.insertion;
+		if (ins == NBC_Motor.INS_ROOFTOP && !dept.RollingHeli()) ins = NBC_Motor.INS_STREET;
+		if (dept.Seats(ins) < dept.SeatsNeeded())
+		{
+			Announce(String.Format("Not enough seats: %d going in, %d in the motorcade.", dept.SeatsNeeded(), dept.Seats(ins)), 35 * 4);
+			return;
+		}
 		rd.readyDistrict = -1;
 		rd.BeginRaid(d);
 		rd.raidMap = districtMaps[d];
-		dept.PruneSquad();
+		for (int i = 0; i < dept.garage.Size(); i++)
+			if (dept.garage[i].rolling && dept.Fits(dept.garage[i], ins)) rd.raidVehicles.Push(dept.garage[i].id);
+		if (ins == NBC_Motor.INS_ROOFTOP)
+		{
+			// the way in over the roofs: the gang's guns might get the bird first
+			int gi = rd.districtGang[d];
+			int alert = gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0;
+			int risk = NBC_Motor.ShootDownRisk(g.tier, alert, dept.RollingHeli().cond);
+			bool down = force == 2 || (force != 1 && rd.Rand(0, 99) < risk);
+			if (down) rd.raidMode = NBC_Motor.MODE_CRASH;
+			else
+			{
+				rd.raidMode = NBC_Motor.MODE_ROOF;
+				String roof = d < roofMaps.Size() ? roofMaps[d] : "";
+				if (roof != "" && LevelInfo.MapExists(roof)) rd.raidMap = roof;
+			}
+		}
 		for (int s = 0; s < dept.squad.Size(); s++)
 		{
 			rd.raidOff.Push(dept.squad[s]);
@@ -929,6 +1152,7 @@ class NBC_RunManager : EventHandler
 			rosterSaved = dept.rosterVersion;
 			CVar.FindCVar("nbc_roster").SetString(dept.SaveRoster());
 			CVar.FindCVar("nbc_memorial").SetString(dept.SaveMemorial());
+			CVar.FindCVar("nbc_avatar").SetInt(dept.playerFace);
 		}
 		if (gamestate != GS_LEVEL || menuactive != Menu.Off) return;
 		if (dept && dept.reportPending && dept.reportSerial != reportSeen && IsHub())
