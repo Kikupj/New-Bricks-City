@@ -8,7 +8,8 @@ demolition crews roll in either way.
 
 > **Status:** in development. The core loop is playable: a case, raids on generated districts, a squad of
 > individual officers with ranks and perks, an evidence locker, Ghost Recon-style squad orders and a polished
-> set of precinct screens. Much of it still needs a human playtest. `docs/STATUS.md` has the live state.
+> set of precinct screens. The core loop has had a full playthrough; some polish and the older test maps
+> still need a human playtest. `docs/STATUS.md` has the live state.
 
 ---
 
