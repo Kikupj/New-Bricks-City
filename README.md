@@ -76,13 +76,25 @@ dialogue, image and sound in the mod is original.
    reinforcements come once most of the crew is down. Command the squad, take down the leader and leave
    by the exit to **topple** the gang. Leaving with the leader alive is a **retreat**, and the gang goes
    on alert. A lethal hit means **OFFICER DOWN**: you're pulled out with a strike against you.
-6. **The after-action report.** You get a grade, kills, time and health lost. Officers earn XP, go to
+6. **The after-action report.** You get a letter grade (S to D, out of 100: the body count, your accuracy,
+   health lost, time against par, the officers), kills, time and health lost. Officers earn XP, go to
    the hospital, or go onto the memorial wall. Everything you carried goes back into the locker, and on a
-   taken block the evidence team bags what the gang dropped. You also get the cash and the bounty.
+   taken block the evidence team bags what the gang dropped. You also get the cash and the bounty, see how
+   **Backing** moved, and bank **Merit**.
 7. **Between raids:** promote officers (each promotion picks one of two perks), recruit new ones, sell
    seized guns and requisition supplies, or **close the day** to let the squad heal.
-8. **The case ends** when every gang is down (case closed), after three strikes (Internal Affairs takes
-   your badge), or on day 30 (demolition). Officers who survive carry over to your next game.
+8. **Backing** is City Hall's and the street's faith in the department (0 to 100, starting at 60). A toppled
+   gang (+15) and a clean raid (+5) raise it; a retreat (−5), going down (−10), an officer killed (−10) or
+   hospitalized (−2) lower it. At 25 or less, hospital stays run a day longer. At zero, Internal Affairs opens a
+   file: a strike, and Backing starts again at 40.
+9. **Merit** is banked after every raid and kept between games: +2 for a taken block, +15 for a toppled gang
+   (+50 for the Crown), +5 for every officer who comes home, and +6 / +4 / +2 for an S / A / B grade. It's spent
+   on the precinct from M8 on.
+10. **The Crown.** Topple three gangs and the Landlord's tower opens on the raid board: their private
+   military and their Brute. Take it to close the case.
+11. **The case ends** when the Crown falls (case closed), after three strikes (Internal Affairs takes
+   your badge), or on day 30 (demolition). The case summary sums it up: days used, gangs toppled, strikes,
+   raids, officers lost, Backing and the Merit it earned. Officers who survive carry over to your next game.
 
 ## Getting started
 
@@ -328,6 +340,7 @@ Gangs are data: `nbc/gangs.txt` holds their rosters, traits, damage profiles, le
 | The Rust Saints | 1 | Pyros: fire and explosives, and fire won't touch them |
 | The Iron Pit | 2 | Roiders: they shrug off stagger; fire hurts them half again |
 | The Collectors | 2 | Vests: pistol and SMG rounds do less; bring shells or rifles |
+| The Landlord's Own (the Crown) | 3 | Private military: armored, drilled, never off guard. Opens after three gangs fall |
 
 Every attack has a damage type (`NBC_Light`, `NBC_Shell`, `NBC_Rifle`, `Melee`, `Fire`, `Blunt`), so the
 right gun for the gang matters. The enemies themselves are the DeeDeeOZ **DeePayback** pack: thugs,
@@ -433,13 +446,13 @@ AGENTS.md               the rules for anyone (or any AI agent) working on the co
 
 | System | File | What it does |
 |---|---|---|
-| `NBC_RunData` | `rundata.zs` | Case and raid state (a STAT_STATIC thinker): day, strikes, cash, gangs, districts, the raid, the squad's orders. All case randomness comes from its seeded RNG, so a seed reproduces a case. |
+| `NBC_RunData` | `rundata.zs` | Case and raid state (a STAT_STATIC thinker): day, strikes, cash, Backing, the Crown, the case file (raids, losses, Merit), gangs, districts, the raid, the squad's orders. All case randomness comes from its seeded RNG, so a seed reproduces a case. |
 | `NBC_Department` | `dept.zs` | The roster (`NBC_Officer`), the memorial, the Evidence Locker, everyone's kit, the after-action report. Menus change it only through `nbc_dept.<op>` netevents. |
 | `NBC_RunManager` | `runmanager.zs` | The loop: deploy → raid setup (gang spawns, leader, exit, your kit, the squad) → resolve (loot, XP, wounds, grade, report). Opens the menus from the UI side. |
 | `NBC_Ally` | `ally.zs` | An officer in the field: class sprite and outfit, weapon profile, aim and perks, pouches, orders and rules of engagement, routing. |
 | `NBC_Orders` | `orders.zs` | Squad commands (`nbc_cmd.<op>`), fireteams, waypoints and go codes, the radio log, contacts for the threat ring, the nav graph's owner. |
 | `CW_NavGraph` | `cw/nav.zs` | The navigation graph built from the map's geometry; Dijkstra routes. |
-| `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results and the command map. |
+| `NBC_UI` and screens | `ui/*.zs` | The screen framework, the terminal, deploy, results, the case summary (`casefile.zs`) and the command map. |
 | `NBC_StatusBar` | `hud.zs` | The magazine and debris readouts, the raid readout, the squad strip, the threat ring, the radio log. |
 | `NBC_Motor`, `NBC_Vehicle` | `garage.zs` | The vehicle catalog, the garage's vehicles, seats, wear, the shoot-down risk, the crash site's fire. |
 | `NBC_TacticalHandler`, `NBC_TacticalAI` | `tactical.zs` | Tactical Duck & Dodge: a controller on every gang member and officer (duck, pop-up, dodge, roll, cover, corner peek, retreat, push, reloads, projectile dodging); cooking barrels. |
@@ -492,6 +505,10 @@ Debug netevents, from the console:
 | `netevent nbc_deploy <district> <force>` | start a raid now (force 1: never shot down, 2: shot down) |
 | `netevent nbc_debug_event <kind> <district> <hour>` | set today's event (0 none, 1 gang war, 2 crowd, 3 deal, 4 blackout, 5 pinned; hour 0-3) |
 | `netevent nbc_debug_motorcade` | on a street raid: stand back from the parked motorcade |
+| `netevent nbc_skipblock` | on a raid: down the leader and the crew and leave by the exit (a taken block) |
+| `netevent nbc_day <n>` | set the case's day (past 30 ends the case) |
+| `netevent nbc_debug_backing <n>` | move Backing by n (to zero for a strike) |
+| `netevent nbc_debug_topple <n>` | topple the first n gangs still standing (not the Crown) |
 | `nbc_seed <n>` | every new case uses this seed |
 | `nbc_navdebug 1` | show the squad navigation graph's nodes |
 | `nbc_kittest <kit> <variant> <seed>` | generate a kit test floor |

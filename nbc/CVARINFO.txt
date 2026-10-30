@@ -9,6 +9,7 @@ server string nbc_roster = "";
 server string nbc_memorial = "";
 server noarchive bool nbc_navdebug = false;   // show the squad navigation graph (nodes) and its build time when a raid starts
 server int nbc_avatar = -1;       // your portrait (a face number; -1 = Det. Vance's own), kept between games
+server int nbc_merit = 0;         // Merit banked after every raid (NBC_Department.merit), kept between games
 
 // Tactical Duck & Dodge AI (zscript/nbc/tactical.zs, ported from reference/TacticalDuckDodge/): the gang and the squad
 server bool  nbc_squad_tactical      = true; // NBC: the squad's officers duck, dodge and take cover too

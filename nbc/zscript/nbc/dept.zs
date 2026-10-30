@@ -223,9 +223,14 @@ class NBC_Report
 	int outcome;
 	String title, place, gang, grade, dayLine;
 	int kills, playerKills, crewTotal, healthLost, timeSecs, cashRaid, bounty, sold, balance;
-	bool leaderDown;
-	// the officers who went in
-	Array<int> offId, offKills, offState, offFace, offRank, offXP;
+	bool leaderDown, crown;
+	// the grade's inputs (PLAN.md §6.11): rounds fired and hits, par time, the points out of 100
+	int shots, hits, parSecs, score;
+	// Backing before and after, what moved it ("Retreat -5"); Merit earned and the department's bank after it
+	int backingWas, backingNow, merit, meritBank;
+	Array<String> backingLog;
+	// the officers who went in (offDays: days in the hospital, 0 = fit or killed)
+	Array<int> offId, offKills, offState, offFace, offRank, offXP, offDays;
 	Array<String> offName;
 	Array<bool> offPromote;
 	// what the raid brought back to the locker (net), item and count
@@ -261,6 +266,8 @@ class NBC_Department : Thinker
 	int nextVehicle, insertion;
 	int playerFace;                  // bumped on every roster change (the UI writes the CVars)
 	bool loaded;
+	// Merit (commendations), banked after every raid and kept between games (nbc_merit); spent from M8 on
+	int merit;
 
 	static NBC_Department Get()
 	{
@@ -298,6 +305,7 @@ class NBC_Department : Thinker
 		// specialists come by recruiting)
 		LoadRoster(CVar.GetCVar("nbc_roster").GetString(), CVar.GetCVar("nbc_memorial").GetString());
 		playerFace = CVar.GetCVar("nbc_avatar").GetInt();
+		merit = max(0, CVar.GetCVar("nbc_merit").GetInt());
 		if (playerFace < 0 || playerFace >= NBC_Cat.FACES) playerFace = NBC_Cat.VANCE_FACE;
 		ResetGarage(null);
 		if (!roster.Size())

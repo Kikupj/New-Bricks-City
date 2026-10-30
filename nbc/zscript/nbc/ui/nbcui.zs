@@ -504,8 +504,13 @@ class NBC_UI : GenericMenu
 			}
 			x -= Text(NewSmallFont, Font.CR_GRAY, x - 4, 15, "STRIKES", 11, 2) + 26;
 			x -= Text(BigFont, Font.CR_WHITE, x, 12, String.Format("%d/%d", rd.day, NBC_RunData.MAX_DAYS), 16, 2) + 8;
-			Text(NewSmallFont, Font.CR_GRAY, x, 15, "DAY", 11, 2);
-			Text(NewSmallFont, Font.CR_DARKGRAY, VW - 18, 37, String.Format("%d of %d gangs toppled", rd.ToppledCount(), rd.gangToppled.Size()), 10, 2);
+			x -= Text(NewSmallFont, Font.CR_GRAY, x, 15, "DAY", 11, 2) + 26;
+			int bc = rd.backing >= NBC_RunData.BACKING_HIGH ? Font.CR_GREEN : (rd.backing <= NBC_RunData.BACKING_LOW ? Font.CR_RED : Font.CR_WHITE);
+			x -= Text(BigFont, bc, x, 12, String.Format("%d", rd.backing), 16, 2) + 8;
+			Text(NewSmallFont, Font.CR_GRAY, x, 15, "BACKING", 11, 2);
+			String crown = rd.crownSlot <= 0 ? "" : (rd.CrownOpen() ? "   THE CROWN IS OPEN" : String.Format("   the Crown opens after %d more", rd.CrownNeeds()));
+			Text(NewSmallFont, rd.CrownOpen() ? Font.CR_GOLD : Font.CR_DARKGRAY, VW - 18, 37,
+				String.Format("%d of %d gangs toppled%s", rd.ToppledCount(), rd.RegularGangs(), crown), 10, 2);
 		}
 		else Text(NewSmallFont, Font.CR_DARKGRAY, VW - 18, 18, "NO OPEN CASE", 12, 2);
 	}

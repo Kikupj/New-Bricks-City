@@ -22,11 +22,12 @@ version "4.10"
 #include "zscript/nbc/runmanager.zs"
 #include "zscript/nbc/hub.zs"
 #include "zscript/nbc/hq.zs"
-// the precinct screens: the terminal, the deploy screen, the after-action report (M7c)
+// the precinct screens: the terminal, the deploy screen, the after-action report (M7c), the case summary (M3)
 #include "zscript/nbc/ui/nbcui.zs"
 #include "zscript/nbc/ui/terminal.zs"
 #include "zscript/nbc/ui/deploy.zs"
 #include "zscript/nbc/ui/results.zs"
+#include "zscript/nbc/ui/casefile.zs"
 #include "zscript/nbc/ui/commandmap.zs"
 #include "zscript/nbc/ui/wheelsup.zs"
 #include "zscript/nbc/ui/facepicker.zs"

@@ -160,7 +160,7 @@ class NBC_Terminal : NBC_UI
 		let rd = NBC_RunData.Find();
 		let rm = RM();
 		return rd && rm && rd.caseActive && !rd.raidActive && d >= 0 && d < rm.districtMaps.Size()
-			&& rm.DistrictGang(rd, d) && !rm.DistrictTaken(rd, d);
+			&& rm.DistrictGang(rd, d) && !rm.DistrictTaken(rd, d) && !rm.DistrictLocked(rd, d);
 	}
 
 	NBC_Officer CurOfficer()
@@ -222,7 +222,7 @@ class NBC_Terminal : NBC_UI
 		{
 			let rd = NBC_RunData.Find();
 			Confirm("OPEN A NEW CASE", rd && rd.caseActive ? "Abandon this case? The Bricks reshuffles, the locker goes back to issue. Your officers stay."
-				: "A new Bricks: the gangs dealt across the districts, 30 days to topple them all, three strikes and Internal Affairs takes your badge.");
+				: "A new Bricks: the gangs dealt across the districts, 30 days to topple three of them and take the Crown, three strikes and Internal Affairs takes your badge.");
 			break;
 		}
 		}
@@ -248,17 +248,20 @@ class NBC_Terminal : NBC_UI
 		if (!rm) return;
 		if (!rd || !rd.caseActive)
 		{
+			let dept0 = NBC_Department.Find();
 			double w = 600, x = (VW - w) / 2;
 			Panel(x, 150, w, 300, "NO OPEN CASE");
 			String last = "";
-			if (rd && rd.caseResult == NBC_CASE_WON) last = "Last case: CLOSED. Every gang in the Bricks went down.";
+			if (rd && rd.caseResult == NBC_CASE_WON) last = rd.crownSlot > 0 ? "Last case: CLOSED. The Crown fell." : "Last case: CLOSED. Every gang in the Bricks went down.";
 			else if (rd && rd.caseResult == NBC_CASE_STRUCK_OUT) last = "Last case: three strikes. Internal Affairs pulled the badge.";
 			else if (rd && rd.caseResult == NBC_CASE_DEMOLITION) last = "Last case: out of time. The demolition crews rolled in.";
 			double y = 200;
 			if (last != "") { Text(NewSmallFont, Font.CR_GOLD, x + 24, y, last, 13); y += 30; }
 			y += Wrap(NewSmallFont, Font.CR_WHITE, x + 24, y, w - 48,
-				"The Bricks is walled off and the gangs run it block by block. A case gives you 30 days to topple every gang: "
-				.. "raid a district, take down the gang's leader, get out. Three officers down and Internal Affairs ends it.", 12, 5);
+				"The Bricks is walled off and the gangs run it block by block. A case gives you 30 days: raid a district, take down "
+				.. "the gang's leader, get out. Topple three gangs and the Landlord's tower, the Crown, opens; take it to close the case. "
+				.. "Three strikes and Internal Affairs ends it.", 12, 5);
+			if (dept0 && dept0.merit > 0) Text(NewSmallFont, Font.CR_GOLD, x + w - 24, 162, String.Format("MERIT BANKED  %d", dept0.merit), 11, 2);
 			// the department you'd take into it
 			let dept = NBC_Department.Find();
 			if (dept && dept.roster.Size())
@@ -286,15 +289,17 @@ class NBC_Terminal : NBC_UI
 			double y = 140 + d * rowH;
 			let g = rm.DistrictGang(rd, d);
 			bool down = rm.DistrictTaken(rd, d);
+			bool locked = rm.DistrictLocked(rd, d);
 			bool f = IsFocus(ID_DISTRICT, d) && registering;
 			Inset(28, y, 428, rowH - 6, selDistrict == d ? C_AMBER_DIM : -1);
-			Fill(28, y, 6, rowH - 6, g ? (down ? C_GREY : C_RED) : C_PANEL);
-			Text(BigFont, down ? Font.CR_DARKGRAY : (f ? Font.CR_GOLD : Font.CR_WHITE), 44, y + 5, rm.TurfTitle(d).MakeUpper(), 14);
-			Text(NewSmallFont, Font.CR_GRAY, 44, y + 23, EnvName(rm.TurfEnv(d)), 10);
+			Fill(28, y, 6, rowH - 6, g ? (down || locked ? C_GREY : (rm.IsCrownDistrict(d) ? C_AMBER : C_RED)) : C_PANEL);
+			Text(BigFont, down || locked ? Font.CR_DARKGRAY : (f ? Font.CR_GOLD : Font.CR_WHITE), 44, y + 5, rm.TurfTitle(d).MakeUpper(), 14);
+			Text(NewSmallFont, Font.CR_GRAY, 44, y + 23, rm.IsCrownDistrict(d) ? "THE LANDLORD'S TOWER" : EnvName(rm.TurfEnv(d)), 10);
 			if (g)
 			{
-				Text(NewSmallFont, down ? Font.CR_DARKGRAY : g.TextColor(), 448, y + 6, g.name, 11, 2);
+				Text(NewSmallFont, down || locked ? Font.CR_DARKGRAY : g.TextColor(), 448, y + 6, g.name, 11, 2);
 				if (down) Text(BigFont, Font.CR_GREEN, 448, y + 22, "TAKEN", 11, 2);
+				else if (locked) Text(BigFont, Font.CR_DARKGRAY, 448, y + 22, String.Format("TOPPLE %d MORE", rd.CrownNeeds()), 10, 2);
 				else if (rd.EventIn(d))
 				{
 					// today's event is here
@@ -372,6 +377,8 @@ class NBC_Terminal : NBC_UI
 			{
 				Stamp(x + w / 2, 432, "TOPPLED", C_GREEN, 26);
 			}
+			else if (rm.DistrictLocked(rd, d))
+				Stamp(x + w / 2, 432, String.Format("SHUT: TOPPLE %d MORE", rd.CrownNeeds()), C_GREY, 18);
 		}
 		else Text(NewSmallFont, Font.CR_DARKGRAY, x + 20, 200, "Nobody holds this block.", 12);
 
@@ -385,8 +392,8 @@ class NBC_Terminal : NBC_UI
 			Wrap(NewSmallFont, Font.CR_GOLD, x + 26, 454, w - 52, String.Format("%s: %s", NBC_Clock.EV_NAME[rd.evKind],
 				NBC_Clock.EventLine(rd.evKind, rm.TurfTitle(d), rd.evWindow)), 9, 2);
 		}
-		else Text(NewSmallFont, Font.CR_GRAY, x + 20, 466, String.Format("Squad: %d picked, %d of %d officers fit for duty.",
-			dept ? dept.squad.Size() : 0, ready, dept ? dept.roster.Size() : 0), 11);
+		else Text(NewSmallFont, Font.CR_GRAY, x + 20, 466, String.Format("Squad: %d picked, %d of %d officers fit for duty.   Backing: %d",
+			dept ? dept.squad.Size() : 0, ready, dept ? dept.roster.Size() : 0, rd.backing), 11);
 		Button(ID_PLAN, 0, x + w - 20 - 190, 486, 190, 46, "PLAN RAID", CanRaid(d), 19, C_AMBER);
 		Button(ID_ENDDAY, 0, x + 20, 486, 140, 46, "CLOSE THE DAY", !rd.raidActive, 11);
 		Button(ID_NEWCASE, 0, x + 168, 486, 90, 46, "NEW CASE", true, 11);

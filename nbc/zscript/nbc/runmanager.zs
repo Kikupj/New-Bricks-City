@@ -10,6 +10,11 @@
 // officers earn XP or go to the hospital or the memorial, and the after-action report waits at the precinct.
 //
 // Kit maps (NBC_K*, M2b) still work as raid maps: the kit gives the spawn spots and the exit.
+//
+// The case (M3): Backing rises and falls with how raids go (§2.5, §6.10; zero is a strike), every raid banks Merit
+// (M8's rates; spent from M8 on), and the Crown (the gang with crown = 1 in gangs.txt, on its own map) opens on the
+// raid board once three gangs are toppled. Taking it closes the case; three strikes or day 30 end it too, and the
+// case summary waits at the precinct.
 
 // A spawn spot (ZScript 4.10 has no arrays of vectors).
 class NBC_Spot
@@ -24,10 +29,14 @@ class NBC_RunManager : EventHandler
 	const SAFE_RADIUS = 768.0;          // no gang member starts this close to the player
 	const REINFORCE_AT = 0.6;           // fraction of the starting crew down before reinforcements come
 	const OFFICER_DOWN_TICS = 70;
+	// par time for the grade (§6.11): a minute, plus this much per gang member on the block
+	const PAR_BASE_SECS = 60;
+	const PAR_SECS_PER_CREW = 8;
 
 	Array<NBC_GangDef> gangs;
 	Array<String> districtMaps, districtTitles, districtEnvs;
 	Array<String> roofMaps;             // the helicopter's rooftop map per district (nbc/rooftops.txt)
+	int crownGang, crownDistrict;       // the Crown's gang and its district (the last one; gangs.txt), -1: none
 
 	// raid bookkeeping (this map only)
 	bool raidSetUp, reinforced, exitFound;
@@ -49,17 +58,31 @@ class NBC_RunManager : EventHandler
 	// someone at the HQ talking: a subtitle along the bottom (NBC_HQNpc)
 	String speakName, speakText, speakHint, speakFace;
 	int speakTics;
-	ui int menuSeen, reportSeen, rosterSaved;
+	ui int menuSeen, reportSeen, rosterSaved, summarySeen;
 
 	override void WorldLoaded(WorldEvent e)
 	{
 		NBC_Gangs.LoadGangs(gangs);
 		NBC_Gangs.LoadDistricts(districtMaps, districtTitles, districtEnvs);
+		// the Crown: its own district after the dealt ones
+		crownGang = -1; crownDistrict = -1;
+		for (int i = 0; i < gangs.Size(); i++)
+		{
+			let g = gangs[i];
+			if (!g.crown || g.crownMap == "") continue;
+			crownGang = i;
+			crownDistrict = districtMaps.Size();
+			districtMaps.Push(g.crownMap);
+			districtTitles.Push(g.crownTurf != "" ? g.crownTurf : g.name);
+			districtEnvs.Push(g.crownEnv != "" ? g.crownEnv : "towers");
+			break;
+		}
 		NBC_Gangs.LoadRooftops(districtMaps, roofMaps);
 		let saved = NBC_Department.Find();
 		if (saved) saved.PadLocker();
 		let rdSaved = NBC_RunData.Find();
 		if (rdSaved) while (rdSaved.raidIssued.Size() < NBC_Cat.IT_COUNT) rdSaved.raidIssued.Push(0);
+		if (rdSaved && rdSaved.caseActive) rdSaved.Upgrade(gangs.Size(), districtMaps.Size(), crownGang, crownDistrict);
 		if (e.IsSaveGame) return;
 
 		let rd = NBC_RunData.Get();
@@ -177,6 +200,12 @@ class NBC_RunManager : EventHandler
 	{
 		int gi = rd && d >= 0 && d < rd.districtGang.Size() ? rd.districtGang[d] : -1;
 		return gi >= 0 && gi < rd.gangToppled.Size() && rd.gangToppled[gi];
+	}
+	clearscope bool IsCrownDistrict(int d) const { return d >= 0 && d == crownDistrict; }
+	// the Crown, before three gangs are down
+	clearscope bool DistrictLocked(NBC_RunData rd, int d) const
+	{
+		return IsCrownDistrict(d) && !(rd && rd.CrownOpen());
 	}
 	// roughly how many are on the block (the raid's own count, before the dice), at an hour (-1: the one it'd go in at)
 	clearscope int CrewEstimate(NBC_RunData rd, int d, int w = -1) const
@@ -902,6 +931,13 @@ class NBC_RunManager : EventHandler
 		Actor t = e.Thing;
 		if (t.player) { rd.raidHealthLost += e.Damage; return; }
 		if (!t.bIsMonster || t is "NBC_Ally") return;
+		// your accuracy: a bullet of yours on one of them (once a tic: a shotgun's pellets are one shot)
+		if (e.DamageSource && e.DamageSource.player && (e.DamageType == 'NBC_Light' || e.DamageType == 'NBC_Shell' || e.DamageType == 'NBC_Rifle')
+			&& rd.raidLastHitTic != level.maptime)
+		{
+			rd.raidHits++;
+			rd.raidLastHitTic = level.maptime;
+		}
 		// crowded streets: the first shot sends the crowd running and wakes the block; fire in the crowd is a strike
 		if (rd.raidEvent == NBC_Clock.EV_CROWD && e.DamageSource && (e.DamageSource.player || e.DamageSource is "NBC_Ally"))
 		{
@@ -962,7 +998,9 @@ class NBC_RunManager : EventHandler
 			let o = dept.OfficerById(a.officerId);
 			if (o && a.health > 0) a.ReturnPouches(o);
 		}
-		int lost = 0, critical = 0;
+		int lost = 0, critical = 0, hospitalized = 0;
+		// low Backing: the city's hospital beds go to someone else first (§2.5)
+		int extraDays = rd.backing <= NBC_RunData.BACKING_LOW ? 1 : 0;
 		for (int s = 0; s < rd.raidOff.Size(); s++)
 		{
 			let o = dept.OfficerById(rd.raidOff[s]);
@@ -981,7 +1019,7 @@ class NBC_RunManager : EventHandler
 				{
 					st = NBC_Report.OS_CRITICAL;
 					o.state = NBC_Officer.ST_HOSPITAL;
-					o.hospital = 4;
+					o.hospital = 4 + extraDays;
 					o.health = max(1, o.MaxHealth() / 4);
 					critical++;
 				}
@@ -994,15 +1032,17 @@ class NBC_RunManager : EventHandler
 			else
 			{
 				o.health = min(hp, o.MaxHealth());
-				if (hp * 100 < o.MaxHealth() * 40) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 2; }
-				else if (hp * 100 < o.MaxHealth() * 70) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 1; }
+				if (hp * 100 < o.MaxHealth() * 40) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 2 + extraDays; }
+				else if (hp * 100 < o.MaxHealth() * 70) { st = NBC_Report.OS_WOUNDED; o.state = NBC_Officer.ST_HOSPITAL; o.hospital = 1 + extraDays; }
 			}
+			if (st == NBC_Report.OS_WOUNDED || st == NBC_Report.OS_CRITICAL) hospitalized++;
 			rep.offId.Push(o.id);
 			rep.offName.Push(o.RankedName());
 			rep.offFace.Push(o.face);
 			rep.offRank.Push(o.rank);
 			rep.offKills.Push(kills);
 			rep.offState.Push(st);
+			rep.offDays.Push(o.state == NBC_Officer.ST_HOSPITAL ? o.hospital : 0);
 			rep.offXP.Push(o.xp);
 			rep.offPromote.Push(st != NBC_Report.OS_KIA && o.CanPromote());
 			if (st == NBC_Report.OS_KIA) dept.KillOfficer(o, rd.day, title);
@@ -1042,6 +1082,9 @@ class NBC_RunManager : EventHandler
 			rd.gangToppled[gi] = true;
 			rd.cash += rd.raidBounty;
 			rep.bounty = rd.raidBounty;
+			rep.crown = rd.IsCrown(gi);
+			if (!rep.crown && rd.CrownOpen() && rd.ToppledCount() == min(NBC_RunData.CROWN_AFTER, rd.RegularGangs()))
+				rep.notes.Push(String.Format("Word's out on the street. %s is open: the Landlord's tower is on the raid board.", TurfTitle(crownDistrict)));
 		}
 		else if (rd.raidMode == NBC_Motor.MODE_CRASH)
 		{
@@ -1068,12 +1111,53 @@ class NBC_RunManager : EventHandler
 		rep.cashRaid = rd.cash - cashAtStart - rep.bounty;
 		rep.balance = rd.cash;
 
-		// 4. the grade: the block, the body count, the cost
-		int score = (taken ? 40 : 0) + (rep.crewTotal > 0 ? 35 * min(rep.kills, rep.crewTotal) / rep.crewTotal : 0)
-			+ (lost + critical == 0 && rd.raidOff.Size() > 0 ? 10 : 0) + 15
-			- lost * 15 - critical * 5 - min(20, rep.healthLost / 10);
-		if (rd.officerDown) score = min(score, 25);
-		rep.grade = score >= 80 ? "A" : (score >= 65 ? "B" : (score >= 50 ? "C" : (score >= 35 ? "D" : "F")));
+		// 4. the grade (§6.11): the body count, your aim, your blood, the clock, the officers (and the residents, from M9)
+		rep.shots = rd.raidShots;
+		rep.hits = min(rd.raidHits, rd.raidShots);
+		rep.parSecs = PAR_BASE_SECS + PAR_SECS_PER_CREW * rep.crewTotal;
+		double score = rep.crewTotal > 0 ? 30.0 * min(rep.kills, rep.crewTotal) / rep.crewTotal : 30.0;
+		score += rep.shots > 0 ? 15.0 * min(1.0, rep.hits / (0.6 * rep.shots)) : 15.0;
+		score += 15.0 * max(0.0, 1.0 - rep.healthLost / 100.0);
+		score += rep.timeSecs <= rep.parSecs ? 10.0 : 10.0 * max(0.0, 1.0 - (rep.timeSecs - rep.parSecs) / (2.0 * rep.parSecs));
+		score += max(0, 20 - 10 * lost - 5 * critical);
+		score += 10;     // residents (M9)
+		// a block you didn't take tops out at C, going down at D
+		if (!taken) score = min(score, 59.0);
+		if (rd.officerDown) score = min(score, 39.0);
+		rep.score = int(score);
+		rep.grade = score >= 90 ? "S" : (score >= 75 ? "A" : (score >= 60 ? "B" : (score >= 40 ? "C" : "D")));
+
+		// 5. Backing (§6.10)
+		if (lost > 0) rd.AddBacking(-10 * lost, lost == 1 ? "Officer killed" : String.Format("%d officers killed", lost));
+		if (hospitalized > 0) rd.AddBacking(-2 * hospitalized, hospitalized == 1 ? "Officer hospitalized" : String.Format("%d officers hospitalized", hospitalized));
+		if (rd.officerDown) rd.AddBacking(-10, "You went down");
+		else if (taken) rd.AddBacking(15, rep.crown ? "The Crown taken" : "Gang toppled");
+		else if (rep.outcome == NBC_Report.OUT_RETREAT) rd.AddBacking(-5, "Retreat");
+		if (taken && lost + critical == 0) rd.AddBacking(5, "Clean raid");
+		rep.backingWas = rd.raidBackingWas;
+		rep.backingNow = rd.backing;
+		rep.backingLog.Copy(rd.backingLog);
+		rd.backingLog.Clear();
+
+		// 6. Merit (M8's rates), banked whatever happened: the block and the gang, everyone who came home, the grade
+		int merit = 0;
+		if (taken) merit += 2 + (rep.crown ? 50 : 15);
+		merit += 5 * (rd.raidOff.Size() - lost);
+		if (rep.grade == "S") merit += 6;
+		else if (rep.grade == "A") merit += 4;
+		else if (rep.grade == "B") merit += 2;
+		rep.merit = merit;
+		rd.caseMerit += merit;
+		dept.merit += merit;
+		rep.meritBank = dept.merit;
+		dept.rosterVersion++;
+
+		// the case file
+		rd.caseRaids++;
+		rd.caseLost += lost;
+		if (rd.officerDown) rd.caseDowns++;
+		else if (taken) rd.caseTaken++;
+		else rd.caseRetreats++;
 
 		if (fireStrike) rep.notes.Push("Fire in a crowd: a strike from Internal Affairs.");
 		rep.window = rd.raidWindow;
@@ -1084,7 +1168,8 @@ class NBC_RunManager : EventHandler
 		if (rd.missedUrgent) rep.notes.Push(String.Format("The unit pinned down in %s waited all day: a strike from Internal Affairs.", TurfTitle(rd.evDistrictWas)));
 		switch (rd.caseResult)
 		{
-		case NBC_CASE_WON: rep.dayLine = "CASE CLOSED. Every gang in the Bricks is down."; break;
+		case NBC_CASE_WON: rep.dayLine = rd.crownSlot > 0 ? "CASE CLOSED. The Crown has fallen, and the Landlord's hold on the Bricks with it."
+			: "CASE CLOSED. Every gang in the Bricks is down."; break;
 		case NBC_CASE_STRUCK_OUT: rep.dayLine = "Three strikes. Internal Affairs takes your badge. The case is over."; break;
 		case NBC_CASE_DEMOLITION: rep.dayLine = "Day 30. The demolition crews roll in. The case is over."; break;
 		default: rep.dayLine = rd.officerDown ? String.Format("Strike %d of %d. Day %d of %d begins.", rd.strikes,
@@ -1126,16 +1211,56 @@ class NBC_RunManager : EventHandler
 		if (e.Name ~== "nbc_deploy") { Deploy(e.Args[0], e.Args[1]); return; }
 		if (e.Name ~== "nbc_terminal") { menuKind = MK_TERMINAL; menuTab = e.Args[0]; menuOfficer = 0; menuRequests++; return; }   // netevent nbc_terminal <tab 0-4>
 		if (e.Name ~== "nbc_ready") { Ready(e.Args[0]); return; }
+		if (e.Name ~== "nbc_summary_seen") { NBC_RunData.Get().summaryPending = false; return; }
+		// testing (M3): netevent nbc_day <n> sets the case's day (past 30 ends it); nbc_skipblock takes the block you're
+		// on (the leader and the crew down, out by the exit); nbc_debug_backing <n> moves Backing; nbc_debug_topple <n>
+		// topples the first n gangs still standing (not the Crown)
+		if (e.Name ~== "nbc_day")
+		{
+			let rd = NBC_RunData.Get();
+			if (!rd.caseActive || rd.raidActive) return;
+			rd.day = max(1, e.Args[0]);
+			rd.CheckCaseEnd();
+			Console.Printf("nbc: day %d%s", rd.day, rd.caseActive ? "" : ", the case is over");
+			return;
+		}
+		if (e.Name ~== "nbc_skipblock")
+		{
+			let rd = NBC_RunData.Find();
+			if (!IsRaidMap(rd) || !raidSetUp || rd.officerDown) return;
+			DebugClear(0);
+			level.ChangeLevel(HUB_MAP, 0, CHANGELEVEL_NOINTERMISSION);
+			return;
+		}
+		if (e.Name ~== "nbc_debug_backing")
+		{
+			let rd = NBC_RunData.Get();
+			rd.AddBacking(e.Args[0], "Testing");
+			if (!rd.raidActive) { rd.backingLog.Clear(); rd.CheckCaseEnd(); }
+			Console.Printf("nbc: Backing %d, strikes %d", rd.backing, rd.strikes);
+			return;
+		}
+		if (e.Name ~== "nbc_debug_topple")
+		{
+			let rd = NBC_RunData.Get();
+			if (!rd.caseActive) return;
+			int n = 0;
+			for (int i = 0; i < rd.gangToppled.Size() && n < e.Args[0]; i++)
+				if (!rd.gangToppled[i] && !rd.IsCrown(i)) { rd.gangToppled[i] = true; n++; }
+			Console.Printf("nbc: %d of %d gangs toppled; the Crown is %s", rd.ToppledCount(), rd.RegularGangs(), rd.CrownOpen() ? "open" : "shut");
+			return;
+		}
 		if (!(e.Name ~== "nbc_board")) return;
 		let rd = NBC_RunData.Get();
 		let dept = NBC_Department.Get();
 		int choice = e.Args[0];
 		if (choice == -1)
 		{
-			rd.NewCase(NewSeed(), gangs.Size(), districtMaps.Size());
+			rd.NewCase(NewSeed(), gangs.Size(), districtMaps.Size(), crownGang, crownDistrict);
 			dept.NewCase();
-			Announce(String.Format("New case opened (seed %d). %d gangs, %d districts, %d days.",
-				rd.seed, gangs.Size(), districtMaps.Size(), NBC_RunData.MAX_DAYS), 35 * 5);
+			Announce(String.Format("New case opened (seed %d). %d gangs, %d districts, %d days.%s",
+				rd.seed, rd.RegularGangs(), districtMaps.Size() - (crownDistrict >= 0 ? 1 : 0), NBC_RunData.MAX_DAYS,
+				rd.crownSlot > 0 ? String.Format("\nTopple %d of them and the Crown opens.", min(NBC_RunData.CROWN_AFTER, rd.RegularGangs())) : ""), 35 * 6);
 			return;
 		}
 		if (choice == -2 && rd.caseActive && !rd.raidActive)
@@ -1153,7 +1278,7 @@ class NBC_RunManager : EventHandler
 	{
 		let rd = NBC_RunData.Get();
 		if (!rd.caseActive || rd.raidActive || !IsHub() || d < 0 || d >= districtMaps.Size()) return;
-		if (!DistrictGang(rd, d) || DistrictTaken(rd, d)) return;
+		if (!DistrictGang(rd, d) || DistrictTaken(rd, d) || DistrictLocked(rd, d)) return;
 		rd.readyDistrict = d;
 		Announce(String.Format("%s: the plan's set. Talk to Rook at the chopper when you're ready to go.", TurfTitle(d)), 35 * 6);
 	}
@@ -1166,7 +1291,7 @@ class NBC_RunManager : EventHandler
 		let dept = NBC_Department.Get();
 		if (!rd.caseActive || rd.raidActive || !IsHub() || d < 0 || d >= districtMaps.Size()) return;
 		let g = DistrictGang(rd, d);
-		if (!g || DistrictTaken(rd, d)) return;
+		if (!g || DistrictTaken(rd, d) || DistrictLocked(rd, d)) return;
 		if (!LevelInfo.MapExists(districtMaps[d]))
 		{
 			Console.Printf("\cgnbc: district map %s is missing (tools/Obsidian/make_bricks).", districtMaps[d]);
@@ -1236,8 +1361,12 @@ class NBC_RunManager : EventHandler
 	{
 		let rd = NBC_RunData.Find();
 		if (!rd) { Console.Printf("nbc: no case data"); return; }
-		Console.Printf("nbc case: active %d result %d seed %d rng steps %d day %d strikes %d cash %d",
-			rd.caseActive, rd.caseResult, rd.seed, rd.rngSteps, rd.day, rd.strikes, rd.cash);
+		Console.Printf("nbc case: active %d result %d seed %d rng steps %d day %d strikes %d cash %d backing %d",
+			rd.caseActive, rd.caseResult, rd.seed, rd.rngSteps, rd.day, rd.strikes, rd.cash, rd.backing);
+		let dm = NBC_Department.Find();
+		Console.Printf("  crown: %s, %d of %d gangs toppled; case raids %d (taken %d, retreats %d, down %d), lost %d, merit %d (banked %d)",
+			rd.crownSlot <= 0 ? "none" : (rd.CrownTaken() ? "taken" : (rd.CrownOpen() ? "open" : "shut")), rd.ToppledCount(), rd.RegularGangs(),
+			rd.caseRaids, rd.caseTaken, rd.caseRetreats, rd.caseDowns, rd.caseLost, rd.caseMerit, dm ? dm.merit : 0);
 		Console.Printf("  today: event %d in district %d at %s; planned hour %s", rd.evKind, rd.evDistrict, NBC_Clock.WindowLine(rd.evWindow), NBC_Clock.WindowLine(rd.planWindow));
 		if (IsRaidMap(rd))
 		{
@@ -1280,8 +1409,9 @@ class NBC_RunManager : EventHandler
 			}
 		}
 		if (rd.raidActive)
-			Console.Printf("  raid: turf %d gang %d on %s, crew %d/%d kills %d (you %d) leader %s", rd.raidDistrict,
-				rd.raidGang, rd.raidMap, crew.Size(), startCount, rd.raidKills, rd.raidPlayerKills, rd.leaderDown ? "down" : "at large");
+			Console.Printf("  raid: turf %d gang %d on %s, crew %d/%d kills %d (you %d) leader %s; you fired %d, hit %d", rd.raidDistrict,
+				rd.raidGang, rd.raidMap, crew.Size(), startCount, rd.raidKills, rd.raidPlayerKills, rd.leaderDown ? "down" : "at large",
+				rd.raidShots, rd.raidHits);
 	}
 
 	// ------------------------------------------------------------ the UI side: menus and the roster CVars
@@ -1296,12 +1426,21 @@ class NBC_RunManager : EventHandler
 			CVar.FindCVar("nbc_roster").SetString(dept.SaveRoster());
 			CVar.FindCVar("nbc_memorial").SetString(dept.SaveMemorial());
 			CVar.FindCVar("nbc_avatar").SetInt(dept.playerFace);
+			CVar.FindCVar("nbc_merit").SetInt(dept.merit);
 		}
 		if (gamestate != GS_LEVEL || menuactive != Menu.Off) return;
 		if (dept && dept.reportPending && dept.reportSerial != reportSeen && IsHub())
 		{
 			reportSeen = dept.reportSerial;
 			Menu.SetMenu("NBC_ResultsMenu");
+			return;
+		}
+		// the case is over: its summary, after the last report
+		let rdc = NBC_RunData.Find();
+		if (rdc && rdc.summaryPending && rdc.summarySerial != summarySeen && IsHub() && !(dept && dept.reportPending))
+		{
+			summarySeen = rdc.summarySerial;
+			Menu.SetMenu("NBC_CaseSummary");
 			return;
 		}
 		if (menuRequests != menuSeen)

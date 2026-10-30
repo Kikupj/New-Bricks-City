@@ -14,6 +14,9 @@ class NBC_GangDef
 	Array<double> strength;
 	Array<int> offGuard;
 	String hours;
+	// the Crown (crown = 1): never dealt to a district; its own map, name on the board and environment
+	bool crown;
+	String crownMap, crownTurf, crownEnv;
 
 	clearscope int TextColor() const
 	{
@@ -107,6 +110,10 @@ class NBC_Gangs
 			else if (key == "painchance") g.painChance = w[1].ToDouble();
 			else if (key == "trait") g.trait = w[1];
 			else if (key == "hours") g.hours = w[1];
+			else if (key == "crown") g.crown = w[1].ToInt() != 0;
+			else if (key == "map") g.crownMap = w[1];
+			else if (key == "turf") g.crownTurf = w[1];
+			else if (key == "env") g.crownEnv = w[1];
 			else if (key == "strength") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.strength[k - 1] = w[k].ToDouble(); }
 			else if (key == "offguard") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.offGuard[k - 1] = clamp(w[k].ToInt(), 0, 100); }
 			else if (key == "mansion") { for (int k = 1; k < w.Size(); k++) g.mansion.Push(w[k]); }

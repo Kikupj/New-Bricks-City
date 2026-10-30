@@ -23,6 +23,9 @@
 //                       street    tower entrance, corner stores, chop lot, under the el
 //                       basement  service basement, cook lab, fight pit, parking garage, smugglers' tunnel
 //                       roof      tower roof, rooftop crossing, roof camp
+//   crown             1: the Landlord's own (PLAN.md §6.9, the Crown). Never dealt to a district; its raid opens once
+//                     three gangs are toppled, and taking it closes the case. A placeholder until M10.
+//   map / turf / env  the Crown's raid map, its name on the raid board and its environment (as in districts.txt)
 
 gang stoop_kings
 {
@@ -114,4 +117,32 @@ gang collectors
 	offguard = 10 0 15 35
 	hours = "Business hours: the suits are all in by day; a skeleton crew minds the tower at night."
 	mansion = "tower:penthouse floor" "street:tower entrance"
+}
+
+// The Crown (M3 placeholder): the Landlord's private military in their own tower. Until M10 builds NBC_CROWN
+// (the penthouse and the roof), the raid borrows a housing-tower district.
+gang landlord
+{
+	crown = 1
+	map = NBC_CT06
+	turf = "The Crown"
+	env = towers
+	name = "The Landlord's Own"
+	short = "Landlord"
+	tier = 3
+	color = "Purple"
+	budget = 1.0
+	health = 1.15
+	roster1 = ePMCchoice
+	roster2 = ePMCchoice ePMCBIGchoice
+	roster3 = Elite1 EliteF1 EliteShotgun
+	leader = BruteMiniGUN
+	leadertitle = "the Landlord's Brute"
+	leaderhealth = 2.5
+	escorts = 4
+	damage = NBC_Light 0.8
+	trait = "Private military: armored, drilled and paid on time. They never sleep on the job."
+	strength = 1.0 1.0 1.0 1.0
+	offguard = 5 5 5 5
+	hours = "Shifts round the clock: no good hour to hit the Crown."
 }

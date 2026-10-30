@@ -1,6 +1,7 @@
 // The after-action report (PLAN.md M7c): the Hamburger Hill results layout. A big title (the block taken,
 // a retreat, or officer down), the numbers and a letter grade, the officers who went in (kills, and stamps:
-// KIA, CRITICAL, WOUNDED, PROMOTION), what the raid brought back to the Evidence Locker, and the money.
+// KIA, CRITICAL, WOUNDED, PROMOTION), what the raid brought back to the Evidence Locker, the money, Backing and
+// Merit (M3).
 // Opened by NBC_RunManager.UiTick when you're back at the precinct; CONTINUE marks it read.
 
 class NBC_ResultsMenu : NBC_UI
@@ -52,15 +53,19 @@ class NBC_ResultsMenu : NBC_UI
 
 		// the numbers and the grade
 		Panel(16, 80, 420, 196);
-		double y = 94;
-		Row(30, y, "KILLS", String.Format("%d  |  %d", rep.kills, rep.crewTotal)); y += 34;
-		Row(30, y, "YOUR KILLS", String.Format("%d", rep.playerKills)); y += 34;
-		Row(30, y, "LEADER", rep.leaderDown ? "DOWN" : "AT LARGE"); y += 34;
-		Row(30, y, "HEALTH LOST", String.Format("%d", rep.healthLost)); y += 34;
+		double y = 90;
+		Row(30, y, "KILLS", String.Format("%d  |  %d", rep.kills, rep.crewTotal)); y += 28;
+		Row(30, y, "YOUR KILLS", String.Format("%d", rep.playerKills)); y += 28;
+		Row(30, y, "LEADER", rep.leaderDown ? "DOWN" : "AT LARGE"); y += 28;
+		Row(30, y, "ACCURACY", rep.shots > 0 ? String.Format("%d%%", 100 * rep.hits / rep.shots) : "-"); y += 28;
+		Row(30, y, "HEALTH LOST", String.Format("%d", rep.healthLost)); y += 28;
 		Row(30, y, "TIME", String.Format("%d:%02d", rep.timeSecs / 60, rep.timeSecs % 60));
+		if (rep.parSecs > 0)
+			Text(NewSmallFont, rep.timeSecs <= rep.parSecs ? Font.CR_GREEN : Font.CR_DARKGRAY, 176, y + 28,
+				String.Format("par %d:%02d", rep.parSecs / 60, rep.parSecs % 60), 9);
 		Inset(310, 94, 112, 168);
 		Text(BigFont, Font.CR_WHITE, 366, 104, "GRADE", 14, 1);
-		int gc = rep.grade == "A" || rep.grade == "B" ? Font.CR_GOLD : (rep.grade == "F" ? Font.CR_RED : Font.CR_WHITE);
+		int gc = rep.grade == "S" || rep.grade == "A" ? Font.CR_GOLD : (rep.grade == "D" ? Font.CR_RED : Font.CR_WHITE);
 		// the grade on a raised stone tile (Hamburger Hill's)
 		Fill(334, 136, 72, 92, 0, 0.5);
 		Fill(330, 132, 72, 92, 0x56606C);
@@ -68,6 +73,7 @@ class NBC_ResultsMenu : NBC_UI
 		Fill(330, 221, 72, 3, 0x2A323C); Fill(399, 132, 3, 92, 0x2A323C);
 		Text(NewSmallFont, Font.CR_BLACK, 369, 151, rep.grade, 62, 1, 0.55);
 		Text(NewSmallFont, gc, 366, 148, rep.grade, 62, 1);
+		Text(NewSmallFont, Font.CR_DARKGRAY, 366, 236, String.Format("%d / 100", rep.score), 10, 1);
 
 		// the officers
 		Panel(448, 80, VW - 16 - 448, 196);
@@ -82,8 +88,9 @@ class NBC_ResultsMenu : NBC_UI
 			Text(NewSmallFont, Font.CR_WHITE, cx + 54, cy + 100, rep.offName[i], 11, 1);
 			Text(NewSmallFont, rep.offKills[i] > 0 ? Font.CR_GOLD : Font.CR_DARKGRAY, cx + 54, cy + 116,
 				rep.offKills[i] > 0 ? String.Format("+%d KILL%s", rep.offKills[i], rep.offKills[i] == 1 ? "" : "S") : "no kills", 10, 1);
-			String note = st == NBC_Report.OS_KIA ? "Killed in action" : (st == NBC_Report.OS_CRITICAL ? "Hospital, 4 days"
-				: (st == NBC_Report.OS_WOUNDED ? "Wounded" : "Fit"));
+			int days = i < rep.offDays.Size() ? rep.offDays[i] : 0;
+			String note = st == NBC_Report.OS_KIA ? "Killed in action" : (st != NBC_Report.OS_FIT && days > 0 ?
+				String.Format("Hospital, %d day%s", days, days == 1 ? "" : "s") : "Fit");
 			Text(NewSmallFont, st == NBC_Report.OS_FIT ? Font.CR_GRAY : Font.CR_RED, cx + 54, cy + 132, note, 9, 1);
 			if (st == NBC_Report.OS_KIA) Stamp(cx + 54, cy + 48, "KIA", C_RED, 20);
 			else if (st == NBC_Report.OS_CRITICAL) Stamp(cx + 54, cy + 48, "CRITICAL", C_RED, 13);
@@ -105,20 +112,40 @@ class NBC_ResultsMenu : NBC_UI
 			Text(NewSmallFont, Font.CR_WHITE, lx + 46, ly + 70, NBC_Cat.ItemName(it), 10, 1);
 		}
 
-		// the money and the day
+		// the money, Backing, Merit and the day
 		Panel(448, 288, VW - 16 - 448, 236);
 		double mx = 462, mw = VW - 16 - 448 - 28;
-		Plate(mx, 302, 150, 34, "SEIZED");
-		Inset(mx + 158, 302, mw - 158, 34);
-		MoneyText(Font.CR_GOLD, mx + mw - 10, 309, max(0, rep.cashRaid), 19, 2, true);
-		Plate(mx, 344, 150, 34, "BOUNTY");
-		Inset(mx + 158, 344, mw - 158, 34);
-		if (rep.bounty > 0) MoneyText(Font.CR_GOLD, mx + mw - 10, 351, rep.bounty, 19, 2, true);
-		else Text(NewSmallFont, Font.CR_DARKGRAY, mx + mw - 10, 351, "-", 19, 2);
-		Inset(mx, 388, mw, 62);
-		Text(BigFont, Font.CR_WHITE, mx + mw / 2, 396, "BALANCE", 14, 1);
-		MoneyText(Font.CR_GOLD, mx + mw / 2, 416, rep.balance, 24, 1);
-		double ny = 458 + Wrap(NewSmallFont, Font.CR_WHITE, mx, 458, mw, rep.dayLine, 12, 3);
+		Plate(mx, 300, 150, 30, "SEIZED");
+		Inset(mx + 158, 300, mw - 158, 30);
+		MoneyText(Font.CR_GOLD, mx + mw - 10, 305, max(0, rep.cashRaid), 18, 2, true);
+		Plate(mx, 336, 150, 30, "BOUNTY");
+		Inset(mx + 158, 336, mw - 158, 30);
+		if (rep.bounty > 0) MoneyText(Font.CR_GOLD, mx + mw - 10, 341, rep.bounty, 18, 2, true);
+		else Text(NewSmallFont, Font.CR_DARKGRAY, mx + mw - 10, 341, "-", 18, 2);
+		// three boxes: the balance, Backing (and its change), Merit earned (and the bank)
+		double bw = (mw - 12) / 3;
+		Inset(mx, 374, bw, 58);
+		Text(BigFont, Font.CR_WHITE, mx + bw / 2, 380, "BALANCE", 11, 1);
+		MoneyText(Font.CR_GOLD, mx + bw / 2, 398, rep.balance, 20, 1);
+		double bx = mx + bw + 6;
+		Inset(bx, 374, bw, 58);
+		Text(BigFont, Font.CR_WHITE, bx + bw / 2, 380, "BACKING", 11, 1);
+		int dBack = rep.backingNow - rep.backingWas;
+		double valW = Text(BigFont, BackingColor(rep.backingNow), bx + bw / 2, 398, String.Format("%d", rep.backingNow), 20, 1);
+		if (dBack != 0) Text(NewSmallFont, dBack > 0 ? Font.CR_GREEN : Font.CR_RED, bx + bw / 2 + valW / 2 + 6, 404,
+			String.Format("%s%d", dBack > 0 ? "+" : "", dBack), 11);
+		double cx = bx + bw + 6;
+		Inset(cx, 374, bw, 58);
+		Text(BigFont, Font.CR_WHITE, cx + bw / 2, 380, "MERIT", 11, 1);
+		Text(BigFont, rep.merit > 0 ? Font.CR_GOLD : Font.CR_DARKGRAY, cx + bw / 2, 398, String.Format("+%d", rep.merit), 20, 1);
+		Text(NewSmallFont, Font.CR_DARKGRAY, cx + bw / 2, 420, String.Format("banked %d", rep.meritBank), 8, 1);
+		// what moved Backing
+		String why = "";
+		for (int i = 0; i < rep.backingLog.Size(); i++) why = why .. (i ? ",  " : "") .. rep.backingLog[i];
+		double ny = 436;
+		if (why != "") ny += Wrap(NewSmallFont, Font.CR_GRAY, mx, ny, mw, "Backing: " .. why, 9, 2);
+		ny += 2;
+		ny += Wrap(NewSmallFont, Font.CR_WHITE, mx, ny, mw, rep.dayLine, 11, 2);
 		// the motorcade
 		for (int i = 0; i < rep.notes.Size() && ny < 520; i++)
 			ny += Wrap(NewSmallFont, Font.CR_ORANGE, mx, ny, mw, rep.notes[i], 10, 2);
@@ -131,8 +158,14 @@ class NBC_ResultsMenu : NBC_UI
 
 	void Row(double x, double y, String label, String value)
 	{
-		Plate(x, y, 140, 28, label, 12);
-		Inset(x + 146, y, 120, 28);
-		Text(BigFont, Font.CR_GOLD, x + 258, y + 6, value, 15, 2);
+		Plate(x, y, 140, 25, label, 11);
+		Inset(x + 146, y, 120, 25);
+		Text(BigFont, Font.CR_GOLD, x + 258, y + 5, value, 14, 2);
+	}
+
+	// Backing's colour: high green, low red (PLAN.md §2.5's thresholds)
+	static int BackingColor(int b)
+	{
+		return b >= NBC_RunData.BACKING_HIGH ? Font.CR_GREEN : (b <= NBC_RunData.BACKING_LOW ? Font.CR_RED : Font.CR_WHITE);
 	}
 }

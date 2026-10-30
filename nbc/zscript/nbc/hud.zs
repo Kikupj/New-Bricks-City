@@ -217,7 +217,7 @@ class NBC_StatusBar : BaseStatusBar
 		}
 		if (rd.caseActive)
 		{
-			Line(String.Format("Day %d/%d   Strikes %d/%d   $%d", rd.day, NBC_RunData.MAX_DAYS, rd.strikes, NBC_RunData.MAX_STRIKES, rd.cash), Font.CR_GRAY, 0.4, y);
+			Line(String.Format("Day %d/%d   Strikes %d/%d   Backing %d   $%d", rd.day, NBC_RunData.MAX_DAYS, rd.strikes, NBC_RunData.MAX_STRIKES, rd.backing, rd.cash), Font.CR_GRAY, 0.4, y);
 			y += 7;
 		}
 		// at the precinct: today's event

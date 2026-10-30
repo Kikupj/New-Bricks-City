@@ -318,7 +318,7 @@ class NBC_HowToPlay : NBC_UI
 		Panel(x, 70, w, 470, "THE JOB");
 		static const String head[] = { "THE CASE", "PLANNING A RAID", "ON THE BLOCK", "BETWEEN RAIDS" };
 		static const String body[] = {
-			"Four gangs hold eight districts of the Bricks. You have 30 days to topple them all. Three strikes and Internal Affairs takes your badge. Talk to Captain Harrow or use the raid board at Checkpoint 9.",
+			"Four gangs hold eight districts of the Bricks. You have 30 days. Topple three and the Landlord's tower, the Crown, opens: take it to close the case. Backing at zero is a strike; three strikes and Internal Affairs takes your badge. Talk to Captain Harrow or use the raid board at Checkpoint 9.",
 			"Pick a district on the raid board. On the deploy screen pick up to four officers, split them into Alpha and Bravo, and kit everyone out of the Evidence Locker. READY, then talk to Rook: choose the hour, the way in (street or rooftop) and the motorcade.",
 			"Take down the gang's leader and get to the exit to topple them. Leaving with the leader alive is a retreat. Command your squad with the keys on the left. A hit that would kill you is OFFICER DOWN: a strike.",
 			"Promote and recruit officers, sell what you seized and buy supplies, repair and buy vehicles, or close the day to let the wounded heal. Each morning, check the radio for the day's event." };

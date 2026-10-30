@@ -673,7 +673,8 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 4. **Settings:** start from the Urban settings the owner found good, then tune for city blocks.
 5. **Environments** (owner, 2026-10-28): the theme supports streets, housing towers, rooftops, an industrial park, parks, underground (basements and sewers) and the subway as separate Obsidian level themes, dealt across a build; buildings vary their facades. ✅ First pass built; see STATUS.
 
-### M3 — The case and raid loop (the heart of the roguelite)
+### M3 — The case and raid loop (the heart of the roguelite) — ✅ BUILT, NEEDS PLAYTEST (2026-10-30, by Claude)
+*Done (2026-10-30): Backing (§2.5, §6.10, `NBC_RunData.AddBacking`), Merit banked after every raid at M8's rates (`nbc_merit`; spending stays M8), the §6.11 grade (accuracy, par time), the Crown placeholder (the `crown = 1` gang in gangs.txt on a borrowed tower map; topple 3 and it opens, take it to win), the case summary, and the debug netevents `nbc_day`, `nbc_skipblock`, `nbc_debug_backing`, `nbc_debug_topple` (the seed is the `nbc_seed` CVar). Owner decisions: going down still costs half of the raid's take, not all your Cash. Superseded by the Obsidian decision (§4.4): the five-block raid (approach, staging flat, floors, leader's floor) is one district map per raid; the staging flat's Intel and Informant come with M7.*
 *Note (2026-10-27): M2's vertical slice already delivers the core of this (RunData, the RunManager, gangs.txt, Officer Down, the case ending), and M2b moves it onto the kits. What remains: the full multi-block raid on the kits (approach → staging flat → 2 floors → leader's floor), Cash, the results screen, Backing's strike, debug commands and save/load checks. Reuse the slice's code rather than rewriting it.*
 
 **Prompt:**

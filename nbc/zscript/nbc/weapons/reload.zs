@@ -280,6 +280,18 @@ class NBC_ReloadWeapon : Weapon
 		return Super.CheckAmmo(fireMode, autoSwitch, requireAmmo, ammocount);
 	}
 
+	// every round you fire on a raid counts toward your accuracy on the after-action report (PLAN.md §6.11)
+	override bool DepleteAmmo(bool altFire, bool checkEnough, int ammouse, bool forceammouse)
+	{
+		bool fired = Super.DepleteAmmo(altFire, checkEnough, ammouse, forceammouse);
+		if (fired && Owner && Owner.player)
+		{
+			let rd = NBC_RunData.Find();
+			if (rd && rd.raidActive) rd.raidShots++;
+		}
+		return fired;
+	}
+
 	override void AttachToOwner(Actor other)
 	{
 		Super.AttachToOwner(other);

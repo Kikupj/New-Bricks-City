@@ -4,7 +4,7 @@
 enum NBC_CaseResult
 {
 	NBC_CASE_RUNNING = 0,
-	NBC_CASE_WON,          // every gang toppled
+	NBC_CASE_WON,          // the Crown taken (every gang toppled, in a case without a Crown)
 	NBC_CASE_STRUCK_OUT,   // 3 strikes: Internal Affairs pulls you
 	NBC_CASE_DEMOLITION,   // out of days
 }
@@ -13,11 +13,28 @@ class NBC_RunData : Thinker
 {
 	const MAX_DAYS = 30;
 	const MAX_STRIKES = 3;
+	const CROWN_AFTER = 3;             // gangs toppled before the Crown opens
+	// Backing (PLAN.md §2.5, §6.10): City Hall's and the street's faith in the department, 0-100
+	const BACKING_START = 60;
+	const BACKING_RESET = 40;          // after Backing hits zero (and a strike)
+	const BACKING_HIGH = 75;
+	const BACKING_LOW = 25;            // at or below: a day longer in the hospital
+	const CASE_VERSION = 1;            // bumped when a case gains state; older saves are brought up to date on load
 
 	bool caseActive;
-	int caseResult;
+	int caseResult, caseVersion;
 	int seed, rngState, rngSteps;
 	int day, strikes, cash, casesClosed;
+	int backing;
+	// the Crown's gang (gangs.txt, crown = 1) + 1; 0: no Crown this case
+	int crownSlot;
+	// the case so far, for the case summary when it ends
+	int caseRaids, caseTaken, caseRetreats, caseDowns, caseLost, caseMerit, caseBackingLow;
+	// the case summary waits at the precinct once the case ends (the UI opens it, like the after-action report)
+	bool summaryPending;
+	int summarySerial;
+	// what moved Backing since the last report ("Retreat -5"), and whether it hit zero
+	Array<String> backingLog;
 
 	// per gang (index into NBC_RunManager.gangs) and per district (index into the district pool)
 	Array<bool> gangToppled;
@@ -43,6 +60,10 @@ class NBC_RunData : Thinker
 	// the officers who went in (NBC_Officer ids), their kills and their health at the end (0 = down)
 	Array<int> raidOff, raidOffKills, raidOffHealth;
 	int raidPlayerKills, raidHealthLost, raidTics;
+	// your accuracy: rounds fired (NBC_ReloadWeapon.DepleteAmmo) and the shots that hit someone of the gang (one per
+	// tic, so a shotgun's pellets count once); fists, blades, debris and fire don't count
+	int raidShots, raidHits, raidLastHitTic;
+	int raidBackingWas;
 	// what the player was issued from the Evidence Locker (per NBC_Cat item), to tell loot from kit afterwards
 	Array<int> raidIssued;
 	// squad orders (Ghost Recon style, NBC_Orders): two fireteams, each with an order, rules of engagement, a goal
@@ -100,10 +121,18 @@ class NBC_RunData : Thinker
 		return lo + r;
 	}
 
-	void NewCase(int newSeed, int gangCount, int districtCount)
+	// gangCount and districtCount include the Crown's (crownGang, crownDistrict; -1 for none), which isn't dealt
+	void NewCase(int newSeed, int gangCount, int districtCount, int crownGang = -1, int crownDistrict = -1)
 	{
 		caseActive = true;
 		caseResult = NBC_CASE_RUNNING;
+		caseVersion = CASE_VERSION;
+		backing = BACKING_START;
+		backingLog.Clear();
+		crownSlot = crownGang >= 0 && crownGang < gangCount ? crownGang + 1 : 0;
+		caseRaids = 0; caseTaken = 0; caseRetreats = 0; caseDowns = 0; caseLost = 0; caseMerit = 0;
+		caseBackingLow = BACKING_START;
+		summaryPending = false;
 		readyDistrict = -1;
 		seed = newSeed;
 		rngState = newSeed;
@@ -119,32 +148,104 @@ class NBC_RunData : Thinker
 		gangToppled.Clear(); gangAlert.Clear();
 		for (int i = 0; i < gangCount; i++) { gangToppled.Push(false); gangAlert.Push(0); }
 
-		// shuffle the gangs, then deal them round the districts so every gang holds at least one
+		// shuffle the gangs, then deal them round the districts so every gang holds at least one; the Crown holds
+		// its own tower
 		Array<int> deck;
-		for (int i = 0; i < gangCount; i++) deck.Push(i);
+		for (int i = 0; i < gangCount; i++) if (i != crownGang) deck.Push(i);
 		for (int i = deck.Size() - 1; i > 0; i--)
 		{
 			int j = Rand(0, i);
 			int t = deck[i]; deck[i] = deck[j]; deck[j] = t;
 		}
 		districtGang.Clear();
+		int k = 0;
 		for (int d = 0; d < districtCount; d++)
-			districtGang.Push(gangCount > 0 ? deck[d % gangCount] : -1);
+		{
+			if (d == crownDistrict) districtGang.Push(CrownGang());
+			else districtGang.Push(deck.Size() > 0 ? deck[k++ % deck.Size()] : -1);
+		}
 	}
 
-	// The gangs still standing; the case is won when none are.
+	// A case saved before Backing and the Crown: start them now (gangCount and the Crown as in NewCase).
+	void Upgrade(int gangCount, int districtCount, int crownGang, int crownDistrict)
+	{
+		while (gangToppled.Size() < gangCount) gangToppled.Push(false);
+		while (gangAlert.Size() < gangCount) gangAlert.Push(0);
+		while (districtGang.Size() < districtCount) districtGang.Push(districtGang.Size() == crownDistrict ? crownGang : -1);
+		if (caseVersion >= CASE_VERSION) return;
+		caseVersion = CASE_VERSION;
+		backing = BACKING_START;
+		caseBackingLow = BACKING_START;
+		crownSlot = crownGang >= 0 && crownGang < gangCount ? crownGang + 1 : 0;
+	}
+
+	clearscope int CrownGang() const { return crownSlot - 1; }
+	clearscope bool IsCrown(int gi) const { return crownSlot > 0 && gi == crownSlot - 1; }
+
+	// the gangs dealt to the districts (not the Crown)
+	clearscope int RegularGangs() const
+	{
+		int n = 0;
+		for (int i = 0; i < gangToppled.Size(); i++) if (!IsCrown(i)) n++;
+		return n;
+	}
+
+	// The gangs still standing (not counting the Crown).
 	clearscope int GangsLeft() const
 	{
 		int n = 0;
-		for (int i = 0; i < gangToppled.Size(); i++) if (!gangToppled[i]) n++;
+		for (int i = 0; i < gangToppled.Size(); i++) if (!gangToppled[i] && !IsCrown(i)) n++;
 		return n;
 	}
 
 	clearscope int ToppledCount() const
 	{
 		int n = 0;
-		for (int i = 0; i < gangToppled.Size(); i++) if (gangToppled[i]) n++;
+		for (int i = 0; i < gangToppled.Size(); i++) if (gangToppled[i] && !IsCrown(i)) n++;
 		return n;
+	}
+
+	// how many more gangs have to fall before the Crown opens
+	clearscope int CrownNeeds() const
+	{
+		return max(0, min(CROWN_AFTER, RegularGangs()) - ToppledCount());
+	}
+	clearscope bool CrownOpen() const { return crownSlot > 0 && CrownNeeds() == 0; }
+	clearscope bool CrownTaken() const
+	{
+		int gi = CrownGang();
+		return gi >= 0 && gi < gangToppled.Size() && gangToppled[gi];
+	}
+
+	// Backing goes up or down for a reason (shown on the next after-action report). At zero, Internal Affairs opens a
+	// file: a strike, and Backing starts again at BACKING_RESET.
+	void AddBacking(int n, String reason)
+	{
+		if (!caseActive || n == 0) return;
+		backing = clamp(backing + n, 0, 100);
+		caseBackingLow = min(caseBackingLow, backing);
+		backingLog.Push(String.Format("%s %s%d", reason, n > 0 ? "+" : "", n));
+		if (backing <= 0)
+		{
+			strikes++;
+			backing = BACKING_RESET;
+			backingLog.Push(String.Format("Backing hit zero. Internal Affairs opens a file: strike %d of %d", strikes, MAX_STRIKES));
+		}
+	}
+
+	// the case ends: the Crown taken (or every gang, in a case without one), three strikes, or out of days
+	void CheckCaseEnd()
+	{
+		if (!caseActive) return;
+		if (crownSlot > 0 ? CrownTaken() : GangsLeft() == 0) caseResult = NBC_CASE_WON;
+		else if (strikes >= MAX_STRIKES) caseResult = NBC_CASE_STRUCK_OUT;
+		else if (day > MAX_DAYS) caseResult = NBC_CASE_DEMOLITION;
+		if (caseResult == NBC_CASE_RUNNING) return;
+		caseActive = false;
+		readyDistrict = -1;
+		if (caseResult == NBC_CASE_WON) casesClosed++;
+		summaryPending = true;
+		summarySerial++;
 	}
 
 	void BeginRaid(int district)
@@ -164,6 +265,9 @@ class NBC_RunData : Thinker
 		raidPlayerKills = 0;
 		raidHealthLost = 0;
 		raidTics = 0;
+		raidShots = 0; raidHits = 0; raidLastHitTic = -1;
+		raidBackingWas = backing;
+		backingLog.Clear();
 		raidIssued.Clear();
 		raidOffTeam.Clear();
 		NBC_Orders.Reset(self);
@@ -196,7 +300,7 @@ class NBC_RunData : Thinker
 		for (int d = 0; d < districtGang.Size(); d++)
 		{
 			int gi = districtGang[d];
-			if (gi >= 0 && gi < gangToppled.Size() && !gangToppled[gi]) open.Push(d);
+			if (gi >= 0 && gi < gangToppled.Size() && !gangToppled[gi] && !IsCrown(gi)) open.Push(d);
 		}
 		if (!open.Size()) return;
 		int r = Rand(0, 99);
@@ -228,14 +332,7 @@ class NBC_RunData : Thinker
 		for (int i = 0; i < gangAlert.Size(); i++)
 			if (i != hitGang && gangAlert[i] > 0) gangAlert[i]--;
 
-		if (GangsLeft() == 0) caseResult = NBC_CASE_WON;
-		else if (strikes >= MAX_STRIKES) caseResult = NBC_CASE_STRUCK_OUT;
-		else if (day > MAX_DAYS) caseResult = NBC_CASE_DEMOLITION;
-		if (caseResult != NBC_CASE_RUNNING)
-		{
-			caseActive = false;
-			if (caseResult == NBC_CASE_WON) casesClosed++;
-		}
+		CheckCaseEnd();
 		RollEvent();
 	}
 }

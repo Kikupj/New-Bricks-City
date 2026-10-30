@@ -114,7 +114,7 @@ class NBC_Captain : NBC_HQNpc
 		let dept = NBC_Department.Find();
 		if (!rd || !rd.caseActive)
 		{
-			if (rd && rd.caseResult == NBC_CASE_WON) return "Case closed. They'll want the Bricks quiet for the cameras. Open another file when you're ready.";
+			if (rd && rd.caseResult == NBC_CASE_WON) return "The Crown's down. They'll want the Bricks quiet for the cameras. Open another file when you're ready.";
 			if (rd && rd.caseResult != NBC_CASE_RUNNING) return "That one's gone, Vance. Wipe the board. We start again.";
 			return "Thirty days, Vance. City Hall signed the order. Open the case file on the board and let's make them count.";
 		}
@@ -124,6 +124,20 @@ class NBC_Captain : NBC_HQNpc
 			return String.Format("Drop everything. A unit's pinned down in %s. Get them out by %s or IA hangs it on you.", rm.TurfTitle(rd.evDistrict), NBC_Clock.WIN_NAME[rd.evWindow].MakeLower());
 		Array<String> say;
 		say.Push(String.Format("Day %d of %d. %d of the gangs are still standing.", rd.day, NBC_RunData.MAX_DAYS, rd.GangsLeft()));
+		// the Crown: open, or how far off
+		if (rd.CrownOpen())
+		{
+			String c = "The Crown's open. The Landlord's own are in that tower, and they're paid better than we are. Take it and we're done.";
+			say.Push(c); say.Push(c);
+		}
+		else if (rd.crownSlot > 0 && rd.ToppledCount() > 0)
+			say.Push(String.Format("Bring down %d more crew%s and the Landlord runs out of people to hide behind. Then we go for the Crown.",
+				rd.CrownNeeds(), rd.CrownNeeds() == 1 ? "" : "s"));
+		// Backing: what City Hall thinks of us
+		if (rd.backing <= NBC_RunData.BACKING_LOW)
+			say.Push(String.Format("City Hall's backing is at %d. Any lower and IA opens a file on its own. And the hospital's putting us last in line.", rd.backing));
+		else if (rd.backing >= NBC_RunData.BACKING_HIGH)
+			say.Push("City Hall's on our side for once. Don't waste it.");
 		if (rm && rd.evKind != NBC_Clock.EV_NONE)
 		{
 			String ev = NBC_Clock.EventLine(rd.evKind, rm.TurfTitle(rd.evDistrict), rd.evWindow);
