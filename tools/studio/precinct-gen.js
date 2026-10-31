@@ -17,7 +17,7 @@
 // The officers fit for duty stand at the NBC_HQSpot things; the raid board, the Evidence Locker and the squad room
 // are Use targets in front of their furniture (nbc/zscript/nbc/hub.zs, hq.zs).
 
-const { Builder, T, R, inset, cx, cy, snap, overlaps, facadeDecor, mass, editorTheme, CARS, FACADE_LIT } = require('./district-gen');
+const { Builder, T, R, inset, cx, cy, snap, overlaps, facadeDecor, mass, editorTheme, doorFit, CARS, FACADE_LIT } = require('./district-gen');
 
 const P = {
     raidBoard: 26010, armoryLocker: 26011, squadRoom: 26012, captain: 26013, pilot: 26014, hqSpot: 26015, hubBay: 26031,
@@ -311,7 +311,7 @@ function exteriorDoor(b, side, p, w, texture) {
     else { header = R(B.x + B.w - 8, p, 8, w); door = R(B.x + B.w - 16, p, 8, w); clear = R(B.x + B.w - 96, p - 16, 160, w + 32); }
     b.opening({ type: 'window', name: 'Entrance', floorHeight: FLOOR, ceilingHeight: FLOOR + 72, floorTexture: 'AXF39', ceilingTexture: 'CWCONCF',
         wallTexture: FACADE, upperTexture: FACADE, lowerTexture: FACADE, blocking: false }, header);
-    b.opening({ type: 'door', name: side === 'S' ? 'Front door' : 'Back door', theme: 'nbc_precinct', wallTexture: texture, lock: 0, speed: 32, wait: 105 }, door);
+    b.opening({ type: 'door', name: side === 'S' ? 'Front door' : 'Back door', theme: 'nbc_precinct', wallTexture: texture, lock: 0, speed: 32, wait: 105, ...doorFit(texture, door, 72) }, door);
     b.keepClear.push(clear);
 }
 

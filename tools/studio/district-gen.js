@@ -28,6 +28,35 @@ function mulberry32(seed) {
     };
 }
 
+// A texture's size from the mod's PNG (its header), for fitting door textures to their doorways
+const fs = require('fs');
+const path = require('path');
+const TEX_DIR = path.resolve(__dirname, '..', '..', 'nbc', 'textures');
+const texSizes = new Map();
+function texSize(name) {
+    if (texSizes.has(name)) return texSizes.get(name);
+    let size = [64, 128];
+    const find = dir => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+            const full = path.join(dir, e.name);
+            if (e.isDirectory()) { const f = find(full); if (f) return f; }
+            else if (e.name.toUpperCase() === `${name.toUpperCase()}.PNG`) return full;
+        }
+        return null;
+    };
+    const file = fs.existsSync(TEX_DIR) ? find(TEX_DIR) : null;
+    if (file) { const head = fs.readFileSync(file).subarray(16, 24); size = [head.readUInt32BE(0), head.readUInt32BE(4)]; }
+    texSizes.set(name, size);
+    return size;
+}
+// a door's texture scaled to show whole on its face: the face's width (the door rect's long side) by the doorway's
+// height (the door opens to the lowest ceiling beside it)
+function doorFit(texture, rect, opening) {
+    const [w, h] = texSize(texture);
+    const face = Math.max(rect.w, rect.h);
+    return { textureScaleX: +(w / face).toFixed(4), textureScaleY: +(h / opening).toFixed(4) };
+}
+
 const snap = v => Math.round(v / 8) * 8;
 const R = (x, y, w, h) => ({ x: snap(x), y: snap(y), w: snap(w), h: snap(h) });
 const inset = (r, d) => ({ x: r.x + d, y: r.y + d, w: r.w - 2 * d, h: r.h - 2 * d });
@@ -446,7 +475,9 @@ function building(b, B, o) {
         const rect = e.axis === 'x' ? R(e.c - 8, p, 16, w) : R(p, e.c - 8, w, 16);
         const tA = themes[link.a.theme], tB = themes[link.b.theme];
         const lock = link.door && o.lockDoors && b.chance(o.lockDoors) ? 1 : 0;
-        if (link.door) b.opening({ type: 'door', name: lock ? 'Locked door' : 'Door', theme: link.a.theme, wallTexture: tA.door || tB.door, lock, speed: 32, wait: 105 }, rect);
+        const doorTex = tA.door || tB.door;
+        if (link.door) b.opening({ type: 'door', name: lock ? 'Locked door' : 'Door', theme: link.a.theme, wallTexture: doorTex, lock, speed: 32, wait: 105,
+            ...doorFit(doorTex, rect, Math.min(link.a.ceil, link.b.ceil) - floor) }, rect);
         else b.opening({ type: 'window', name: 'Doorway', floorHeight: floor, ceilingHeight: floor + 72, wallTexture: tA.wall, upperTexture: tA.wall, lowerTexture: tA.wall, blocking: false }, rect);
         const clear = e.axis === 'x' ? R(e.c - 56, p - 8, 112, w + 16) : R(p - 8, e.c - 56, w + 16, 112);
         b.keepClear.push(clear);
@@ -470,7 +501,9 @@ function building(b, B, o) {
         const t = themes[ent.leaf.theme];
         b.opening({ type: 'window', name: 'Entrance', floorHeight: o.outsideFloor ?? floor, ceilingHeight: floor + 72, wallTexture: facade, upperTexture: facade, lowerTexture: facade, blocking: false }, header);
         const lockFront = o.lockFront && b.chance(o.lockFront) ? 1 : 0;
-        b.opening({ type: 'door', name: lockFront ? 'Locked front door' : 'Front door', theme: ent.leaf.theme, wallTexture: o.frontDoor || t.door, lock: lockFront, speed: 32, wait: 105 }, door);
+        const frontTex = o.frontDoor || t.door;
+        b.opening({ type: 'door', name: lockFront ? 'Locked front door' : 'Front door', theme: ent.leaf.theme, wallTexture: frontTex, lock: lockFront, speed: 32, wait: 105,
+            ...doorFit(frontTex, door, 72) }, door);
         b.keepClear.push(clear);
         ent.leaf.openings.push(clear);
         entrances.push({ side: ent.side, x: cx(door), y: cy(door), rect: door });
@@ -1104,4 +1137,4 @@ function placeExit(b, built) {
     throw new Error('no wall for the exit');
 }
 
-module.exports = { generateDistrict, ENV, T, Builder, R, inset, grow, cx, cy, snap, overlaps, roomLights, facadeDecor, fence, mass, editorTheme, TENEMENT_THEMES, ROOM_PROPS, CARS, FACADE_LIT };
+module.exports = { generateDistrict, ENV, T, Builder, R, inset, grow, cx, cy, snap, overlaps, roomLights, facadeDecor, fence, mass, editorTheme, doorFit, TENEMENT_THEMES, ROOM_PROPS, CARS, FACADE_LIT };
