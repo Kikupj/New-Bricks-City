@@ -14,6 +14,7 @@ class NBC_RunData : Thinker
 	const MAX_DAYS = 30;
 	const MAX_STRIKES = 3;
 	const CROWN_AFTER = 3;             // gangs toppled before the Crown opens
+	const CASE_GANGS = 4;              // gangs a case deals to its districts (of the regular ones in gangs.txt; PLAN §6.9)
 	// Backing (PLAN.md §2.5, §6.10): City Hall's and the street's faith in the department, 0-100
 	const BACKING_START = 60;
 	const BACKING_RESET = 40;          // after Backing hits zero (and a strike)
@@ -56,6 +57,7 @@ class NBC_RunData : Thinker
 	// the current raid
 	bool raidActive, leaderDown, officerDown;
 	int raidDistrict, raidGang, raidKills, raidBounty;
+	int raidArrests, raidFled;        // the ones who gave up: cuffed, and the ones who ran (objective.zs)
 	// the map the raid runs on (a district's Obsidian map); on a kit floor (M2b, test maps) also the variant,
 	// layout seed and preferred entry (NBC_KitGen.EK_*)
 	String raidMap;
@@ -155,8 +157,8 @@ class NBC_RunData : Thinker
 		int districtCount = caseDistricts.Size() + (crownGang >= 0 ? 1 : 0);
 		int crownDistrict = crownGang >= 0 ? caseDistricts.Size() : -1;
 
-		// shuffle the gangs, then deal them round the districts so every gang holds at least one; the Crown holds
-		// its own tower
+		// shuffle the gangs and keep four of them, then deal them round the districts so every gang holds at least
+		// one; the Crown holds its own tower
 		Array<int> deck;
 		for (int i = 0; i < gangCount; i++) if (i != crownGang) deck.Push(i);
 		for (int i = deck.Size() - 1; i > 0; i--)
@@ -164,6 +166,7 @@ class NBC_RunData : Thinker
 			int j = Rand(0, i);
 			int t = deck[i]; deck[i] = deck[j]; deck[j] = t;
 		}
+		while (deck.Size() > CASE_GANGS) deck.Pop();
 		districtGang.Clear();
 		int k = 0;
 		for (int d = 0; d < districtCount; d++)
@@ -219,11 +222,14 @@ class NBC_RunData : Thinker
 	clearscope int CrownGang() const { return crownSlot - 1; }
 	clearscope bool IsCrown(int gi) const { return crownSlot > 0 && gi == crownSlot - 1; }
 
+	// a gang in this case: it holds a district (a case deals four of the gangs, PLAN §6.9)
+	clearscope bool InCase(int gi) const { return districtGang.Find(gi) != districtGang.Size(); }
+
 	// the gangs dealt to the districts (not the Crown)
 	clearscope int RegularGangs() const
 	{
 		int n = 0;
-		for (int i = 0; i < gangToppled.Size(); i++) if (!IsCrown(i)) n++;
+		for (int i = 0; i < gangToppled.Size(); i++) if (!IsCrown(i) && InCase(i)) n++;
 		return n;
 	}
 
@@ -231,14 +237,14 @@ class NBC_RunData : Thinker
 	clearscope int GangsLeft() const
 	{
 		int n = 0;
-		for (int i = 0; i < gangToppled.Size(); i++) if (!gangToppled[i] && !IsCrown(i)) n++;
+		for (int i = 0; i < gangToppled.Size(); i++) if (!gangToppled[i] && !IsCrown(i) && InCase(i)) n++;
 		return n;
 	}
 
 	clearscope int ToppledCount() const
 	{
 		int n = 0;
-		for (int i = 0; i < gangToppled.Size(); i++) if (gangToppled[i] && !IsCrown(i)) n++;
+		for (int i = 0; i < gangToppled.Size(); i++) if (gangToppled[i] && !IsCrown(i) && InCase(i)) n++;
 		return n;
 	}
 
@@ -293,6 +299,7 @@ class NBC_RunData : Thinker
 		leaderDown = false;
 		officerDown = false;
 		raidKills = 0;
+		raidArrests = 0; raidFled = 0;
 		raidBounty = 0;
 		raidMap = "";
 		raidVariant = 0;

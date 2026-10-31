@@ -80,6 +80,7 @@ class NBC_CaseSummary : NBC_UI
 		double gy = 128;
 		for (int i = 0; i < rd.gangToppled.Size() && i < rm.gangs.Size(); i++)
 		{
+			if (!rd.InCase(i)) continue;
 			let g = rm.gangs[i];
 			bool down = rd.gangToppled[i];
 			bool crown = rd.IsCrown(i);

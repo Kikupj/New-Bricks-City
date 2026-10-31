@@ -11,9 +11,9 @@
 class NBC_Objective play
 {
 	bool done;
+	String status;          // the HUD's line (kept up to date by Tick)
 	virtual void Begin(NBC_RunManager rm, NBC_RunData rd, NBC_GangDef g) {}
 	virtual void Tick(NBC_RunManager rm, NBC_RunData rd, NBC_GangDef g) {}
-	virtual clearscope String Status(NBC_RunManager rm, NBC_RunData rd) const { return ""; }
 }
 
 class NBC_Sweep : NBC_Objective
@@ -32,22 +32,14 @@ class NBC_Sweep : NBC_Objective
 		let d = rm.director;
 		int total = max(1, d.sentTotal);
 		int down = total - d.Alive();
+		int need = int(ceil(total * breakAt));
+		status = String.Format("SWEEP: %d of %d down (%d to break them)%s", down, total, max(0, need - down),
+			d.AllSent() ? "" : String.Format(", wave %d of %d", d.wave, d.waves));
 		if (!rd.leaderDown || down < total * breakAt) return;
 		done = true;
+		status = "BLOCK SECURE: head for the exit";
 		d.CallOff();
-		rm.Secure(rd);
-	}
-
-	override clearscope String Status(NBC_RunManager rm, NBC_RunData rd) const
-	{
-		if (done) return "BLOCK SECURE: head for the exit";
-		if (!rm.director) return "";
-		let d = rm.director;
-		int total = max(1, d.sentTotal);
-		int down = total - d.Alive();
-		int need = int(ceil(total * breakAt));
-		return String.Format("SWEEP: %d of %d down (%d to break them)%s", down, total, max(0, need - down),
-			d.Spent() ? "" : String.Format(", wave %d of %d", d.wave, d.waves));
+		rm.SecureBlock(rd);
 	}
 }
 
@@ -60,7 +52,7 @@ class NBC_Captive : Actor
 	const RUN = 20;
 	class<Actor> was;
 	State see;
-	int phase, until, animAt;
+	int phase, doneAt, animAt;
 	bool cuffed;
 	Vector2 edge;
 
@@ -90,7 +82,7 @@ class NBC_Captive : Actor
 		c.frame = pain.Frame;
 		c.see = m.SeeState;
 		c.edge = edge;
-		c.until = level.maptime + 35 * KNEEL;
+		c.doneAt = level.maptime + 35 * KNEEL;
 		m.Destroy();
 		return c;
 	}
@@ -114,10 +106,10 @@ class NBC_Captive : Actor
 		if (health <= 0 || bDestroyed) return;
 		if (phase == 0)
 		{
-			if (cuffed || level.maptime < until) return;
+			if (cuffed || level.maptime < doneAt) return;
 			// time's up: run for it
 			phase = 1;
-			until = level.maptime + 35 * RUN;
+			doneAt = level.maptime + 35 * RUN;
 			bSolid = false;
 			let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
 			if (rm && !rm.runnersCalled) { rm.runnersCalled = true; NBC_Orders.Say("They're running!", Font.CR_ORANGE); if (developer) Console.Printf("nbc objective: they're running"); }
@@ -132,7 +124,7 @@ class NBC_Captive : Actor
 		}
 		MoveOn();
 		let p = players[consoleplayer].mo;
-		if (level.maptime >= until || (p && (pos.xy - p.pos.xy).Length() > 768 && !CheckSight(p)))
+		if (level.maptime >= doneAt || (p && (pos.xy - p.pos.xy).Length() > 768 && !CheckSight(p)))
 		{
 			let rd = NBC_RunData.Find();
 			if (rd) rd.raidFled++;

@@ -45,7 +45,7 @@ class NBC_Director play
 		return d;
 	}
 
-	static int Cost(int tier) { return TIER_COST[clamp(tier, 1, 4) - 1]; }
+	static int Cost(int tier) { return NBC_Director.TIER_COST[clamp(tier, 1, 4) - 1]; }
 
 	// §6.2 for a district: the four floors' budgets and the leader's floor
 	static int BlockBudget(NBC_GangDef g, NBC_RunData rd, int alert, double mul)
@@ -80,7 +80,7 @@ class NBC_Director play
 		for (int i = 0; i < later; i++) waveBudget.Push(rest / later + (i < rest % later ? 1 : 0));
 	}
 
-	clearscope bool Spent() const { return calledOff || wave >= waves; }
+	clearscope bool AllSent() const { return calledOff || wave >= waves; }
 	void CallOff() { calledOff = true; }
 
 	// the block's awake: the waves start their clock (an alarm brings the next one now)
@@ -89,7 +89,7 @@ class NBC_Director play
 		if (engaged) return;
 		engaged = true;
 		nextAt = level.maptime + 35 * WAVE_SECS;
-		if (g && g.alarm && !alarmSent && !Spent())
+		if (g && g.alarm && !alarmSent && !AllSent())
 		{
 			alarmSent = true;
 			rm.Announce("ALARM! The whole building knows you're here. More of them on the way.", 35 * 4);
@@ -113,7 +113,7 @@ class NBC_Director play
 			}
 			if (!engaged) return;
 		}
-		if (Spent()) return;
+		if (AllSent()) return;
 		int alive = 0;
 		for (int i = 0; i < current.Size(); i++) if (current[i] && current[i].health > 0) alive++;
 		bool thinned = current.Size() == 0 || (current.Size() - alive) >= current.Size() * WAVE_AT;
@@ -123,7 +123,7 @@ class NBC_Director play
 	// Spend the next wave's budget out of your sight
 	void SendWave(NBC_GangDef g, NBC_RunData rd)
 	{
-		if (Spent()) return;
+		if (AllSent()) return;
 		let p = players[consoleplayer].mo;
 		if (!p) return;
 		int share = waveBudget.Size() > wave - 1 ? waveBudget[wave - 1] : 0;

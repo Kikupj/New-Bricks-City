@@ -178,7 +178,7 @@ class NBC_StatusBar : BaseStatusBar
 			else if (dark) { Line("Flashlight off (F)", Font.CR_DARKGRAY, 0.4, y); y += 7; }
 			String lead;
 			int lc = Font.CR_RED;
-			if (rd.leaderDown) { lead = "Leader down: get to the exit"; lc = Font.CR_GREEN; }
+			if (rd.leaderDown) { lead = rm.secure ? "Leader down" : "Leader down: finish the sweep"; lc = Font.CR_GREEN; }
 			else if (rm.leader && rm.leader.health > 0 && CPlayer && CPlayer.mo)
 			{
 				Vector2 d = rm.leader.pos.xy - CPlayer.mo.pos.xy;
@@ -199,7 +199,14 @@ class NBC_StatusBar : BaseStatusBar
 			int left = 0;
 			for (int i = 0; i < rm.crew.Size(); i++) if (rm.crew[i] && rm.crew[i].health > 0) left++;
 			Line(String.Format("Crew left %d", left), Font.CR_LIGHTBLUE, 0.4, y);
-			y += 8;
+			y += 7;
+			// the objective (objective.zs): the Sweep, then BLOCK SECURE
+			if (rm.objective && rd.raidMode != NBC_Motor.MODE_CRASH)
+			{
+				String obj = rm.objective.status;
+				if (obj != "") { Line(obj, rm.secure ? Font.CR_GREEN : Font.CR_ORANGE, 0.4, y); y += 7; }
+			}
+			y += 1;
 			if (rm.squad.Size()) { squadY = y; y += 30; }
 			// each fireteam's order and rules of engagement; ">" marks who your keys talk to
 			if (rm.squad.Size() && rd.teamOrder.Size() == NBC_Orders.TEAMS)
@@ -279,6 +286,18 @@ class NBC_StatusBar : BaseStatusBar
 		DrawNBCCase();
 		DrawThreatRing();
 		DrawSquadLog();
+		DrawAimedElite();
+	}
+
+	// an elite under your crosshair (NBC_RunManager.AimCheck): its name and modifiers, just under the crosshair
+	void DrawAimedElite()
+	{
+		let rm = NBC_RunManager(EventHandler.Find("NBC_RunManager"));
+		if (!rm || rm.aimedTics <= 0 || !rm.aimed || rm.aimed.health <= 0 || !nbcSmallFont) return;
+		let el = NBC_Elite(rm.aimed.FindInventory("NBC_Elite"));
+		if (!el) return;
+		String s = String.Format("ELITE %s: %s", NBC_Elite.NameOf(rm.aimed).MakeUpper(), el.Title());
+		Say(nbcSmallFont, NewSmallFont, s, (0, 14), DI_SCREEN_CENTER | DI_TEXT_ALIGN_CENTER, Font.CR_GOLD, 6, min(1.0, rm.aimedTics / 8.0));
 	}
 
 	// Ghost Recon's threat indicator: a ring at the bottom of the screen, a mark for every gang member the squad

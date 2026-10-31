@@ -28,7 +28,6 @@ class NBC_RunManager : EventHandler
 {
 	const HUB_MAP = "NBC_HUB";
 	const SAFE_RADIUS = 768.0;          // no gang member starts this close to the player
-	const REINFORCE_AT = 0.6;           // fraction of the starting crew down before reinforcements come
 	const OFFICER_DOWN_TICS = 70;
 	// par time for the grade (§6.11): a minute, plus this much per gang member on the block
 	const PAR_BASE_SECS = 60;
@@ -42,7 +41,14 @@ class NBC_RunManager : EventHandler
 	int crownGang, crownDistrict;       // the Crown's gang and its district (the last one; gangs.txt), -1: none
 
 	// raid bookkeeping (this map only)
-	bool raidSetUp, reinforced, exitFound;
+	bool raidSetUp, exitFound;
+	// the spawn director and the raid's objective (director.zs, objective.zs): waves, the Sweep, BLOCK SECURE
+	NBC_Director director;
+	NBC_Objective objective;
+	bool secure, runnersCalled;
+	// the elite you're aiming at (the HUD names it)
+	Actor aimed;
+	int aimedTics;
 	bool blockAwake, fireStrike;
 	Vector3 parkedAt;                   // where the motorcade parked (nbc_debug_motorcade)        // crowded streets: the first shot wakes the block; fire in the crowd (a strike)
 	int startCount, officerDownTics, cashAtStart;
@@ -201,6 +207,19 @@ class NBC_RunManager : EventHandler
 		}
 		rd.raidTics++;
 		RaidTick(rd);
+		if (aimedTics > 0) aimedTics--;
+		if (level.maptime % 3 == 0) AimCheck();
+	}
+
+	// what's under the crosshair: an elite gets named on the HUD
+	void AimCheck()
+	{
+		let p = players[consoleplayer].mo;
+		if (!p || !p.player) return;
+		FLineTraceData t;
+		p.LineTrace(p.angle, 2048, p.pitch, TRF_THRUBLOCK, p.player.viewheight, data: t);
+		Actor a = t.HitActor;
+		if (a && a.health > 0 && a.FindInventory("NBC_Elite")) { aimed = a; aimedTics = 18; }
 	}
 
 	// ------------------------------------------------------------ helpers
@@ -546,7 +565,7 @@ class NBC_RunManager : EventHandler
 		blockAwake = false; fireStrike = false;
 
 		// 4. the leader at the leader's place (a marker), else nearest the exit; escorts round them
-		int leaderSpot = -1;
+		int leaderSpot = -1, escortCost = 0;
 		double best = 1e12;
 		for (int i = 0; i < cand.Size() && !leaderSpots.Size(); i++)
 		{
@@ -558,10 +577,11 @@ class NBC_RunManager : EventHandler
 			Vector3 lp;
 			if (leaderSpots.Size()) lp = leaderSpots[rd.Rand(0, leaderSpots.Size() - 1)].pos;
 			else { lp = cand[leaderSpot].pos; cand.Delete(leaderSpot); }
-			leader = SpawnMember(g.leader, lp, g, rd, g.leaderHealth);
+			leader = SpawnMember(g.leader, lp, g, rd, g.leaderHealth, 0, 1);
 			if (leader)
 			{
 				leader.GiveInventoryType("NBC_LeaderToken");
+				if (g.leaderElite) NBC_Elite.Make(leader, g.leaderElite);
 				leader.SetTag(g.leaderTitle);
 				leader.Scale *= 1.12;
 				int escorts = g.escorts + NBC_Clock.EV_ESCORTS[ev];
@@ -569,8 +589,8 @@ class NBC_RunManager : EventHandler
 				{
 					Vector2 off = Actor.AngleToVector(k * 360.0 / max(1, escorts), 72 + 24 * (k / 4));
 					Vector3 ep = (lp.xy + off, lp.z);
-					let esc = SpawnMember(PickRoster(g, rd, 2), ep, g, rd, hpMul);
-					if (esc) crew.Push(esc);
+					let esc = SpawnMember(PickRoster(g, rd, 2), ep, g, rd, hpMul, 2, 1);
+					if (esc) { crew.Push(esc); escortCost += NBC_Director.Cost(EffectiveTier(g, 2)); }
 				}
 			}
 		}
@@ -582,19 +602,20 @@ class NBC_RunManager : EventHandler
 			* g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev]);
 		want = min(want, cand.Size());
 		SpreadAlongRoute(cand, p.pos, exitPos, want);
-		int placed = 0, k = 0, asleep = 0;
+		int placed = 0, k = 0, asleep = 0, crewCost = escortCost;
 		while (placed < want && k < cand.Size())
 		{
 			int r = rd.Rand(0, 99);
 			int tier = r < 60 - alert * 5 ? 1 : (r < 90 ? 2 : 3);
 			// a perch gets a shooter, rarely asleep; an idle spot is where they sleep it off
 			int role = cand[k].role;
-			if (role == NBC_GangSpot.ROLE_PERCH) tier = max(tier, 2);
+			if (role == NBC_GangSpot.ROLE_PERCH) tier = min(tier, 2);
 			int og = role == NBC_GangSpot.ROLE_IDLE ? min(95, offGuard * 2 + 20) : (role == NBC_GangSpot.ROLE_PERCH ? offGuard / 3 : offGuard);
-			let a = SpawnMember(PickRoster(g, rd, tier), cand[k].pos, g, rd, hpMul);
+			let a = SpawnMember(PickRoster(g, rd, tier), cand[k].pos, g, rd, hpMul, tier, 1);
 			k++;
 			if (!a) continue;
 			crew.Push(a);
+			crewCost += NBC_Director.Cost(EffectiveTier(g, tier));
 			placed++;
 			if (rd.Rand(0, 99) < og) { a.GiveInventoryType("NBC_OffGuard"); asleep++; }
 		}
@@ -608,6 +629,15 @@ class NBC_RunManager : EventHandler
 		for (; k < cand.Size(); k++) spareSpots.Push(cand[k]);
 		allSpots.Copy(spots);
 		startCount = crew.Size();
+
+		// the director (PLAN.md M4, §6.2): the block's threat budget; the crew's the first wave, the rest come later
+		double budgetMul = g.budget * InsertionCrewFactor(rd) * g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev];
+		director = NBC_Director.Create(self);
+		director.Begin(g, rd, NBC_Director.BlockBudget(g, rd, alert, budgetMul), crewCost, crew.Size() + (leader ? 1 : 0), crew);
+		objective = new("NBC_Sweep");
+		objective.Begin(self, rd, g);
+		secure = false; runnersCalled = false;
+		Dress(g, rd, p);
 
 		// 6. your kit, then the squad in behind you
 		IssueKit(p, dept, rd);
@@ -648,6 +678,9 @@ class NBC_RunManager : EventHandler
 			Console.Printf("nbc raid markers: spots %d ground, %d perch, %d reinforcement, %d off guard; the leader %s; the exit %s; %d spare spots for reinforcements.",
 				nGround, nPerch, nReinforce, nIdle,
 				leaderSpots.Size() ? "at the leader's place" : "nearest the exit", hasExtraction ? "at the extraction point" : "from the exit line", spareSpots.Size());
+			int elites = 0;
+			for (int i = 0; i < crew.Size(); i++) if (crew[i] && crew[i].FindInventory("NBC_Elite")) elites++;
+			Console.Printf("nbc director: budget %d, the crew cost %d (%d elites), %d waves in all", director.budget, director.spent, elites, director.waves);
 		}
 		String title = TurfTitle(rd.raidDistrict);
 		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
@@ -903,7 +936,8 @@ class NBC_RunManager : EventHandler
 	String PickRoster(NBC_GangDef g, NBC_RunData rd, int tier)
 	{
 		Array<String> list;
-		if (tier >= 3 && g.roster3.Size()) list.Copy(g.roster3);
+		if (tier >= 4 && g.roster4.Size()) list.Copy(g.roster4);
+		else if (tier >= 3 && g.roster3.Size()) list.Copy(g.roster3);
 		else if (tier >= 2 && g.roster2.Size()) list.Copy(g.roster2);
 		else if (g.roster1.Size()) list.Copy(g.roster1);
 		else if (g.roster2.Size()) list.Copy(g.roster2);
@@ -911,7 +945,23 @@ class NBC_RunManager : EventHandler
 		return list[rd.Rand(0, list.Size() - 1)];
 	}
 
-	Actor SpawnMember(String className, Vector3 at, NBC_GangDef g, NBC_RunData rd, double healthMul)
+	// a tier-1 pick from a gang with no rank and file (the Quiet) is really a tier-2 one
+	static int EffectiveTier(NBC_GangDef g, int tier)
+	{
+		if (tier == 1 && g && !g.roster1.Size()) return 2;
+		if (tier == 4 && g && !g.roster4.Size()) return 3;
+		return tier;
+	}
+
+	// a wave's health: the gang's and the day's event's
+	double WaveHealth(NBC_GangDef g, NBC_RunData rd)
+	{
+		int ev = clamp(rd.raidEvent, 0, NBC_Clock.EV_COUNT - 1);
+		return g.health * NBC_Clock.EV_HEALTH[ev];
+	}
+
+	// tier 0: the leader (no elite roll; the data makes them one); wave: 1 the crew, 2+ the director's waves
+	Actor SpawnMember(String className, Vector3 at, NBC_GangDef g, NBC_RunData rd, double healthMul, int tier = 1, int wave = 1)
 	{
 		if (className == "") return null;
 		class<Actor> cls = NBC_Gangs.Resolve(className, rd);
@@ -935,7 +985,103 @@ class NBC_RunManager : EventHandler
 				prof.factors.Copy(g.damageFactors);
 			}
 		}
+		let mb = NBC_Member(a.GiveInventoryType("NBC_Member"));
+		if (mb) { mb.tier = EffectiveTier(g, tier); mb.wave = wave; }
+		if (g.marksman) a.GiveInventoryType("NBC_Marksman");
+		if (tier > 0) NBC_Elite.Roll(a, g, rd);
 		return a;
+	}
+
+	// a gang's dressing (gangs.txt dress): the Rust Saints' explosive barrels, the Wall Watch's sandbags, by the
+	// spots nobody's standing on, away from your start
+	void Dress(NBC_GangDef g, NBC_RunData rd, Actor p)
+	{
+		if (!g.dressCount || g.dressKind == "") return;
+		String kind = g.dressKind ~== "barrels" ? "ExplosiveBarrel" : (g.dressKind ~== "sandbags" ? "CW_FSandbags" : g.dressKind);
+		class<Actor> cls = kind;
+		if (!cls) return;
+		int placed = 0;
+		for (int t = 0; t < 40 && placed < g.dressCount && allSpots.Size(); t++)
+		{
+			let s = allSpots[rd.Rand(0, allSpots.Size() - 1)];
+			if ((s.pos.xy - p.pos.xy).Length() < SAFE_RADIUS) continue;
+			// a step off the spot, toward where you'll come from: cover for them
+			Vector2 toward = p.pos.xy - s.pos.xy;
+			Vector2 at = s.pos.xy + toward.Unit() * 48 + Actor.AngleToVector(rd.Rand(0, 359), 12);
+			let d = Actor.Spawn(cls, (at, s.pos.z), NO_REPLACE);
+			if (!d) continue;
+			if (!d.TestMobjLocation()) { d.Destroy(); continue; }
+			d.angle = VectorAngle(toward.x, toward.y);
+			placed++;
+		}
+		if (developer) Console.Printf("nbc director: dressed the block with %d %s", placed, g.dressKind);
+	}
+
+	// BLOCK SECURE (the Sweep, objective.zs): the ones still standing give up; the waves are called off
+	void SecureBlock(NBC_RunData rd)
+	{
+		if (secure) return;
+		secure = true;
+		let p = players[consoleplayer].mo;
+		int gave = 0;
+		for (int i = 0; i < crew.Size(); i++)
+		{
+			Actor m = crew[i];
+			if (!m || m.health <= 0) continue;
+			if (NBC_Captive.Take(m, EdgeFor(m, p))) gave++;
+			crew[i] = null;
+		}
+		Announce(gave ? String.Format("BLOCK SECURE: head for the exit.\n%d of them are giving up: Use to cuff them before they run.", gave)
+			: "BLOCK SECURE: head for the exit.", 35 * 6);
+		if (gave) NBC_Orders.Say("They're giving up!", Font.CR_GREEN);
+		if (developer) Console.Printf("nbc objective: block secure; %d surrendered", gave);
+	}
+
+	void DebugGoto(int kind)
+	{
+		let p = players[consoleplayer].mo;
+		if (!p) return;
+		Actor best = null;
+		double bd = 1e12;
+		let it = ThinkerIterator.Create(kind == 1 ? "NBC_Captive" : "Actor");
+		Actor mo;
+		while ((mo = Actor(it.Next())))
+		{
+			if (mo.health <= 0 || (kind != 1 && !mo.FindInventory("NBC_Elite"))) continue;
+			double d = p.Distance2D(mo);
+			if (d < bd) { bd = d; best = mo; }
+		}
+		if (!best) { Console.Printf("nbc: nothing to go to"); return; }
+		double dist = kind == 1 ? 52 : 160;
+		Vector2 dir = (p.pos.xy - best.pos.xy);
+		dir = dir.Length() > 0 ? dir.Unit() : (1, 0);
+		for (int a = 0; a < 360; a += 30)
+		{
+			Vector2 at = best.pos.xy + Actor.RotateVector(dir, a) * dist;
+			if (p.TeleportMove((at, best.pos.z), false))
+			{
+				Vector2 d = best.pos.xy - at;
+				p.angle = VectorAngle(d.x, d.y);
+				p.pitch = 0;
+				Console.Printf("nbc: at (%d, %d), facing %s", int(at.x), int(at.y), best.GetClassName());
+				return;
+			}
+		}
+		Console.Printf("nbc: no room next to it");
+	}
+
+	// where a runner makes for: the map's edge (a reinforcement spot, else any spot) away from you
+	Vector2 EdgeFor(Actor m, Actor p)
+	{
+		Vector2 best = m.pos.xy;
+		double score = -1e12;
+		for (int i = 0; i < allSpots.Size(); i++)
+		{
+			let s = allSpots[i];
+			double sc = (p ? (s.pos.xy - p.pos.xy).Length() : 0) - 0.5 * (s.pos.xy - m.pos.xy).Length() + (s.role == NBC_GangSpot.ROLE_REINFORCE ? 1024 : 0);
+			if (sc > score) { score = sc; best = s.pos.xy; }
+		}
+		return best;
 	}
 
 	// ------------------------------------------------------------ during the raid
@@ -979,24 +1125,12 @@ class NBC_RunManager : EventHandler
 			}
 		}
 
-		// reinforcements once the crew is mostly down: out of the player's sight, away from them
-		if (!reinforced && startCount > 0 && rd.raidKills >= startCount * REINFORCE_AT)
+		// the director's waves and the objective (not at a crash site: that's its own fight)
+		if (rd.raidMode != NBC_Motor.MODE_CRASH)
 		{
-			reinforced = true;
 			let g = GangAt(rd.raidGang);
-			int sent = 0;
-			for (int i = 0; i < spareSpots.Size() && sent < 6; i++)
-			{
-				if ((spareSpots[i].pos.xy - p.pos.xy).Length() < SAFE_RADIUS) continue;
-				let a = SpawnMember(PickRoster(g, rd, 2), spareSpots[i].pos, g, rd, g.health);
-				if (!a) continue;
-				if (a.CheckSight(p)) { a.Destroy(); continue; }
-				a.target = p;
-				a.SetStateLabel("See");
-				crew.Push(a);
-				sent++;
-			}
-			if (sent) Announce("Radio: more of them coming in behind you.", 35 * 4);
+			if (director) director.Tick(g, rd, p);
+			if (objective) objective.Tick(self, rd, g);
 		}
 	}
 
@@ -1061,6 +1195,8 @@ class NBC_RunManager : EventHandler
 		}
 		// shot by an officer: often turn on them
 		if (e.DamageSource is "NBC_Ally" && t.health > 0 && random(0, 99) < 60) t.target = e.DamageSource;
+		// the block's awake: the director's waves start their clock
+		if (director && e.DamageSource && (e.DamageSource.player || e.DamageSource is "NBC_Ally")) director.Engage(GangAt(rd.raidGang), rd);
 	}
 
 	// ------------------------------------------------------------ results
@@ -1071,7 +1207,7 @@ class NBC_RunManager : EventHandler
 		let dept = NBC_Department.Get();
 		String title = TurfTitle(rd.raidDistrict);
 		int gi = rd.raidGang;
-		bool taken = !rd.officerDown && rd.leaderDown && gi >= 0 && gi < rd.gangToppled.Size();
+		bool taken = !rd.officerDown && rd.leaderDown && (secure || rd.raidMode == NBC_Motor.MODE_CRASH) && gi >= 0 && gi < rd.gangToppled.Size();
 
 		let rep = new("NBC_Report");
 		rep.place = title;
@@ -1282,6 +1418,32 @@ class NBC_RunManager : EventHandler
 	override void NetworkProcess(ConsoleEvent e)
 	{
 		if (e.Name ~== "nbc_debug_case") { DebugCase(); return; }
+		if (e.Name ~== "nbc_debug_director")
+		{
+			if (director) director.Debug();
+			else Console.Printf("nbc director: no raid on");
+			if (objective) Console.Printf("  objective: %s", objective.status);
+			let rdd = NBC_RunData.Find();
+			if (rdd) Console.Printf("  arrests %d, fled %d", rdd.raidArrests, rdd.raidFled);
+			let ef = NBC_EnemyFire(EventHandler.Find("NBC_EnemyFire"));
+			if (ef) Console.Printf("  marksman rounds put back on target: %d", ef.marksmanShots);
+			let ci = ThinkerIterator.Create("NBC_Captive");
+			NBC_Captive c;
+			while ((c = NBC_Captive(ci.Next()))) Console.Printf("  captive at (%d, %d)%s", int(c.pos.x), int(c.pos.y), c.cuffed ? " cuffed" : (c.phase ? " running" : " kneeling"));
+			return;
+		}
+		// testing: the next wave now (and the block awake)
+		if (e.Name ~== "nbc_debug_wave")
+		{
+			let rdw = NBC_RunData.Find();
+			if (!director || !rdw) return;
+			let gw = GangAt(rdw.raidGang);
+			director.Engage(gw, rdw);
+			director.SendWave(gw, rdw);
+			return;
+		}
+		// testing: stand facing the nearest elite (0) or captive (1)
+		if (e.Name ~== "nbc_debug_goto") { DebugGoto(e.Args[0]); return; }
 		if (e.Name ~== "nbc_debug_clear") { DebugClear(e.Args[0]); return; }
 		if (e.Name ~== "nbc_debug_cash") { let rd = NBC_RunData.Get(); rd.cash += e.Args[0]; return; }   // testing
 		if (e.Name ~== "nbc_debug_motorcade")   // testing: stand back from the parked motorcade, looking at it
@@ -1345,7 +1507,7 @@ class NBC_RunManager : EventHandler
 			if (!rd.caseActive) return;
 			int n = 0;
 			for (int i = 0; i < rd.gangToppled.Size() && n < e.Args[0]; i++)
-				if (!rd.gangToppled[i] && !rd.IsCrown(i)) { rd.gangToppled[i] = true; n++; }
+				if (!rd.gangToppled[i] && !rd.IsCrown(i) && rd.InCase(i)) { rd.gangToppled[i] = true; n++; }
 			Console.Printf("nbc: %d of %d gangs toppled; the Crown is %s", rd.ToppledCount(), rd.RegularGangs(), rd.CrownOpen() ? "open" : "shut");
 			return;
 		}

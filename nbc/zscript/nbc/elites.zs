@@ -53,13 +53,13 @@ class NBC_Elite : Inventory
 
 	static int Weight(NBC_GangDef g, int i)
 	{
-		int w = MOD_WEIGHT[i];
+		int w = NBC_Elite.MOD_WEIGHT[i];
 		if (i == 2 && g) w = int(w * max(g.volatileMul, 0.0));       // Volatile: the Rust Saints' are twice as common
 		return w;
 	}
 
 	// a modifier by name, for the data (gangs.txt leaderelite)
-	static int ModByName(String s)
+	clearscope static int ModByName(String s)
 	{
 		s = s.MakeLower();
 		if (s == "armored") return MOD_ARMORED;
@@ -104,7 +104,7 @@ class NBC_Elite : Inventory
 	{
 		if (!a) return "";
 		String t = a.GetTag("");
-		if (t == "" || t ~== a.GetClassName()) return "Gang member";
+		if (t == "" || t ~== String.Format("%s", a.GetClassName())) return "Gang member";
 		return t;
 	}
 

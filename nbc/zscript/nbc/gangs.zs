@@ -6,7 +6,15 @@ class NBC_GangDef
 	String id, name, shortName, color, leader, leaderTitle, trait;
 	int tier, escorts;
 	double budget, health, leaderHealth, painChance;
-	Array<String> roster1, roster2, roster3;
+	Array<String> roster1, roster2, roster3, roster4;
+	// M4 (director.zs, elites.zs, objective.zs, enemyfire.zs): an alarm wave when the block wakes; the share of the
+	// crew down when the rest break (0: the usual three in four); how common Volatile elites are; marksmen; the
+	// leader's elite modifiers; what the gang dresses its block with
+	bool alarm, marksman;
+	double moraleBreak, volatileMul;
+	int leaderElite;
+	String dressKind;
+	int dressCount;
 	Array<String> mansion;     // kit floors the gang holds, "K2:tenement" (kit:variant name); one is picked per raid
 	Array<Name> damageTypes;
 	Array<double> damageFactors;
@@ -91,7 +99,7 @@ class NBC_Gangs
 				g = new("NBC_GangDef");
 				g.id = w[1];
 				g.name = w[1]; g.shortName = w[1]; g.color = "White";
-				g.tier = 1; g.budget = 1; g.health = 1; g.leaderHealth = 4; g.painChance = 1; g.escorts = 2;
+				g.tier = 1; g.budget = 1; g.health = 1; g.leaderHealth = 4; g.painChance = 1; g.escorts = 2; g.volatileMul = 1;
 				for (int k = 0; k < NBC_Clock.W_COUNT; k++) { g.strength.Push(1.0); g.offGuard.Push(0); }
 				gangs.Push(g);
 				continue;
@@ -117,15 +125,22 @@ class NBC_Gangs
 			else if (key == "strength") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.strength[k - 1] = w[k].ToDouble(); }
 			else if (key == "offguard") { for (int k = 1; k < w.Size() && k <= NBC_Clock.W_COUNT; k++) g.offGuard[k - 1] = clamp(w[k].ToInt(), 0, 100); }
 			else if (key == "mansion") { for (int k = 1; k < w.Size(); k++) g.mansion.Push(w[k]); }
-			else if (key == "roster1" || key == "roster2" || key == "roster3")
+			else if (key == "roster1" || key == "roster2" || key == "roster3" || key == "roster4")
 			{
 				for (int k = 1; k < w.Size(); k++)
 				{
 					if (key == "roster1") g.roster1.Push(w[k]);
 					else if (key == "roster2") g.roster2.Push(w[k]);
-					else g.roster3.Push(w[k]);
+					else if (key == "roster3") g.roster3.Push(w[k]);
+					else g.roster4.Push(w[k]);
 				}
 			}
+			else if (key == "alarm") g.alarm = w[1].ToInt() != 0;
+			else if (key == "marksman") g.marksman = w[1].ToInt() != 0;
+			else if (key == "morale") g.moraleBreak = w[1].ToDouble();
+			else if (key == "volatile") g.volatileMul = w[1].ToDouble();
+			else if (key == "leaderelite") { for (int k = 1; k < w.Size(); k++) g.leaderElite |= NBC_Elite.ModByName(w[k]); }
+			else if (key == "dress") { g.dressKind = w[1]; g.dressCount = w.Size() > 2 ? w[2].ToInt() : 6; }
 			else if (key == "damage")
 			{
 				for (int k = 1; k + 1 < w.Size(); k += 2)

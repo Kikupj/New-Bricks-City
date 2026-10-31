@@ -6,7 +6,8 @@
 //   color             text colour on the board and HUD (a font colour name)
 //   budget            enemy count multiplier (Swarm gangs > 1)
 //   health            gang members' health multiplier
-//   roster1..3        enemy choice classes (actors/enemies/Espawners.txt) by tier; spawners are resolved in code
+//   roster1..4        enemy choice classes (actors/enemies/Espawners.txt) by tier; spawners are resolved in code.
+//                     Tier 4 (elite units) turns up once the gang's at alert 2, and in the Crown
 //   leader            the leader's class; leaderhealth multiplies its health; leadertitle names it
 //   escorts           how many roster2 guards stand with the leader
 //   damage            pairs of <damage type> <factor> taken by gang members (NBC_Light, NBC_Shell, NBC_Rifle, Fire, Melee, Blunt)
@@ -26,6 +27,14 @@
 //   crown             1: the Landlord's own (PLAN.md §6.9, the Crown). Never dealt to a district; its raid opens once
 //                     three gangs are toppled, and taking it closes the case. A placeholder until M10.
 //   map / turf / env  the Crown's raid map, its name on the raid board and its environment (as in districts.txt)
+// The spawn director, elites and the Sweep (PLAN.md M4; zscript/nbc/director.zs, elites.zs, objective.zs, enemyfire.zs):
+//   alarm             1: when the block wakes, a reinforcement wave right away (the Collectors)
+//   morale            the share of everyone they put in that has to be down before the rest give up (default 0.75)
+//   volatile          how common Volatile elites are, times the usual (the Rust Saints: 2)
+//   marksman          1: 25% more accurate past 512 units, a second slow to react within 256 (the Wall Watch)
+//   leaderelite       the leader's elite modifiers: Armored Wired Volatile ShotCaller Landlord
+//   dress             what they dress the block with, and how many: barrels <n> (explosive), sandbags <n>
+// A case deals four of the regular gangs (not the Crown) to its districts.
 
 gang stoop_kings
 {
@@ -41,8 +50,10 @@ gang stoop_kings
 	leader = eKILLERchoice
 	leadertitle = "the Stoop King"
 	leaderhealth = 6
+	leaderelite = Wired ShotCaller
 	escorts = 3
-	trait = "Swarm: more of them on every stoop, but they drop fast."
+	morale = 0.5
+	trait = "Swarm: more of them on every stoop, but they drop fast, and they give up at half."
 	strength = 0.75 0.95 1.25 1.15
 	offguard = 45 20 5 15
 	hours = "Stoop life: out in force from dusk, sleeping it off until noon."
@@ -65,7 +76,9 @@ gang rust_saints
 	leaderhealth = 2
 	escorts = 2
 	damage = Fire 0
-	trait = "Pyros: fire and explosives, and fire won't touch them."
+	volatile = 2
+	dress = barrels 8
+	trait = "Pyros: fire and explosives (barrels everywhere, elites that go up), and fire won't touch them."
 	strength = 0.85 0.9 1.0 1.3
 	offguard = 35 25 10 0
 	hours = "Night shift at the chop lot: full force after dark, thin and groggy in the morning."
@@ -86,6 +99,7 @@ gang iron_pit
 	leader = eROIDchoice
 	leadertitle = "the Champion"
 	leaderhealth = 7
+	leaderelite = Armored Wired
 	escorts = 3
 	damage = Fire 1.5
 	painchance = 0.4
@@ -110,9 +124,11 @@ gang collectors
 	leader = eSUITMANchoice
 	leadertitle = "the Head Collector"
 	leaderhealth = 8
+	leaderelite = ShotCaller
 	escorts = 3
 	damage = NBC_Light 0.6
-	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles."
+	alarm = 1
+	trait = "Vests: pistol and SMG rounds do less. Bring shells or rifles. They hit the alarm the moment they see you."
 	strength = 1.0 1.25 1.0 0.7
 	offguard = 10 0 15 35
 	hours = "Business hours: the suits are all in by day; a skeleton crew minds the tower at night."
@@ -137,13 +153,65 @@ gang landlord
 	roster1 = ePMCchoice
 	roster2 = ePMCchoice ePMCBIGchoice
 	roster3 = Elite1 EliteF1 EliteShotgun
+	roster4 = BadassElite BadassElite2 BigElite BadassPara Rocketeer
 	leader = BruteMiniGUN
 	leadertitle = "the Landlord's Brute"
 	leaderhealth = 2.5
+	leaderelite = Armored Landlord
 	escorts = 4
 	damage = NBC_Light 0.8
 	trait = "Private military: armored, drilled and paid on time. They never sleep on the job."
 	strength = 1.0 1.0 1.0 1.0
 	offguard = 5 5 5 5
 	hours = "Shifts round the clock: no good hour to hit the Crown."
+}
+
+// The last two of PLAN.md §6.9's six (M4). They come after the Crown so a case saved before them keeps its gangs.
+gang wall_watch
+{
+	name = "The Wall Watch"
+	short = "Wall Watch"
+	tier = 2
+	color = "Olive"
+	budget = 1.0
+	health = 1.0
+	roster1 = eMILSMGchoice eMILFEMchoice
+	roster2 = eRUSSIANchoice eRUSSFEMchoice eBANDITchoice eTERRORchoice
+	roster3 = eRUSGUNchoice eRUSSBIGchoice
+	roster4 = BigElite
+	leader = BigElite
+	leadertitle = "the Quartermaster"
+	leaderhealth = 3
+	leaderelite = Armored
+	escorts = 3
+	marksman = 1
+	dress = sandbags 8
+	trait = "Long guns: dead shots at range, sandbags in every room. A beat slow up close: get in their faces."
+	strength = 0.85 0.8 1.1 1.3
+	offguard = 30 35 10 0
+	hours = "Smugglers' hours: they run the tunnels at night and sleep through the day."
+	mansion = "basement:smugglers' tunnel" "roof:rooftop crossing"
+}
+
+gang quiet
+{
+	name = "The Quiet"
+	short = "Quiet"
+	tier = 3
+	color = "Ice"
+	budget = 0.8
+	health = 1.0
+	roster2 = Ninja1 Ninja2 Ninja3 Ninja4 eKILLERchoice
+	roster3 = eTERRORchoice
+	roster4 = KappaBorgM KappaBorgF
+	leader = KappaBorgM
+	leadertitle = "the Quiet One"
+	leaderhealth = 3
+	leaderelite = Armored Wired
+	escorts = 3
+	trait = "Ninjas and cyborgs: few of them, every one of them dangerous."
+	strength = 0.8 0.8 1.1 1.3
+	offguard = 10 10 0 0
+	hours = "Night work: sharpest after dark, and never really asleep."
+	mansion = "tower:penthouse floor"
 }
