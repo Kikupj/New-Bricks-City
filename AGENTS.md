@@ -39,7 +39,7 @@ This is a roguelite FPS mod for **UZDoom** (a GZDoom fork). The police are losin
 - Map things the mod defines use DoomEdNums starting at **26000**, registered in MAPINFO. 25013 is taken by the imported Molotov.
 - Never remove entries from `nbc/CREDITS.txt`. Add credits for any new asset.
 - Keep names, characters, dialogue, art and audio original. *Brick Mansions* is setting inspiration only; *Dirty Harry*, *Bad Boys II* and *Den of Thieves* are tone only; *Hamburger Hill* (`docs/hamburger-hill-analysis.md`) is mechanics and screen layouts only.
-- Levels come from **Obsidian** with the New Bricks City theme (`tools/Obsidian/addons/NewBricksCity/`, PLAN.md §4.4 and M2d), generated outside the game into `nbc/maps/NBC_CT*.wad`. Extend that theme; swap Doom prefabs and textures for ours. The in-game kits (`NBC_KT/KS/KB/KR`, `kit_*.zs`) are kept as test maps only: don't extend them.
+- Levels are built with **iDoom Studio** (github.com/Kikupj/iDoom-Studio-Map-Editor), the owner's map editor, through its MCP server (or its HTTP agent API) with the **New Bricks City game profile** (owner decision 2026-10-31; PLAN.md §4.4, M2e). The editor reads this mod's textures, sprites and map things straight from `nbc/`; maps export as `NBC_*` lumps (8 characters at most) into `nbc/maps/`, and each new map needs its MAPINFO entry. Themes, scale, starter maps and thing categories live in the editor's `profiles/new-bricks-city.json`: change them there. **Obsidian is frozen**: `tools/Obsidian/` stays as a record and NBC_CT/RF stay in the district pool until editor-built districts replace them. The in-game kits (`NBC_KT/KS/KB/KR`, `kit_*.zs`) are test maps only. Don't extend either.
 
 ## Allied officer (squad) rules
 - Allies are `NBC_Ally` subclasses with their own target-finding. Don't rely on the engine's built-in FRIENDLY AI: the pack's enemies have `+NOTARGET`, `+NOINFIGHTING` and `DamageFactor "Enemy", 0`.
@@ -67,8 +67,8 @@ Launch.bat                                                    # menu launcher: p
 powershell -File tools\run.ps1 -Extra "+give all"            # play (NBC_TEST until the hub exists)
 powershell -File tools\smoke_test.ps1 -Map NBC_TEST           # smoke test
 tools/smoke_test.sh NBC_TEST NBC_K2                           # smoke test on Linux (cloud sessions; see docs/STATUS.md notes)
-powershell -File tools\Obsidian\make_bricks.ps1             # build the Obsidian districts (Windows, the owner's obsidian.exe)
-tools/Obsidian/make_bricks.sh --length single --no-export     # the same on Linux, with a source build of Obsidian (see the script)
+Launch iDoom Studio.bat                                       # (in the iDoom Studio folder) the map editor on the New Bricks City profile
+IDOOM_MOD_DIR=../New-Bricks-City/nbc node server.js           # the same anywhere; agents drive it through src/mcp-server.js (MCP.md)
 python tools\check_lumps.py                                   # static checks
 python tools\list_textures.py BRICK                           # find texture names
 python tools\build_pk3.py                                     # release build → dist\NewBricksCity.pk3

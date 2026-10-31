@@ -467,6 +467,10 @@ How the smoke test works:
 
 ### 4.4 Levels: "the Bricks"
 
+**Decision (owner, 2026-10-31): levels are built with iDoom Studio**, the owner's own map editor (github.com/Kikupj/iDoom-Studio-Map-Editor), through its MCP server. It's easier for an agent to build real map geometry this way than from ZScript (the kits) or the old Doom editors, and a person can watch and adjust every edit live in the browser. The editor has a **New Bricks City game profile** (its `profiles/new-bricks-city.json`): it loads this mod's textures, sprites and map things straight from `nbc/`, offers Bricks material themes at the mod's scale (below), and exports `NBC_*` maps into `nbc/maps/`. **Obsidian is frozen**, like the kits before it: `tools/Obsidian/` stays as a record and the NBC_CT/RF districts stay in the pool until editor-built ones replace them. The milestone is **M2e**.
+
+*Superseded (2026-10-31): the Obsidian decision below.*
+
 **Decision (owner, 2026-10-28): levels come from Obsidian again.** Obsidian has proven level architecture, and its Urban theme with the right settings makes good maps. Obsidian is the base: we finish the New Bricks City theme (`tools/Obsidian/addons/NewBricksCity/`) so every Doom prefab and texture it uses is swapped for New Bricks City prefabs and textures, and modify Obsidian's output as far as we can. Maps are generated outside the game into the district pool; that's fine. The in-game kits (below, M2b/M2c) are kept as loadable test maps (`nbc_kittest`) but no longer extended. The milestone is **M2d**.
 
 *Superseded (2026-10-28): the two decisions below.*
@@ -665,13 +669,21 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 
 ---
 
-### M2d — Back to Obsidian: finish the New Bricks City theme — 🔧 IN PROGRESS (2026-10-28)
+### M2d — Back to Obsidian: finish the New Bricks City theme — ⛔ SUPERSEDED (2026-10-31) by M2e
 **Decision (owner, 2026-10-28):** Obsidian is the level base (§4.4). Steps:
 1. **Build Obsidian in the cloud** so maps can be generated and checked here. ✅ A console-only source build of Obsidian 20 (github.com/obsidian-level-maker/Obsidian) runs `tools/Obsidian/make_bricks.sh`, the Linux twin of `make_bricks.ps1`; a level builds in about 4 seconds.
 2. **Raids run on Obsidian districts again:** restore the M2 district pool (`nbc/districts.txt` lists NBC_CT maps; the RunManager replaces Obsidian's monsters with the gang). The kits leave the raid pool but stay loadable.
 3. **Finish the theme:** find every Doom prefab and texture still reaching the maps (screenshots and `inspect_udmf.py`) and swap it for a New Bricks City one: wall and floor textures, doors, wall decor and light fixtures, techbase and hell props, liquids, skies.
 4. **Settings:** start from the Urban settings the owner found good, then tune for city blocks.
 5. **Environments** (owner, 2026-10-28): the theme supports streets, housing towers, rooftops, an industrial park, parks, underground (basements and sewers) and the subway as separate Obsidian level themes, dealt across a build; buildings vary their facades. ✅ First pass built; see STATUS.
+
+### M2e — Levels from iDoom Studio — 🔧 IN PROGRESS (2026-10-31)
+**Decision (owner, 2026-10-31):** replace Obsidian with maps built in iDoom Studio through its MCP (§4.4). Steps:
+1. **The editor's New Bricks City profile.** ✅ (2026-10-31; see STATUS.) The mod's textures, sprites and things, Bricks themes, the mod's scale, `NBC_*` export into `nbc/maps/`, playtest with the mod loaded.
+2. **Raid markers.** Map things (DoomEdNums 26020+, registered in MAPINFO so the editor picks them up) for what a raid needs to know about a map: gang spots by role (ground, perch, reinforcement, off-guard), the leader's room, the extraction point, the street and rooftop insertions. `NBC_RunManager` reads them when a map has them and falls back to monster spots and exit lines otherwise. M4's spawn director builds on the roles.
+3. **Breaching.** A locked door is a breach point: you or a Breacher blow it open (loud, it wakes the block) instead of hunting a keycard.
+4. **The district pool.** Build 4-5 districts per environment (streets, towers, rooftops, industrial, parks, underground, subway) with the editor, a rooftop insertion on each, and let the case seed deal maps to districts. Then retire NBC_CT01-08 and NBC_RF01-08.
+5. **Hand-built maps.** The Crown for M10 (`NBC_CRWN`: map lumps are 8 characters at most, so not "NBC_CROWN"), and Checkpoint 9 rebuilt with every precinct room for M8.
 
 ### M3 — The case and raid loop (the heart of the roguelite) — ✅ BUILT, NEEDS PLAYTEST (2026-10-30, by Claude)
 *Done (2026-10-30): Backing (§2.5, §6.10, `NBC_RunData.AddBacking`), Merit banked after every raid at M8's rates (`nbc_merit`; spending stays M8), the §6.11 grade (accuracy, par time), the Crown placeholder (the `crown = 1` gang in gangs.txt on a borrowed tower map; topple 3 and it opens, take it to win), the case summary, and the debug netevents `nbc_day`, `nbc_skipblock`, `nbc_debug_backing`, `nbc_debug_topple` (the seed is the `nbc_seed` CVar). Owner decisions: going down still costs half of the raid's take, not all your Cash. Superseded by the Obsidian decision (§4.4): the five-block raid (approach, staging flat, floors, leader's floor) is one district map per raid; the staging flat's Intel and Informant come with M7.*
@@ -879,7 +891,7 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 >
 > **Gang leaders** (§6.9): on each leader's floor, the leader holds the deepest objective room with the gang's best units, plus a health bar and a short intro line. Arresting the leader (stagger or a takedown) instead of killing them gives double Merit and a free intel level on the Crown.
 >
-> **The Crown:** two K2 luxury floors, then the hand-built `NBC_CROWN` penthouse and roof (build a placeholder; the owner will rebuild it in UDB). BruteMiniGUN has a phase change at 50% (PMC adds, flickering lights), then the Landlord escapes across the roof as a final Rooftop Pursuit. Apply the Crown's active defenses from the gang tick, minus those stripped by toppled gangs.
+> **The Crown:** two K2 luxury floors, then the hand-built `NBC_CRWN` penthouse and roof (build a placeholder; the owner will rebuild it in UDB). BruteMiniGUN has a phase change at 50% (PMC adds, flickering lights), then the Landlord escapes across the roof as a final Rooftop Pursuit. Apply the Crown's active defenses from the gang tick, minus those stripped by toppled gangs.
 >
 > **Winning:** a win screen → the case summary → unlock "Demolition Day" mode in the Captain's Office (+25% budget, elites ×2, 20 days instead of 30, Backing starts at 40). Optional Demolition Day rule, off by default: when you go down, you take over the nearest living officer instead (*Hamburger Hill*'s rule); the raid fails only when the whole squad is down. Allies must handle every leader floor and the Crown: no getting stuck.
 
