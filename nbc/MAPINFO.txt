@@ -84,6 +84,7 @@ DoomEdNums
 	26013 = NBC_Captain
 	26014 = NBC_Pilot
 	26015 = NBC_HQSpot
+	26020 = NBC_RoofStart
 }
 
 // New Game starts at the hub (PLAN M2).
@@ -152,3 +153,4 @@ map NBC_KR "The Roof"
 include "mapinfo/city_maps.txt"   // Obsidian city maps (tools/Obsidian/export_maps.py)  (frozen, PLAN.md §4.4)
 include "mapinfo/cw_props.txt"   // Corpo Wars prop map numbers (tools/import/port_cw_props.py)
 include "mapinfo/nbc_rf_maps.txt"   // rooftop maps for helicopter insertions (export_maps.py --pair-with)
+include "mapinfo/studio_maps.txt"   // the districts and the Crown built in iDoom Studio (tools/studio/build_maps.js)

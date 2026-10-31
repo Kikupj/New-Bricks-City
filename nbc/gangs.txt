@@ -119,12 +119,13 @@ gang collectors
 	mansion = "tower:penthouse floor" "street:tower entrance"
 }
 
-// The Crown (M3 placeholder): the Landlord's private military in their own tower. Until M10 builds NBC_CROWN
-// (the penthouse and the roof), the raid borrows a housing-tower district.
+// The Crown: the Landlord's private military in their own tower (NBC_CRWN, built in iDoom Studio by
+// tools/studio/build_maps.js: the penthouse floor, the plaza dug in with sandbags, roof gardens). M10 adds the boss
+// fight and the roof escape.
 gang landlord
 {
 	crown = 1
-	map = NBC_CT06
+	map = NBC_CRWN
 	turf = "The Crown"
 	env = towers
 	name = "The Landlord's Own"

@@ -417,6 +417,8 @@ class NBC_RunManager : EventHandler
 		if (!p || !g) return;
 		let dept = NBC_Department.Get();
 		cashAtStart = rd.cash;
+		// a rooftop raid on a district with its own roofs: down on the roof start (the case RNG picks one)
+		if (rd.raidMode == NBC_Motor.MODE_ROOF) RoofStart(p, rd);
 
 		// 1. the map's own monsters out (their spots kept); a kit gives its own spots
 		Array<NBC_Spot> spots;
@@ -575,6 +577,20 @@ class NBC_RunManager : EventHandler
 			when = when .. ". It's dark: F for your flashlight (they'll see it too)";
 		Announce(String.Format("%s%s, %s. %s hold this block (%d on the ground).\nTake down %s, then get to the exit.",
 			how, title, when, g.name, startCount + (leader ? 1 : 0), g.leaderTitle), 35 * 7);
+	}
+
+	// The district's roof starts (NBC_RoofStart); none on a paired rooftop map, whose own player start is the roof
+	void RoofStart(Actor p, NBC_RunData rd)
+	{
+		Array<Actor> starts;
+		let it = ThinkerIterator.Create("NBC_RoofStart");
+		Actor s;
+		while ((s = Actor(it.Next()))) starts.Push(s);
+		if (!starts.Size()) return;
+		let at = starts[rd.Rand(0, starts.Size() - 1)];
+		p.SetOrigin(at.pos, false);
+		p.angle = at.angle;
+		p.vel = (0, 0, 0);
 	}
 
 	// The crew spread along the way in, not bunched where Obsidian put most of its monsters (owner playtest: quiet
@@ -1284,7 +1300,8 @@ class NBC_RunManager : EventHandler
 	}
 
 	// WHEELS UP at the pilot (or netevent nbc_deploy <district> for testing): the squad as picked goes in with you
-	// force (testing, netevent nbc_deploy <district> <force>): 1 = no shoot-down, 2 = shot down
+	// force (testing, netevent nbc_deploy <district> <force>): 1 = no shoot-down, 2 = shot down, 3 = a rooftop
+	// insertion whatever the motor pool has (never shot down)
 	void Deploy(int d, int force = 0)
 	{
 		let rd = NBC_RunData.Get();
@@ -1300,8 +1317,9 @@ class NBC_RunManager : EventHandler
 		// the motorcade: the vehicles have to seat everyone
 		dept.PruneSquad();
 		int ins = dept.insertion;
-		if (ins == NBC_Motor.INS_ROOFTOP && !dept.RollingHeli()) ins = NBC_Motor.INS_STREET;
-		if (dept.Seats(ins) < dept.SeatsNeeded())
+		if (force == 3) ins = NBC_Motor.INS_ROOFTOP;
+		else if (ins == NBC_Motor.INS_ROOFTOP && !dept.RollingHeli()) ins = NBC_Motor.INS_STREET;
+		if (force != 3 && dept.Seats(ins) < dept.SeatsNeeded())
 		{
 			Announce(String.Format("Not enough seats: %d going in, %d in the motorcade.", dept.SeatsNeeded(), dept.Seats(ins)), 35 * 4);
 			return;
@@ -1316,8 +1334,9 @@ class NBC_RunManager : EventHandler
 			// the way in over the roofs: the gang's guns might get the bird first
 			int gi = rd.districtGang[d];
 			int alert = gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0;
-			int risk = NBC_Motor.ShootDownRisk(g.tier, alert, dept.RollingHeli().cond);
-			bool down = force == 2 || (force != 1 && rd.Rand(0, 99) < risk);
+			let heli = dept.RollingHeli();
+			int risk = heli ? NBC_Motor.ShootDownRisk(g.tier, alert, heli.cond) : 0;
+			bool down = force == 2 || (force != 1 && force != 3 && rd.Rand(0, 99) < risk);
 			if (down) rd.raidMode = NBC_Motor.MODE_CRASH;
 			else
 			{

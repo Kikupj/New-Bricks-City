@@ -1,0 +1,24 @@
+*** Fatal Error ***
+Address not mapped to object (signal 11)
+Address: (nil)
+
+System: Linux vm 6.18.44-fc-v185 #1 SMP PREEMPT_DYNAMIC @0 x86_64 x86_64 x86_64 GNU/Linux
+
+UZDoom version 5.0.3 (7910df7102033fd7754a317f3254f24101135926)
+Command line: /home/user/uzdoom/uzdoom/build/uzdoom -iwad freedoom-0.13.0/freedoom2.wad -nosound -stdout -config /tmp/claude-0/-home-user/e0a1c3cb-2d29-5afc-8a58-0c6999135c9d/scratchpad/raid/raid.ini +vid_fullscreen 0 +vid_rendermode 0 +vid_preferbackend 0 +developer 1 +exec /tmp/claude-0/-home-user/e0a1c3cb-2d29-5afc-8a58-0c6999135c9d/scratchpad/raid/binds.cfg -file nbc
+Wad 0: uzdoom.pk3
+Wad 1: game_support.pk3
+Wad 2: freedoom2.wad
+Wad 3: lights.pk3
+Wad 4: brightmaps.pk3
+Wad 5: game_widescreen_gfx.pk3
+Wad 6: /home/user/New-Bricks-City/nbc/
+
+Current map: NBC_D03
+
+viewx = 576.000000
+viewy = 140.000000
+viewz = 50.000000
+viewangle = 90.000000
+
+Executing: gdb --quiet --batch --command=gdb-respfile-wDj5Jf

@@ -53,6 +53,15 @@ class NBC_Vehicle
 	clearscope int Seats() const { return NBC_Motor.TYPE_SEATS[clamp(type, 0, NBC_Motor.V_COUNT - 1)]; }
 }
 
+// Where the helicopter puts the squad down on a district that has its own roofs (map thing 26020; the iDoom
+// Studio districts). A rooftop raid on such a district runs on the district's own map and starts here; districts
+// with a paired rooftop map (nbc/rooftops.txt) use that instead. The angle is the way you face on landing.
+class NBC_RoofStart : Actor
+{
+	Default { +NOBLOCKMAP; +NOGRAVITY; +DONTSPLASH; +NOINTERACTION; RenderStyle "None"; }
+	States { Spawn: TNT1 A -1; Stop; }
+}
+
 // The crash site: the wreck burns and smokes for the whole raid (particles only, no damage).
 class NBC_WreckFire : Actor
 {
