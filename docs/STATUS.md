@@ -6,6 +6,11 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Rooftop maps: an endless pit instead of ground below (2026-10-31, by Claude)
+- **Owner feedback:** the lower sections of the rooftop maps still had ground; they should be an endless pit, to show how high up the roofs are.
+- **Now:** the gaps between the blocks and the drop outside the roof's edge are one pit: the floor 1,024 down, black (light 0), and sector special 115 (instant death) kills whoever reaches it. I took out the lower roofs and street I'd just put outside the edge, and the stairs out of the gaps. The roofs are islands joined by plank bridges: every bridge is built now (before, a third were skipped, and the stairs were the way back from a gap), so every roof stays reachable. No gang spots or props are placed over a pit (a rooftop map has about 15-20 fewer ground spots than it did, which were down in the gaps).
+- **Not tested in play:** falling in (what the Officer Down code does with an instant-death fall: a strike, like any lethal hit), or a raid from one of the maps; the four maps build with Map Check 0 errors and the smoke test passes. Gang members and officers who step off a bridge will fall too: tell me if the squad or the gang does it a lot.
+
 ### Rooftop maps: the roof's edge instead of a wall (2026-10-31, by Claude)
 - **Owner feedback:** the building wall round the rooftop maps looks odd, and the map doesn't read as large rooftops.
 - **What it was:** the same ring of tall lit-window buildings as the street maps, so you stood in a courtyard.

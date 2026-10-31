@@ -153,6 +153,7 @@ class Builder {
             floorHeight: o.floor || 0, ceilingHeight: o.ceil, lightLevel: o.light || 160, theme: o.theme
         };
         for (const key of ['floorTexture', 'ceilingTexture', 'wallTexture', 'upperTexture', 'lowerTexture']) if (o[key]) room[key] = o[key];
+        if (o.sectorSpecial) room.sectorSpecial = o.sectorSpecial;
         this.rooms.push(room);
         return room;
     }
@@ -705,6 +706,10 @@ function buildingOptions(b, kind, P) {
     }
 }
 
+// The rooftop maps' lower sections are an endless pit: the floor far below, black, and it kills (sector special 115,
+// Damage_InstantDeath) whoever reaches it. The roofs are islands joined by plank bridges.
+const PIT_FLOOR = -1024, PIT_SPECIAL = 115;
+
 // Each environment: the ground, the street grid, the mix of blocks, the backdrop
 const ENV = {
     streets: {
@@ -726,7 +731,7 @@ const ENV = {
     rooftops: {
         width: 3072, height: 3328, cols: 3, rows: 4, street: 256, edge: 128, sidewalk: 0,
         ground: { name: 'Roofs', theme: 'nbc_rooftop', ceil: 384, light: 184, lowerTexture: 'ADBRICK', upperTexture: 'CWCONCW', wallTexture: 'CWCONCW' },
-        alley: { floor: -224, theme: 'nbc_street', lowerTexture: 'ADBRICK', wallTexture: 'ADBRICK', light: 120 },
+        alley: { floor: PIT_FLOOR, theme: 'nbc_street', lowerTexture: 'ADBRICK', wallTexture: 'ADBRICK', light: 0 },
         blockFloor: 0, edgeFacades: FACADE_LIT,
         mix: [['hut', 4], ['deck', 4], ['roofplant', 3], ['mass', 1]],
         cars: 0, lamps: false, bridges: true, strongLayout: 'bsp', rim: true
@@ -771,41 +776,20 @@ const ENV = {
     }
 };
 
-// The edge of a rooftop map: not a wall but the edge of the roof. A 40-high parapet round the roof plane, then a
-// drop (to a sunken street 320 down) with the lower roofs of the neighbouring buildings below, at different
-// heights, and across the street the next building's wall. The ring's ceiling is a sky flat well under your eyes
-// (as are the lower roofs'), so you see out over all of it to the skyline in the sky box: you stand on top of a
-// city block, not in a courtyard.
+// The edge of a rooftop map: not a wall but the edge of the roof. A 40-high parapet round the roof plane, then the
+// endless pit (the same as the gaps between the blocks). The pit's ceiling is a sky flat well under your eyes, so
+// you see out over it to the skyline in the sky box: you stand on top of a tall block, not in a courtyard.
 function rooftopEdge(b, W, H, E, P) {
-    const RIM = 16, DEPTH = E - RIM, FLOOR_DROP = -320, CEIL_DROP = -64;
-    const drop = (rect, name) => b.room(rect, { prefix: 'drop', name, theme: 'nbc_street', floor: FLOOR_DROP, ceil: CEIL_DROP, light: 112,
-        ceilingTexture: 'F_SKY1', floorTexture: 'CWASPH', wallTexture: b.pick(FACADE_LIT), lowerTexture: 'ADBRICK', upperTexture: 'ADBRICK' });
+    const RIM = 16, DEPTH = E - RIM, FLOOR_DROP = PIT_FLOOR, CEIL_DROP = -64;
+    const drop = (rect, name) => b.room(rect, { prefix: 'drop', name, theme: 'nbc_street', floor: FLOOR_DROP, ceil: CEIL_DROP, light: 0,
+        ceilingTexture: 'F_SKY1', floorTexture: 'CWASPH', wallTexture: b.pick(FACADE_LIT), lowerTexture: 'ADBRICK', upperTexture: 'ADBRICK', sectorSpecial: PIT_SPECIAL });
     const strips = [R(0, 0, W, DEPTH), R(0, H - DEPTH, W, DEPTH), R(0, DEPTH, DEPTH, H - 2 * DEPTH), R(W - DEPTH, DEPTH, DEPTH, H - 2 * DEPTH)];
-    for (const r of strips) drop(r, 'Street below');
+    for (const r of strips) drop(r, 'Pit');
     // the parapet: concrete, 40 high (you can shoot over it, not step over it), the roof's own rim
     const rimTop = (rect) => b.top({ type: 'pillar', solid: false, name: 'Roof edge', floorHeight: 40, ceilingHeight: P.ground.ceil, ceilingTexture: 'F_SKY1',
         floorTexture: 'CWCONCF', wallTexture: 'CWCONCW', lowerTexture: 'CWCONCW' }, rect);
     rimTop(R(DEPTH, DEPTH, W - 2 * DEPTH, RIM)); rimTop(R(DEPTH, H - DEPTH - RIM, W - 2 * DEPTH, RIM));
     rimTop(R(DEPTH, DEPTH + RIM, RIM, H - 2 * DEPTH - 2 * RIM)); rimTop(R(W - DEPTH - RIM, DEPTH + RIM, RIM, H - 2 * DEPTH - 2 * RIM));
-    // the neighbours' lower roofs down in the drop: slabs at different heights with a brick lip, inside the street's
-    // 112 so a gap of street shows on both sides
-    const roofs = [];
-    const slab = (rect) => {
-        const floor = b.pick([-112, -144, -176, -208, -240, -272]);
-        roofs.push(rect);
-        b.top({ type: 'pillar', solid: false, name: 'Lower roof', floorHeight: floor, ceilingHeight: CEIL_DROP, ceilingTexture: 'F_SKY1',
-            floorTexture: b.pick(['AXF05', 'CWCONCF', 'AXF02']), wallTexture: b.pick(['ADBRICK', 'AXW85', 'CWCONCW']), lowerTexture: 'ADBRICK' }, rect);
-    };
-    for (const [horiz, base] of [[true, 0], [true, H - DEPTH], [false, 0], [false, W - DEPTH]]) {
-        const len = horiz ? W : H;
-        let t = horiz ? 0 : DEPTH;
-        const end = horiz ? W : H - DEPTH;
-        while (t < end - 96) {
-            const l = Math.min(end - t, snap(b.int(160, 384)));
-            if (b.chance(0.7)) slab(horiz ? R(t, base + 24, l, DEPTH - 48) : R(base + 24, t, DEPTH - 48, l));
-            t += l + snap(b.int(24, 56));
-        }
-    }
 }
 
 // ------------------------------------------------------------------ a district
@@ -897,11 +881,11 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     if (P.alley) {
         for (let col = 1; col < P.cols; col++) {
             const x = colX[col] - P.street;
-            b.room(R(x + 32, margin - 64, P.street - 64, innerH + 128), { prefix: 'alley', name: 'Alley', theme: P.alley.theme, floor: P.alley.floor, ceil: sky, light: P.alley.light, ceilingTexture: 'F_SKY1', lowerTexture: P.alley.lowerTexture, wallTexture: P.alley.wallTexture });
+            b.room(R(x + 32, margin - 64, P.street - 64, innerH + 128), { prefix: 'alley', name: 'Pit', theme: P.alley.theme, floor: P.alley.floor, ceil: sky, light: P.alley.light, ceilingTexture: 'F_SKY1', floorTexture: 'CWASPH', lowerTexture: P.alley.lowerTexture, wallTexture: P.alley.wallTexture, sectorSpecial: PIT_SPECIAL });
         }
         for (let row = 1; row < P.rows; row++) {
             const y = rowY[row] - P.street;
-            b.room(R(margin - 64, y + 32, innerW + 128, P.street - 64), { prefix: 'alley', name: 'Alley', theme: P.alley.theme, floor: P.alley.floor, ceil: sky, light: P.alley.light, ceilingTexture: 'F_SKY1', lowerTexture: P.alley.lowerTexture, wallTexture: P.alley.wallTexture });
+            b.room(R(margin - 64, y + 32, innerW + 128, P.street - 64), { prefix: 'alley', name: 'Pit', theme: P.alley.theme, floor: P.alley.floor, ceil: sky, light: P.alley.light, ceilingTexture: 'F_SKY1', floorTexture: 'CWASPH', lowerTexture: P.alley.lowerTexture, wallTexture: P.alley.wallTexture, sectorSpecial: PIT_SPECIAL });
         }
     }
     // parks: paths along the streets
@@ -935,7 +919,6 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
         for (let col = 1; col < P.cols; col++) {
             const x = colX[col] - P.street;
             for (let row = 0; row < P.rows; row++) {
-                if (b.chance(0.35) && row !== 0) continue;
                 const y = snap(rowY[row] + rowH[row] * (0.25 + b.r() * 0.5));
                 b.room(R(x, y, P.street, 72), { prefix: 'bridge', name: 'Plank bridge', theme: 'nbc_rooftop', floor: 0, ceil: sky, light: 176, ceilingTexture: 'F_SKY1', floorTexture: 'ADFWOOD', lowerTexture: 'AXDW06A', wallTexture: 'AXDW06A' });
             }
@@ -943,18 +926,14 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
         for (let row = 1; row < P.rows; row++) {
             const y = rowY[row] - P.street;
             for (let col = 0; col < P.cols; col++) {
-                if (b.chance(0.35) && col !== strongCol) continue;
                 const x = snap(colX[col] + colW[col] * (0.25 + b.r() * 0.5));
                 b.room(R(x, y, 72, P.street), { prefix: 'bridge', name: 'Plank bridge', theme: 'nbc_rooftop', floor: 0, ceil: sky, light: 176, ceilingTexture: 'F_SKY1', floorTexture: 'ADFWOOD', lowerTexture: 'AXDW06A', wallTexture: 'AXDW06A' });
             }
         }
-        // stairs up out of each alley at its south end (a fall isn't a dead end)
-        for (const room of b.rooms.filter(r => r.id.startsWith('alley'))) {
-            const vertical = room.height > room.width;
-            if (vertical) b.opening({ type: 'stairs', name: 'Alley stairs', direction: 'S', steps: 14, startFloor: P.alley.floor, endFloor: 0, ceilingHeight: sky, ceilingTexture: 'F_SKY1', floorTexture: 'CWSTAIF', wallTexture: 'ADBRICK', lowerTexture: 'AXSTEP23' }, R(room.x, room.y, 72, 336));
-            else b.opening({ type: 'stairs', name: 'Alley stairs', direction: 'W', steps: 14, startFloor: P.alley.floor, endFloor: 0, ceilingHeight: sky, ceilingTexture: 'F_SKY1', floorTexture: 'CWSTAIF', wallTexture: 'ADBRICK', lowerTexture: 'AXSTEP23' }, R(room.x, room.y, 336, 72));
-        }
     }
+
+    // nothing is placed over the pits (spots, props): they'd fall to their death
+    for (const room of b.rooms.filter(r => r.sectorSpecial === PIT_SPECIAL)) b.solid.push({ x: room.x, y: room.y, w: room.width, h: room.height });
 
     // sewers: water channels down the middle of the north-south tunnels
     if (P.channels) {
