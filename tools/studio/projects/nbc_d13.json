@@ -3152,7 +3152,9 @@
       "wallTexture": "CWDOORS",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_67",
@@ -3181,7 +3183,9 @@
       "wallTexture": "CWDOORS",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_69",
@@ -3210,7 +3214,9 @@
       "wallTexture": "CWDOORS",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_71",
@@ -3434,7 +3440,9 @@
       "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_116",
@@ -3463,7 +3471,9 @@
       "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_143",
@@ -3522,7 +3532,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_147",
@@ -3551,7 +3563,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_167",
@@ -3580,7 +3594,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_169",
@@ -3609,7 +3625,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_205",
@@ -3653,7 +3671,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.2308
     },
     {
       "id": "window_208",
@@ -3682,7 +3702,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_210",
@@ -3711,7 +3733,9 @@
       "wallTexture": "AXW28",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_274",
@@ -3785,7 +3809,9 @@
       "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.2308
     },
     {
       "id": "window_279",
@@ -3814,7 +3840,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.2308
     },
     {
       "id": "window_281",
@@ -3858,7 +3886,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_284",
@@ -3887,7 +3917,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_323",
@@ -3916,7 +3948,9 @@
       "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_325",
@@ -3945,7 +3979,9 @@
       "wallTexture": "AXW28",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_327",
@@ -4169,7 +4205,9 @@
       "wallTexture": "CWFIRED",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_365",
@@ -4198,7 +4236,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_387",
@@ -4242,7 +4282,9 @@
       "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_390",
@@ -4271,7 +4313,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_407",
@@ -4300,7 +4344,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_409",
@@ -4329,7 +4375,9 @@
       "wallTexture": "AXW86",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "exit_428",

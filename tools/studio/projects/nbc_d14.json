@@ -3303,7 +3303,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_228",
@@ -3317,7 +3319,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_229",
@@ -3331,7 +3335,9 @@
       "wallTexture": "CWFIRED",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_230",
@@ -3360,7 +3366,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_232",
@@ -3449,7 +3457,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_238",
@@ -3478,7 +3488,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_240",
@@ -3792,7 +3804,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_392",
@@ -3806,7 +3820,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_393",
@@ -3850,7 +3866,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_396",
@@ -3879,7 +3897,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_398",
@@ -4118,7 +4138,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_529",
@@ -4132,7 +4154,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_530",
@@ -4176,7 +4200,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_533",
@@ -4205,7 +4231,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_535",
@@ -4403,7 +4431,9 @@
       "wallTexture": "CWDOORS",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_751",
@@ -4432,7 +4462,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_753",
@@ -4461,7 +4493,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_755",
@@ -4475,7 +4509,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_756",
@@ -4489,7 +4525,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_757",
@@ -4533,7 +4571,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_760",
@@ -4562,7 +4602,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_762",
@@ -4846,7 +4888,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_897",
@@ -4890,7 +4934,9 @@
       "wallTexture": "CWFIRED",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_900",
@@ -4919,7 +4965,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_902",

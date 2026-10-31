@@ -3020,7 +3020,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_193",
@@ -3049,7 +3051,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_195",
@@ -3063,7 +3067,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_196",
@@ -3077,7 +3083,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_197",
@@ -3121,7 +3129,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_200",
@@ -3150,7 +3160,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_202",
@@ -3544,7 +3556,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_382",
@@ -3603,7 +3617,9 @@
       "wallTexture": "CWFIRED",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_386",
@@ -3632,7 +3648,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_388",
@@ -3856,7 +3874,9 @@
       "wallTexture": "CWDOORS",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "door_554",
@@ -3870,7 +3890,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_555",
@@ -3899,7 +3921,9 @@
       "wallTexture": "CWDOOR1",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_557",
@@ -3943,7 +3967,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_560",
@@ -3987,7 +4013,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_563",
@@ -4016,7 +4044,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_565",
@@ -4270,7 +4300,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_748",
@@ -4374,7 +4406,9 @@
       "wallTexture": "CWDOORS",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_755",
@@ -4418,7 +4452,9 @@
       "wallTexture": "CWDOOR2",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.3333
     },
     {
       "id": "window_758",
@@ -4462,7 +4498,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_761",
@@ -4491,7 +4529,9 @@
       "wallTexture": "CWFIRED",
       "lock": 1,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_763",
@@ -4805,7 +4845,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_885",
@@ -4834,7 +4876,9 @@
       "wallTexture": "CWFIRED",
       "lock": 0,
       "speed": 32,
-      "wait": 105
+      "wait": 105,
+      "textureScaleX": 1.1429,
+      "textureScaleY": 1.7778
     },
     {
       "id": "window_887",
