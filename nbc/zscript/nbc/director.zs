@@ -51,7 +51,7 @@ class NBC_Director play
 	static int BlockBudget(NBC_GangDef g, NBC_RunData rd, int alert, double mul)
 	{
 		int base = 12 + 8 * (clamp(g.tier, 1, 3) - 1) + 4 * rd.ToppledCount() + 6 * alert;
-		return max(12, int((base * 3 + 10) * mul));
+		return max(12, int((base * 2 + 6) * mul));
 	}
 
 	// A tier for one gang member: mostly rank and file, more heavies at alert; tier 4 from the gang's roster4 once
@@ -73,8 +73,8 @@ class NBC_Director play
 		wave = 1;
 		current.Clear();
 		for (int i = 0; i < crew.Size(); i++) if (crew[i]) current.Push(crew[i]);
-		int rest = max(int(budget * 0.3), budget - spent);
-		int later = clamp(rest / 12, 1, 3);
+		int rest = clamp(budget - spent, budget / 5, budget * 2 / 5);
+		int later = clamp(rest / 12, 1, 2);
 		waves = 1 + later;
 		waveBudget.Clear();
 		for (int i = 0; i < later; i++) waveBudget.Push(rest / later + (i < rest % later ? 1 : 0));

@@ -42,7 +42,7 @@ class NBC_Cat
 		"CLIPA0", "SHELA0", "ROCKA0", "MOLPA0", "MEDIA0", "ARM1A0", "MP5GA0", "M16VA0", "SERCA0", "NSMGA0", "NFBGA0" };
 	// what one comes in for at the counter (ammo: per 10 rounds); 0 = not on the requisition list
 	static const int ITEM_SELL[] = { 40, 70, 90, 100, 150, 20, 15, 2, 4, 5, 10, 15, 30, 120, 160, 80, 12, 15 };
-	static const int ITEM_BUY[] = { 0, 0, 0, 0, 0, 0, 0, 6, 10, 12, 30, 40, 90, 0, 0, 0, 35, 45 };
+	static const int ITEM_BUY[] = { 120, 220, 200, 240, 380, 0, 0, 4, 7, 8, 30, 40, 90, 360, 420, 220, 35, 45 };
 	static const int ITEM_UNIT[] = { 1, 1, 1, 1, 1, 1, 1, 10, 10, 10, 1, 1, 1, 1, 1, 1, 1, 1 };
 	static const int ITEM_AMMO[] = { IT_LIGHT, IT_LIGHT, IT_SHELL, IT_LIGHT, IT_RIFLE, -1, -1, -1, -1, -1, -1, -1, -1, IT_LIGHT, IT_RIFLE, IT_SHELL, -1, -1 };
 	static const String ITEM_DESC[] = {
@@ -324,11 +324,13 @@ class NBC_Department : Thinker
 		locker[NBC_Cat.IT_COLT] = 2;
 		locker[NBC_Cat.IT_PUMP] = 1;
 		locker[NBC_Cat.IT_UZI] = 1;
-		locker[NBC_Cat.IT_LIGHT] = 240;
-		locker[NBC_Cat.IT_SHELL] = 40;
-		locker[NBC_Cat.IT_RIFLE] = 30;
-		locker[NBC_Cat.IT_MOLOTOV] = 3;
-		locker[NBC_Cat.IT_MEDKIT] = 3;
+		locker[NBC_Cat.IT_AK] = 1;
+		locker[NBC_Cat.IT_SHORTY] = 1;
+		locker[NBC_Cat.IT_LIGHT] = 400;
+		locker[NBC_Cat.IT_SHELL] = 80;
+		locker[NBC_Cat.IT_RIFLE] = 150;
+		locker[NBC_Cat.IT_MOLOTOV] = 4;
+		locker[NBC_Cat.IT_MEDKIT] = 5;
 		locker[NBC_Cat.IT_VEST] = 1;
 		locker[NBC_Cat.IT_SMOKE] = 3;
 		locker[NBC_Cat.IT_FLASH] = 3;

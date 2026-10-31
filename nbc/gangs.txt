@@ -49,7 +49,7 @@ gang stoop_kings
 	roster3 = eKILLERchoice
 	leader = eKILLERchoice
 	leadertitle = "the Stoop King"
-	leaderhealth = 6
+	leaderhealth = 4
 	leaderelite = Wired ShotCaller
 	escorts = 3
 	morale = 0.5
@@ -98,7 +98,7 @@ gang iron_pit
 	roster3 = eCHUBBchoice eDOORMANchoice
 	leader = eROIDchoice
 	leadertitle = "the Champion"
-	leaderhealth = 7
+	leaderhealth = 4.5
 	leaderelite = Armored Wired
 	escorts = 3
 	damage = Fire 1.5
@@ -123,7 +123,7 @@ gang collectors
 	roster3 = eSUITAKchoice
 	leader = eSUITMANchoice
 	leadertitle = "the Head Collector"
-	leaderhealth = 8
+	leaderhealth = 5
 	leaderelite = ShotCaller
 	escorts = 3
 	damage = NBC_Light 0.6
@@ -156,7 +156,7 @@ gang landlord
 	roster4 = BadassElite BadassElite2 BigElite BadassPara Rocketeer
 	leader = BruteMiniGUN
 	leadertitle = "the Landlord's Brute"
-	leaderhealth = 2.5
+	leaderhealth = 2
 	leaderelite = Armored Landlord
 	escorts = 4
 	damage = NBC_Light 0.8

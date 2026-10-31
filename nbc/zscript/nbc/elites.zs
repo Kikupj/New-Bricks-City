@@ -1,7 +1,7 @@
 // Elites (PLAN.md M4, §6.2): now and then a gang member is a cut above, with a modifier (two in a tier-3 gang or
 // the Crown). The chance comes from the gang's tier: 5%, 10%, 15%, 20% in the Crown. Elites wear a gold
 // translation (TRNSLATE: NBC_Elite) and the HUD names them, with their modifiers, when you aim at one.
-//   Armored         twice the health, half the damage from bullets
+//   Armored         half again the health, 30% less damage from bullets
 //   Wired           40% faster
 //   Volatile        goes up when it dies (the Rust Saints' are twice as common: gangs.txt volatile = 2)
 //   Shot Caller     at half health, calls in three of the rank and file (NBC_Director.CallIn)
@@ -78,7 +78,7 @@ class NBC_Elite : Inventory
 		if (!e) return null;
 		int added = mods & ~e.mods;
 		e.mods |= mods;
-		if (added & MOD_ARMORED) a.health *= 2;
+		if (added & MOD_ARMORED) a.health = a.health * 3 / 2;
 		if (added & MOD_WIRED) a.Speed *= 1.4;
 		a.A_SetTranslation('NBC_Elite');
 		e.fullHealth = a.health;
@@ -112,7 +112,7 @@ class NBC_Elite : Inventory
 	{
 		if (!passive || damage <= 0 || !(mods & MOD_ARMORED)) return;
 		if (damageType == 'NBC_Light' || damageType == 'NBC_Shell' || damageType == 'NBC_Rifle')
-			newdamage = max(1, newdamage / 2);
+			newdamage = max(1, newdamage * 7 / 10);
 	}
 
 	override void DoEffect()

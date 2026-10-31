@@ -275,7 +275,7 @@ class NBC_RunManager : EventHandler
 		int alert = gi < rd.gangAlert.Size() ? rd.gangAlert[gi] : 0;
 		if (w < 0) w = rd.WindowFor(d);
 		int ev = rd.EventIn(d) ? rd.evKind : NBC_Clock.EV_NONE;
-		static const int baseCount[] = { 22, 18, 16 };
+		static const int baseCount[] = { 16, 13, 11 };
 		return int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev])
 			+ 1 + g.escorts + NBC_Clock.EV_ESCORTS[ev];
 	}
@@ -324,7 +324,7 @@ class NBC_RunManager : EventHandler
 		StripKit(p);
 		rd.raidIssued.Clear();
 		for (int i = 0; i < NBC_Cat.IT_COUNT; i++) rd.raidIssued.Push(0);
-		static const int AMMO_CAP[] = { 200, 50, 150 };   // light, shells, rifle
+		static const int AMMO_CAP[] = { 300, 80, 200 };   // light, shells, rifle
 
 		Array<int> slots;
 		slots.Push(dept.pPrimary); slots.Push(dept.pSidearm); slots.Push(dept.pMelee);
@@ -596,7 +596,7 @@ class NBC_RunManager : EventHandler
 		}
 
 		// 5. the crew: the game sets the count, not Obsidian
-		static const int baseCount[] = { 22, 18, 16 };
+		static const int baseCount[] = { 16, 13, 11 };
 		int alert = rd.gangAlert.Size() > rd.raidGang ? rd.gangAlert[rd.raidGang] : 0;
 		int want = int(baseCount[clamp(g.tier, 1, 3) - 1] * g.budget * (1.0 + 0.15 * alert) * InsertionCrewFactor(rd)
 			* g.StrengthAt(w) * NBC_Clock.EV_STRENGTH[ev]);

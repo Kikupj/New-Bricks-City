@@ -6,6 +6,15 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Balance pass after the owner's playtest (2026-10-31, by Claude)
+- **Feedback:** the raids are brutal (too many of them, hitting too hard); not enough weapons and ammo to fight the stronger gangs; some gold (elite) enemies are extremely tanky.
+- **Fewer of them:** the starting crew is down by about a quarter (tier 1 / 2 / 3: 22 / 18 / 16 to 16 / 13 / 11 before the gang's, the hour's and the alert's multipliers). The director's budget was `(base x 3 + 10)`, now `(base x 2 + 6)`, and later waves are 20-40% of it (they used to be 30% or whatever the crew left over, and the crew often cost more than the budget on top), in one or two waves (was up to three).
+- **Hitting softer:** skill damage to you: Rookie 0.4 (was 0.5), Patrol 0.7 (was 1.0, the default), Detective 1.0 (was 1.25), Internal Affairs 1.4 (was 1.6); monster health Detective 1.1 (was 1.15), IA 1.25 (was 1.3).
+- **Tankiness:** the gold ones were mostly leaders: a leader's health multiplier (6-8x) times Armored (2x health, half the bullet damage) was about 24-32x effective health. Armored is now 1.5x health and 30% less bullet damage; leaders' multipliers are down by about a third (Stoop King 4, Champion 4.5, Head Collector 5, the Landlord's Brute 2).
+- **Guns and ammo:** the locker now starts with an AK-47 and a Super Shorty on top of the Colts, pump and Uzi, with 400 light, 80 shells and 150 rifle rounds (was 240 / 40 / 30), 4 Molotovs and 5 medkits; you can carry up to 300 / 80 / 200 on a raid (was 200 / 50 / 150). **Every gun is on the requisition list now** (Colt $120, Dual 92s $220, pump $200, Uzi $240, MP5K-SD $360, AK-47 $380, M16 $420, Super Shorty $220); ammo is cheaper (light $4, shells $7, rifle $8 per ten).
+- **Not changed:** the guns' own damage. If it still feels weak with the bigger kit, say which guns and against whom. Enemy ammo drops from kills aren't tuned yet either (M7's Cash and loot pass).
+- Not re-tested in scripted raids (numbers only): compiles and boots clean on the test room and the hub.
+
 ### M4 — The spawn director, enemy tiers, elites and the Sweep — ✅ BUILT, NEEDS PLAYTEST (2026-10-31, by Claude)
 - **Owner request:** start the next phase on the roadmap (PLAN.md M4).
 - **The threat budget** (`director.zs`, `NBC_Director`; PLAN.md §6.2): a raid is one district map now, so the budget is §6.2's four floors and the leader's in one: `(12 + 8 x (tier - 1) + 4 x toppled + 6 x alert) x 3 + 10`, times the gang's budget (Swarm), the hour's and the event's strength and the insertion. Gang members cost their tier: 1, 3, 6, 10. Every member carries its tier and wave (`NBC_Member`).

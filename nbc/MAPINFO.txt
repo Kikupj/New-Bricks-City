@@ -37,7 +37,7 @@ clearskills
 skill rookie
 {
 	AmmoFactor = 1.5
-	DamageFactor = 0.5
+	DamageFactor = 0.4
 	SpawnFilter = Normal
 	Name = "Rookie"
 	Key = "r"
@@ -45,6 +45,7 @@ skill rookie
 
 skill patrol
 {
+	DamageFactor = 0.7
 	SpawnFilter = Normal
 	Name = "Patrol"
 	Key = "p"
@@ -53,8 +54,8 @@ skill patrol
 
 skill detective
 {
-	DamageFactor = 1.25
-	MonsterHealth = 1.15
+	DamageFactor = 1.0
+	MonsterHealth = 1.1
 	SpawnFilter = Normal
 	Name = "Detective"
 	Key = "d"
@@ -62,8 +63,8 @@ skill detective
 
 skill internalaffairs
 {
-	DamageFactor = 1.6
-	MonsterHealth = 1.3
+	DamageFactor = 1.4
+	MonsterHealth = 1.25
 	AmmoFactor = 0.75
 	SpawnFilter = Normal
 	Name = "Internal Affairs"
