@@ -60,7 +60,8 @@ dialogue, image and sound in the mod is original.
 1. **New Game** (pick how hard the Bricks hit back: Rookie, Patrol, Detective or Internal Affairs) starts you at
    Checkpoint 9, the precinct. Captain Harrow, Rook the pilot and your officers
    who are fit for duty are there; talk to them with Use. Use the **raid board** (or the captain) to open a
-   case. A seed deals the four gangs across eight districts.
+   case. A seed deals eight districts out of the pool of 28 (at least one of every environment) and the four gangs
+   across them.
 2. **Plan a raid.** Pick a district on the raid board. Its dossier shows the gang, its leader, its tier,
    how alert it is, how many are on the block, what works on them and how they keep the clock (how many are
    out and how many are off guard at each hour). The day's event, if there is one, is flagged on its district.
@@ -72,8 +73,11 @@ dialogue, image and sound in the mod is original.
    district's roofs, but it can be shot down, and a crash landing turns into a survival ambush round the wreck).
    The vehicles' seats have to carry everyone. **ROLL OUT** / **WHEELS UP** starts the raid.
 5. **The raid.** You land in the district with your squad behind you. The game clears the map's own
-   monsters and fills it with the holding gang. The leader waits near the exit with escorts, and
-   reinforcements come once most of the crew is down. Command the squad, take down the leader and leave
+   monsters and fills it with the holding gang, at the map's gang spots (some up on the decks, some asleep in the
+   flats). The leader waits at the far end with escorts, and reinforcements come in from the edges once most of
+   the crew is down. A **locked door** is a breach point: Use it without the key to set a charge (stay by the
+   door: two seconds, one with a Breacher officer alongside), and it blows: the door's open for good, whoever's
+   behind it reels, and the whole block hears it. Find the red keycard and it opens the quiet way. Command the squad, take down the leader and leave
    by the exit to **topple** the gang. Leaving with the leader alive is a **retreat**, and the gang goes
    on alert. A lethal hit means **OFFICER DOWN**: you're pulled out with a strike against you.
 6. **The after-action report.** You get a letter grade (S to D, out of 100: the body count, your accuracy,
@@ -234,11 +238,17 @@ automatically on every map.
 
 ## Checkpoint 9
 
+The precinct post is built into the Wall. You come in from the street into the **Bullpen** (the raid board, the
+desks); the **Armory cage** is behind a chain-link wall on one side and the **Squad Room** on the other. A corridor
+runs behind them, out to the helipad (west) and the car park (east), where the motor pool's vehicles stand. The
+rest of the precinct is boarded up and dark: the Motor Pool, the Captain's Office, the Radio Room, the Infirmary,
+the Range, the Crime Lab, the Holding Cells (flooded) and the Roof Access. Merit reopens them (M8).
+
 The precinct is a place with people in it:
 
 - **Captain Harrow** stands by the raid board with a cigar. Talk to him for the state of the case (the day,
   the gangs left, strikes, who's in the hospital, who's due a promotion). Talk again for the raid board.
-- **Rook, the pilot,** waits by the door out to the pad. Once a raid is planned (READY on the deploy screen),
+- **Rook, the pilot,** waits outside the corridor's back door, by the helipad. Once a raid is planned (READY on the deploy screen),
   talking to Rook brings up the **wheels-up check**: the district, the gang, everyone going in. WHEELS UP
   starts the raid.
 - **Your officers** who are fit for duty stand around the precinct in their own clothes, at the desks, in the
@@ -259,7 +269,7 @@ with a panel van and an unmarked sedan.
 | Helicopter | 5 | $4,000 | rooftop insertion, fewer of them up there; can be shot down |
 
 - **Street insertions** park the motorcade out on the street nearest your start on the district map.
-- **Rooftop insertions** fly you onto the district's own rooftop map (`NBC_RF01-08`). The shoot-down risk (shown
+- **Rooftop insertions** put you down on the district's own roofs (its `NBC_RoofStart` spots). The shoot-down risk (shown
   before you go) grows with the gang's tier and alert and the helicopter's damage.
 - **Shot down:** you come down in the street, hurt, next to the burning wreck, and the gang sends four waves at
   the crash site. Hold out until the way to the exit is clear and walk out. The helicopter is gone.
@@ -361,7 +371,8 @@ chances; see below.
 ## The districts
 
 The districts are built in **iDoom Studio** (see below) by `tools/studio/build_maps.js`, and ship as
-`nbc/maps/NBC_D01-08.wad`; `nbc/districts.txt` is the pool the raid board reads. The Crown is `NBC_CRWN`.
+`nbc/maps/NBC_D01-28.wad`; `nbc/districts.txt` is the pool. A case deals eight of them, at least one of every
+environment. The Crown is `NBC_CRWN`. The first eight:
 
 | Map | District | Environment |
 |---|---|---|
@@ -375,6 +386,17 @@ The districts are built in **iDoom Studio** (see below) by `tools/studio/build_m
 | NBC_D08 | Arden Docks | industrial: warehouses, container yards, loading decks |
 | NBC_CRWN | The Crown | the Landlord's tower: the penthouse floor, a plaza dug in with sandbags, roof gardens |
 
+And twenty more, three or so per environment: rooftops (Ossory Rooftops, Garnet Heights, Kiln Street Roofs),
+subway (Broadmoor Station, Line 9 Interchange, Orchard Terminal), streets (Haddon Street, Corbin Avenue), parks
+(Lattimer Green, The Old Reservoir, Brigid Square), underground (Fenwick Boiler Works, The Cisterns, Quill Lane
+Basements), housing towers (Marlow Towers, The Ninety Houses, Ashgrove Estate) and industrial (Canal Foundry,
+Gasworks Row, Kettle Wharf): `NBC_D09-28`.
+
+Each map tells a raid about itself with **raid markers** (`nbc/zscript/nbc/raidmarks.zs`, invisible map things):
+gang spots on the ground (26023), perches up high (26024: a shooter, rarely asleep), reinforcement spots at the
+edges (26025), places to sleep it off (26026), the leader's place deep in the stronghold (26027) and the
+extraction point at the exit (26028). Maps without them fall back to their monster spots and exit lines.
+
 The sky over every district is a 3D skyline (rings of towers in lit-window facades, seeded per map) behind the
 ring of buildings at the map's edge; fronts have storeys of windows, rooms have ceiling lights with dynamic light
 under them (`NBC_RoomLight`, 26021) and street lamps a sodium glow (`NBC_StreetLight`, 26022).
@@ -385,7 +407,9 @@ districts (`NBC_CT01-08`, rooftops `NBC_RF01-08`) are still in `nbc/maps/` but o
 
 Other maps:
 
-- **NBC_HUB**, Checkpoint 9, the precinct, built by `tools/make_hub_map.py`.
+- **NBC_HUB**, Checkpoint 9, the precinct, built in iDoom Studio by `tools/studio/build_maps.js NBC_HUB` from
+  `tools/studio/precinct-gen.js` (the old one-room hub's `tools/make_hub_map.py` is kept as a record). Its rooms
+  carry `NBC_RoomMarker` things (26030, the room in arg0) and its yard `NBC_HubBay` parking bays (26031).
 - **NBC_TEST**, a test room.
 - **NBC_KT / KS / KB / KR**, the in-game "kit" generators (tower, street, basement, roof), kept as test
   maps only.
@@ -500,14 +524,15 @@ The editor finds `nbc/` through `IDOOM_MOD_DIR`, `modDir` in its `studio.config.
 `tools/studio/district-gen.js`: a ground room per environment, a grid of uneven blocks split into lots (buildings
 with corridor-and-flats, hall or split-room interiors, solid blocks with lit facades, fenced yards, raised decks
 with stairs and parapets, parks, container yards), walls as solid pillars, doors behind 72-high headers, windows
-you can shoot through, Corpo Wars furniture and street props as cover, gang member spots, an exit breaker box in
-the far building. Each map goes in as an editor project, is validated and Map Checked, saved
+you can shoot through, Corpo Wars furniture and street props as cover, raid markers (gang spots by role, the
+leader's place, the extraction point), locked doors on the stronghold and a red keycard elsewhere, an exit breaker
+box in the far building. Checkpoint 9 comes from `tools/studio/precinct-gen.js`. Each map goes in as an editor project, is validated and Map Checked, saved
 (`tools/studio/projects/*.json`, open one in the editor to change a map by hand) and exported.
 
 ```bash
 npm install --prefix ../idoom-studio-map-editor            # once, the editor's packages
 node tools/studio/build_maps.js                            # every map (starts the editor if it isn't running)
-node tools/studio/build_maps.js NBC_D03                    # one
+node tools/studio/build_maps.js NBC_D03 NBC_HUB            # some
 ```
 
 Obsidian (`tools/Obsidian/`) is frozen.

@@ -259,6 +259,20 @@
       "theme": "nbc_stairwell"
     },
     {
+      "id": "rug_105",
+      "name": "Rug",
+      "shape": "rect",
+      "x": 424,
+      "y": 2792,
+      "width": 240,
+      "height": 128,
+      "floorHeight": 24,
+      "ceilingHeight": 120,
+      "lightLevel": 128,
+      "theme": "nbc_flat",
+      "floorTexture": "CWCARP1"
+    },
+    {
       "id": "fixture_106",
       "name": "Light",
       "shape": "rect",
@@ -270,8 +284,8 @@
       "ceilingHeight": 120,
       "lightLevel": 152,
       "theme": "nbc_flat",
-      "floorTexture": "CWCARP2",
-      "ceilingTexture": "ADCLITE"
+      "floorTexture": "CWCARP1",
+      "ceilingTexture": "ADCLRND"
     },
     {
       "id": "rug_109",
@@ -346,21 +360,7 @@
       "ceilingTexture": "ADCLRND"
     },
     {
-      "id": "rug_120",
-      "name": "Rug",
-      "shape": "rect",
-      "x": 1048,
-      "y": 2784,
-      "width": 216,
-      "height": 120,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP3"
-    },
-    {
-      "id": "fixture_121",
+      "id": "fixture_120",
       "name": "Light",
       "shape": "rect",
       "x": 1144,
@@ -371,11 +371,11 @@
       "ceilingHeight": 120,
       "lightLevel": 152,
       "theme": "nbc_flat",
-      "floorTexture": "CWCARP3",
-      "ceilingTexture": "ADCLRND"
+      "floorTexture": "CWCARP2",
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_124",
+      "id": "fixture_123",
       "name": "Light",
       "shape": "rect",
       "x": 1144,
@@ -386,30 +386,42 @@
       "ceilingHeight": 120,
       "lightLevel": 176,
       "theme": "nbc_stairwell",
-      "ceilingTexture": "ADCLRND"
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "room_131",
-      "name": "Den",
+      "id": "room_130",
+      "name": "Office",
       "shape": "rect",
       "x": 360,
       "y": 360,
-      "width": 416,
-      "height": 224,
+      "width": 280,
+      "height": 240,
       "floorHeight": 24,
       "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2"
+      "lightLevel": 168,
+      "theme": "nbc_precinct"
     },
     {
-      "id": "room_136",
-      "name": "Corner store",
+      "id": "room_135",
+      "name": "Office",
       "shape": "rect",
       "x": 360,
-      "y": 584,
-      "width": 416,
-      "height": 224,
+      "y": 600,
+      "width": 280,
+      "height": 208,
+      "floorHeight": 24,
+      "ceilingHeight": 120,
+      "lightLevel": 168,
+      "theme": "nbc_precinct"
+    },
+    {
+      "id": "room_140",
+      "name": "Corner store",
+      "shape": "rect",
+      "x": 640,
+      "y": 360,
+      "width": 264,
+      "height": 216,
       "floorHeight": 24,
       "ceilingHeight": 120,
       "lightLevel": 176,
@@ -417,40 +429,12 @@
       "floorTexture": "CWTILEF"
     },
     {
-      "id": "room_141",
-      "name": "Den",
-      "shape": "rect",
-      "x": 776,
-      "y": 360,
-      "width": 312,
-      "height": 232,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2"
-    },
-    {
-      "id": "room_146",
-      "name": "Den",
-      "shape": "rect",
-      "x": 776,
-      "y": 592,
-      "width": 312,
-      "height": 216,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2"
-    },
-    {
-      "id": "room_151",
+      "id": "room_145",
       "name": "Corner store",
       "shape": "rect",
-      "x": 1088,
-      "y": 360,
-      "width": 232,
+      "x": 640,
+      "y": 576,
+      "width": 264,
       "height": 232,
       "floorHeight": 24,
       "ceilingHeight": 120,
@@ -459,18 +443,32 @@
       "floorTexture": "CWTILEF"
     },
     {
-      "id": "room_156",
+      "id": "room_150",
       "name": "Den",
       "shape": "rect",
-      "x": 1088,
-      "y": 592,
-      "width": 232,
+      "x": 904,
+      "y": 360,
+      "width": 416,
       "height": 216,
       "floorHeight": 24,
       "ceilingHeight": 120,
       "lightLevel": 128,
       "theme": "nbc_flat",
       "floorTexture": "CWCARP2"
+    },
+    {
+      "id": "room_155",
+      "name": "Corner store",
+      "shape": "rect",
+      "x": 904,
+      "y": 576,
+      "width": 416,
+      "height": 232,
+      "floorHeight": 24,
+      "ceilingHeight": 120,
+      "lightLevel": 176,
+      "theme": "nbc_precinct",
+      "floorTexture": "CWTILEF"
     },
     {
       "id": "rug_183",
@@ -478,34 +476,63 @@
       "shape": "rect",
       "x": 416,
       "y": 416,
-      "width": 304,
-      "height": 112,
+      "width": 168,
+      "height": 128,
       "floorHeight": 24,
       "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2"
+      "lightLevel": 168,
+      "theme": "nbc_precinct",
+      "floorTexture": "CWCARP1"
     },
     {
       "id": "fixture_184",
       "name": "Light",
       "shape": "rect",
-      "x": 552,
-      "y": 456,
+      "x": 488,
+      "y": 464,
       "width": 32,
       "height": 32,
       "floorHeight": 24,
       "ceilingHeight": 120,
-      "lightLevel": 152,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2",
+      "lightLevel": 192,
+      "theme": "nbc_precinct",
+      "floorTexture": "CWCARP1",
       "ceilingTexture": "ADCLITE"
     },
     {
       "id": "fixture_187",
       "name": "Light",
       "shape": "rect",
-      "x": 552,
+      "x": 488,
+      "y": 688,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 120,
+      "lightLevel": 192,
+      "theme": "nbc_precinct",
+      "ceilingTexture": "ADCLRND"
+    },
+    {
+      "id": "fixture_190",
+      "name": "Light",
+      "shape": "rect",
+      "x": 760,
+      "y": 456,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 120,
+      "lightLevel": 200,
+      "theme": "nbc_precinct",
+      "floorTexture": "CWTILEF",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "fixture_193",
+      "name": "Light",
+      "shape": "rect",
+      "x": 760,
       "y": 680,
       "width": 32,
       "height": 32,
@@ -514,72 +541,43 @@
       "lightLevel": 200,
       "theme": "nbc_precinct",
       "floorTexture": "CWTILEF",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "rug_190",
-      "name": "Rug",
-      "shape": "rect",
-      "x": 832,
-      "y": 416,
-      "width": 200,
-      "height": 120,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 128,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP1"
-    },
-    {
-      "id": "fixture_191",
-      "name": "Light",
-      "shape": "rect",
-      "x": 920,
-      "y": 464,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 152,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP1",
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "rug_194",
+      "id": "rug_196",
       "name": "Rug",
       "shape": "rect",
-      "x": 832,
-      "y": 648,
-      "width": 200,
+      "x": 960,
+      "y": 416,
+      "width": 304,
       "height": 104,
       "floorHeight": 24,
       "ceilingHeight": 120,
       "lightLevel": 128,
       "theme": "nbc_flat",
-      "floorTexture": "CWCARP1"
+      "floorTexture": "CWCARP3"
     },
     {
-      "id": "fixture_195",
+      "id": "fixture_197",
       "name": "Light",
       "shape": "rect",
-      "x": 920,
-      "y": 688,
+      "x": 1096,
+      "y": 456,
       "width": 32,
       "height": 32,
       "floorHeight": 24,
       "ceilingHeight": 120,
       "lightLevel": 152,
       "theme": "nbc_flat",
-      "floorTexture": "CWCARP1",
-      "ceilingTexture": "ADCLRND"
+      "floorTexture": "CWCARP3",
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_198",
+      "id": "fixture_200",
       "name": "Light",
       "shape": "rect",
-      "x": 1192,
-      "y": 464,
+      "x": 1096,
+      "y": 680,
       "width": 32,
       "height": 32,
       "floorHeight": 24,
@@ -590,22 +588,7 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_201",
-      "name": "Light",
-      "shape": "rect",
-      "x": 1192,
-      "y": 688,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 152,
-      "theme": "nbc_flat",
-      "floorTexture": "CWCARP2",
-      "ceilingTexture": "ADCLITE"
-    },
-    {
-      "id": "room_208",
+      "id": "room_207",
       "name": "Station hall",
       "shape": "rect",
       "x": 1592,
@@ -656,7 +639,7 @@
       "ceilingHeight": 160,
       "lightLevel": 184,
       "theme": "nbc_subway",
-      "ceilingTexture": "ADCLITE"
+      "ceilingTexture": "ADCLRND"
     },
     {
       "id": "room_247",
@@ -748,7 +731,7 @@
       "ceilingHeight": 128,
       "lightLevel": 136,
       "theme": "nbc_basement",
-      "ceilingTexture": "ADCLITE"
+      "ceilingTexture": "ADCLRND"
     },
     {
       "id": "fixture_289",
@@ -776,7 +759,7 @@
       "ceilingHeight": 128,
       "lightLevel": 136,
       "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
+      "ceilingTexture": "ADCLITE"
     },
     {
       "id": "fixture_295",
@@ -790,7 +773,7 @@
       "ceilingHeight": 128,
       "lightLevel": 136,
       "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
+      "ceilingTexture": "ADCLITE"
     },
     {
       "id": "fixture_298",
@@ -804,7 +787,7 @@
       "ceilingHeight": 128,
       "lightLevel": 136,
       "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
+      "ceilingTexture": "ADCLITE"
     },
     {
       "id": "fixture_301",
@@ -818,7 +801,7 @@
       "ceilingHeight": 128,
       "lightLevel": 184,
       "theme": "nbc_stairwell",
-      "ceilingTexture": "ADCLITE"
+      "ceilingTexture": "ADCLRND"
     },
     {
       "id": "room_309",
@@ -860,7 +843,7 @@
       "theme": "nbc_precinct"
     },
     {
-      "id": "fixture_338",
+      "id": "fixture_339",
       "name": "Light",
       "shape": "rect",
       "x": 568,
@@ -874,7 +857,7 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_340",
+      "id": "fixture_341",
       "name": "Light",
       "shape": "rect",
       "x": 568,
@@ -888,7 +871,7 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_342",
+      "id": "fixture_343",
       "name": "Light",
       "shape": "rect",
       "x": 856,
@@ -902,7 +885,7 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_344",
+      "id": "fixture_345",
       "name": "Light",
       "shape": "rect",
       "x": 856,
@@ -916,7 +899,7 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "rug_351",
+      "id": "rug_352",
       "name": "Rug",
       "shape": "rect",
       "x": 1152,
@@ -930,7 +913,7 @@
       "floorTexture": "CWCARP1"
     },
     {
-      "id": "fixture_352",
+      "id": "fixture_353",
       "name": "Light",
       "shape": "rect",
       "x": 1192,
@@ -942,10 +925,10 @@
       "lightLevel": 192,
       "theme": "nbc_precinct",
       "floorTexture": "CWCARP1",
-      "ceilingTexture": "ADCLRND"
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "rug_355",
+      "id": "rug_356",
       "name": "Rug",
       "shape": "rect",
       "x": 1152,
@@ -956,10 +939,10 @@
       "ceilingHeight": 120,
       "lightLevel": 168,
       "theme": "nbc_precinct",
-      "floorTexture": "CWCARP3"
+      "floorTexture": "CWCARP2"
     },
     {
-      "id": "fixture_356",
+      "id": "fixture_357",
       "name": "Light",
       "shape": "rect",
       "x": 1192,
@@ -970,16 +953,16 @@
       "ceilingHeight": 120,
       "lightLevel": 192,
       "theme": "nbc_precinct",
-      "floorTexture": "CWCARP3",
-      "ceilingTexture": "ADCLRND"
+      "floorTexture": "CWCARP2",
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "room_363",
+      "id": "room_364",
       "name": "Station hall",
       "shape": "rect",
       "x": 1592,
       "y": 1832,
-      "width": 640,
+      "width": 864,
       "height": 624,
       "floorHeight": 24,
       "ceilingHeight": 160,
@@ -987,36 +970,10 @@
       "theme": "nbc_subway"
     },
     {
-      "id": "room_368",
-      "name": "Office",
-      "shape": "rect",
-      "x": 2232,
-      "y": 1832,
-      "width": 224,
-      "height": 312,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 168,
-      "theme": "nbc_precinct"
-    },
-    {
-      "id": "room_373",
-      "name": "Office",
-      "shape": "rect",
-      "x": 2232,
-      "y": 2144,
-      "width": 224,
-      "height": 312,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 168,
-      "theme": "nbc_precinct"
-    },
-    {
-      "id": "fixture_393",
+      "id": "fixture_384",
       "name": "Light",
       "shape": "rect",
-      "x": 1752,
+      "x": 1720,
       "y": 1984,
       "width": 32,
       "height": 32,
@@ -1024,178 +981,124 @@
       "ceilingHeight": 160,
       "lightLevel": 184,
       "theme": "nbc_subway",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_395",
-      "name": "Light",
-      "shape": "rect",
-      "x": 1752,
-      "y": 2272,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 160,
-      "lightLevel": 184,
-      "theme": "nbc_subway",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_397",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2040,
-      "y": 1984,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 160,
-      "lightLevel": 184,
-      "theme": "nbc_subway",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_399",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2040,
-      "y": 2272,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 160,
-      "lightLevel": 184,
-      "theme": "nbc_subway",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "rug_406",
-      "name": "Rug",
-      "shape": "rect",
-      "x": 2288,
-      "y": 1888,
-      "width": 112,
-      "height": 200,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 168,
-      "theme": "nbc_precinct",
-      "floorTexture": "CWCARP2"
-    },
-    {
-      "id": "fixture_407",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2328,
-      "y": 1976,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 192,
-      "theme": "nbc_precinct",
-      "floorTexture": "CWCARP2",
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "fixture_410",
+      "id": "fixture_386",
       "name": "Light",
       "shape": "rect",
-      "x": 2328,
-      "y": 2288,
+      "x": 1720,
+      "y": 2272,
       "width": 32,
       "height": 32,
       "floorHeight": 24,
-      "ceilingHeight": 120,
-      "lightLevel": 192,
-      "theme": "nbc_precinct",
-      "ceilingTexture": "ADCLRND"
+      "ceilingHeight": 160,
+      "lightLevel": 184,
+      "theme": "nbc_subway",
+      "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "room_417",
+      "id": "fixture_388",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2008,
+      "y": 1984,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 160,
+      "lightLevel": 184,
+      "theme": "nbc_subway",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "fixture_390",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2008,
+      "y": 2272,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 160,
+      "lightLevel": 184,
+      "theme": "nbc_subway",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "fixture_392",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2296,
+      "y": 1984,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 160,
+      "lightLevel": 184,
+      "theme": "nbc_subway",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "fixture_394",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2296,
+      "y": 2272,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 160,
+      "lightLevel": 184,
+      "theme": "nbc_subway",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "room_405",
       "name": "Boiler room",
       "shape": "rect",
       "x": 1592,
       "y": 2728,
-      "width": 192,
-      "height": 248,
+      "width": 216,
+      "height": 208,
       "floorHeight": 24,
       "ceilingHeight": 128,
       "lightLevel": 112,
       "theme": "nbc_basement"
     },
     {
-      "id": "room_422",
-      "name": "Warehouse",
-      "shape": "rect",
-      "x": 1592,
-      "y": 2976,
-      "width": 192,
-      "height": 248,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 144,
-      "theme": "nbc_industrial"
-    },
-    {
-      "id": "room_427",
-      "name": "Warehouse",
-      "shape": "rect",
-      "x": 1784,
-      "y": 2728,
-      "width": 208,
-      "height": 280,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 144,
-      "theme": "nbc_industrial"
-    },
-    {
-      "id": "room_432",
+      "id": "room_410",
       "name": "Boiler room",
       "shape": "rect",
-      "x": 1992,
-      "y": 2728,
-      "width": 192,
-      "height": 280,
+      "x": 1592,
+      "y": 2936,
+      "width": 216,
+      "height": 288,
       "floorHeight": 24,
       "ceilingHeight": 128,
       "lightLevel": 112,
       "theme": "nbc_basement"
     },
     {
-      "id": "room_437",
+      "id": "room_415",
       "name": "Warehouse",
       "shape": "rect",
-      "x": 1784,
-      "y": 3008,
-      "width": 208,
-      "height": 216,
+      "x": 1808,
+      "y": 2728,
+      "width": 336,
+      "height": 232,
       "floorHeight": 24,
       "ceilingHeight": 128,
       "lightLevel": 144,
       "theme": "nbc_industrial"
     },
     {
-      "id": "room_442",
-      "name": "Warehouse",
-      "shape": "rect",
-      "x": 1992,
-      "y": 3008,
-      "width": 192,
-      "height": 216,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 144,
-      "theme": "nbc_industrial"
-    },
-    {
-      "id": "room_447",
+      "id": "room_420",
       "name": "Boiler room",
       "shape": "rect",
-      "x": 2184,
-      "y": 2728,
-      "width": 272,
+      "x": 1808,
+      "y": 2960,
+      "width": 336,
       "height": 264,
       "floorHeight": 24,
       "ceilingHeight": 128,
@@ -1203,122 +1106,37 @@
       "theme": "nbc_basement"
     },
     {
-      "id": "room_452",
+      "id": "room_425",
       "name": "Boiler room",
       "shape": "rect",
-      "x": 2184,
-      "y": 2992,
-      "width": 272,
-      "height": 232,
+      "x": 2144,
+      "y": 2728,
+      "width": 312,
+      "height": 304,
       "floorHeight": 24,
       "ceilingHeight": 128,
       "lightLevel": 112,
       "theme": "nbc_basement"
     },
     {
-      "id": "fixture_468",
-      "name": "Light",
+      "id": "room_430",
+      "name": "Warehouse",
       "shape": "rect",
-      "x": 1672,
-      "y": 2840,
-      "width": 32,
-      "height": 32,
+      "x": 2144,
+      "y": 3032,
+      "width": 312,
+      "height": 192,
       "floorHeight": 24,
       "ceilingHeight": 128,
-      "lightLevel": 136,
-      "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
+      "lightLevel": 144,
+      "theme": "nbc_industrial"
     },
     {
-      "id": "fixture_471",
+      "id": "fixture_444",
       "name": "Light",
       "shape": "rect",
-      "x": 1672,
-      "y": 3088,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 168,
-      "theme": "nbc_industrial",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_474",
-      "name": "Light",
-      "shape": "rect",
-      "x": 1872,
-      "y": 2856,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 168,
-      "theme": "nbc_industrial",
-      "ceilingTexture": "ADCLITE"
-    },
-    {
-      "id": "fixture_477",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2072,
-      "y": 2856,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 136,
-      "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_480",
-      "name": "Light",
-      "shape": "rect",
-      "x": 1872,
-      "y": 3104,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 168,
-      "theme": "nbc_industrial",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_483",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2072,
-      "y": 3104,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 168,
-      "theme": "nbc_industrial",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_486",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2304,
-      "y": 2848,
-      "width": 32,
-      "height": 32,
-      "floorHeight": 24,
-      "ceilingHeight": 128,
-      "lightLevel": 136,
-      "theme": "nbc_basement",
-      "ceilingTexture": "ADCLRND"
-    },
-    {
-      "id": "fixture_489",
-      "name": "Light",
-      "shape": "rect",
-      "x": 2304,
-      "y": 3096,
+      "x": 1688,
+      "y": 2816,
       "width": 32,
       "height": 32,
       "floorHeight": 24,
@@ -1328,7 +1146,77 @@
       "ceilingTexture": "ADCLITE"
     },
     {
-      "id": "shaft_494",
+      "id": "fixture_447",
+      "name": "Light",
+      "shape": "rect",
+      "x": 1688,
+      "y": 3064,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 128,
+      "lightLevel": 136,
+      "theme": "nbc_basement",
+      "ceilingTexture": "ADCLRND"
+    },
+    {
+      "id": "fixture_450",
+      "name": "Light",
+      "shape": "rect",
+      "x": 1960,
+      "y": 2832,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 128,
+      "lightLevel": 168,
+      "theme": "nbc_industrial",
+      "ceilingTexture": "ADCLRND"
+    },
+    {
+      "id": "fixture_453",
+      "name": "Light",
+      "shape": "rect",
+      "x": 1960,
+      "y": 3080,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 128,
+      "lightLevel": 136,
+      "theme": "nbc_basement",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "fixture_456",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2288,
+      "y": 2864,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 128,
+      "lightLevel": 136,
+      "theme": "nbc_basement",
+      "ceilingTexture": "ADCLRND"
+    },
+    {
+      "id": "fixture_459",
+      "name": "Light",
+      "shape": "rect",
+      "x": 2288,
+      "y": 3112,
+      "width": 32,
+      "height": 32,
+      "floorHeight": 24,
+      "ceilingHeight": 128,
+      "lightLevel": 168,
+      "theme": "nbc_industrial",
+      "ceilingTexture": "ADCLITE"
+    },
+    {
+      "id": "shaft_467",
       "name": "Access shaft",
       "shape": "rect",
       "x": 160,
@@ -2074,12 +1962,23 @@
       "wallTexture": "CWCONCW"
     },
     {
-      "id": "wall_127",
+      "id": "wall_126",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
       "x": 352,
       "y": 352,
+      "width": 976,
+      "height": 8,
+      "wallTexture": "ADBRICK"
+    },
+    {
+      "id": "wall_127",
+      "name": "Facade",
+      "type": "pillar",
+      "solid": true,
+      "x": 352,
+      "y": 808,
       "width": 976,
       "height": 8,
       "wallTexture": "ADBRICK"
@@ -2090,24 +1989,13 @@
       "type": "pillar",
       "solid": true,
       "x": 352,
-      "y": 808,
-      "width": 976,
-      "height": 8,
-      "wallTexture": "ADBRICK"
-    },
-    {
-      "id": "wall_129",
-      "name": "Facade",
-      "type": "pillar",
-      "solid": true,
-      "x": 352,
       "y": 352,
       "width": 8,
       "height": 464,
       "wallTexture": "ADBRICK"
     },
     {
-      "id": "wall_130",
+      "id": "wall_129",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -2118,15 +2006,26 @@
       "wallTexture": "ADBRICK"
     },
     {
-      "id": "wall_132",
+      "id": "wall_131",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
       "x": 360,
       "y": 360,
-      "width": 416,
+      "width": 280,
       "height": 8,
-      "wallTexture": "CWWALL2"
+      "wallTexture": "ADGREYW"
+    },
+    {
+      "id": "wall_132",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 360,
+      "y": 592,
+      "width": 280,
+      "height": 8,
+      "wallTexture": "ADGREYW"
     },
     {
       "id": "wall_133",
@@ -2134,32 +2033,32 @@
       "type": "pillar",
       "solid": true,
       "x": 360,
-      "y": 576,
-      "width": 416,
-      "height": 8,
-      "wallTexture": "CWWALL2"
+      "y": 368,
+      "width": 8,
+      "height": 224,
+      "wallTexture": "ADGREYW"
     },
     {
       "id": "wall_134",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 360,
+      "x": 632,
       "y": 368,
       "width": 8,
-      "height": 208,
-      "wallTexture": "CWWALL2"
+      "height": 224,
+      "wallTexture": "ADGREYW"
     },
     {
-      "id": "wall_135",
+      "id": "wall_136",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 768,
-      "y": 368,
-      "width": 8,
-      "height": 208,
-      "wallTexture": "CWWALL2"
+      "x": 360,
+      "y": 600,
+      "width": 280,
+      "height": 8,
+      "wallTexture": "ADGREYW"
     },
     {
       "id": "wall_137",
@@ -2167,10 +2066,10 @@
       "type": "pillar",
       "solid": true,
       "x": 360,
-      "y": 584,
-      "width": 416,
+      "y": 800,
+      "width": 280,
       "height": 8,
-      "wallTexture": "AXCITY08"
+      "wallTexture": "ADGREYW"
     },
     {
       "id": "wall_138",
@@ -2178,31 +2077,31 @@
       "type": "pillar",
       "solid": true,
       "x": 360,
-      "y": 800,
-      "width": 416,
-      "height": 8,
-      "wallTexture": "AXCITY08"
+      "y": 608,
+      "width": 8,
+      "height": 192,
+      "wallTexture": "ADGREYW"
     },
     {
       "id": "wall_139",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 360,
-      "y": 592,
+      "x": 632,
+      "y": 608,
       "width": 8,
-      "height": 208,
-      "wallTexture": "AXCITY08"
+      "height": 192,
+      "wallTexture": "ADGREYW"
     },
     {
-      "id": "wall_140",
+      "id": "wall_141",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 768,
-      "y": 592,
-      "width": 8,
-      "height": 208,
+      "x": 640,
+      "y": 360,
+      "width": 264,
+      "height": 8,
       "wallTexture": "AXCITY08"
     },
     {
@@ -2210,87 +2109,87 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
-      "y": 360,
-      "width": 312,
+      "x": 640,
+      "y": 568,
+      "width": 264,
       "height": 8,
-      "wallTexture": "CWWALL2"
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_143",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
-      "y": 584,
-      "width": 312,
-      "height": 8,
-      "wallTexture": "CWWALL2"
+      "x": 640,
+      "y": 368,
+      "width": 8,
+      "height": 200,
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_144",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
+      "x": 896,
       "y": 368,
       "width": 8,
-      "height": 216,
-      "wallTexture": "CWWALL2"
+      "height": 200,
+      "wallTexture": "AXCITY08"
     },
     {
-      "id": "wall_145",
+      "id": "wall_146",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1080,
-      "y": 368,
-      "width": 8,
-      "height": 216,
-      "wallTexture": "CWWALL2"
+      "x": 640,
+      "y": 576,
+      "width": 264,
+      "height": 8,
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_147",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
-      "y": 592,
-      "width": 312,
+      "x": 640,
+      "y": 800,
+      "width": 264,
       "height": 8,
-      "wallTexture": "CWWALL2"
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_148",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
-      "y": 800,
-      "width": 312,
-      "height": 8,
-      "wallTexture": "CWWALL2"
+      "x": 640,
+      "y": 584,
+      "width": 8,
+      "height": 216,
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_149",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 776,
-      "y": 600,
+      "x": 896,
+      "y": 584,
       "width": 8,
-      "height": 200,
-      "wallTexture": "CWWALL2"
+      "height": 216,
+      "wallTexture": "AXCITY08"
     },
     {
-      "id": "wall_150",
+      "id": "wall_151",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1080,
-      "y": 600,
-      "width": 8,
-      "height": 200,
+      "x": 904,
+      "y": 360,
+      "width": 416,
+      "height": 8,
       "wallTexture": "CWWALL2"
     },
     {
@@ -2298,43 +2197,43 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 360,
-      "width": 232,
+      "x": 904,
+      "y": 568,
+      "width": 416,
       "height": 8,
-      "wallTexture": "AXCITY08"
+      "wallTexture": "CWWALL2"
     },
     {
       "id": "wall_153",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 584,
-      "width": 232,
-      "height": 8,
-      "wallTexture": "AXCITY08"
+      "x": 904,
+      "y": 368,
+      "width": 8,
+      "height": 200,
+      "wallTexture": "CWWALL2"
     },
     {
       "id": "wall_154",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 368,
-      "width": 8,
-      "height": 216,
-      "wallTexture": "AXCITY08"
-    },
-    {
-      "id": "wall_155",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
       "x": 1312,
       "y": 368,
       "width": 8,
-      "height": 216,
+      "height": 200,
+      "wallTexture": "CWWALL2"
+    },
+    {
+      "id": "wall_156",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 904,
+      "y": 576,
+      "width": 416,
+      "height": 8,
       "wallTexture": "AXCITY08"
     },
     {
@@ -2342,47 +2241,36 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 592,
-      "width": 232,
+      "x": 904,
+      "y": 800,
+      "width": 416,
       "height": 8,
-      "wallTexture": "CWWALL2"
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_158",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 800,
-      "width": 232,
-      "height": 8,
-      "wallTexture": "CWWALL2"
+      "x": 904,
+      "y": 584,
+      "width": 8,
+      "height": 216,
+      "wallTexture": "AXCITY08"
     },
     {
       "id": "wall_159",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1088,
-      "y": 600,
-      "width": 8,
-      "height": 200,
-      "wallTexture": "CWWALL2"
-    },
-    {
-      "id": "wall_160",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
       "x": 1312,
-      "y": 600,
+      "y": 584,
       "width": 8,
-      "height": 200,
-      "wallTexture": "CWWALL2"
+      "height": 216,
+      "wallTexture": "AXCITY08"
     },
     {
-      "id": "wall_204",
+      "id": "wall_203",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -2393,7 +2281,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_205",
+      "id": "wall_204",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -2404,7 +2292,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_206",
+      "id": "wall_205",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -2415,7 +2303,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_207",
+      "id": "wall_206",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -2426,7 +2314,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_209",
+      "id": "wall_208",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
@@ -2437,7 +2325,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_210",
+      "id": "wall_209",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
@@ -2448,7 +2336,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_211",
+      "id": "wall_210",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
@@ -2459,7 +2347,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_212",
+      "id": "wall_211",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
@@ -2467,6 +2355,17 @@
       "y": 368,
       "width": 8,
       "height": 432,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_216",
+      "name": "Column",
+      "type": "pillar",
+      "solid": true,
+      "x": 1688,
+      "y": 456,
+      "width": 24,
+      "height": 24,
       "wallTexture": "CWTILEW"
     },
     {
@@ -3135,7 +3034,7 @@
       "type": "pillar",
       "solid": true,
       "x": 648,
-      "y": 2120,
+      "y": 1928,
       "width": 24,
       "height": 24,
       "wallTexture": "CWTILEW"
@@ -3146,7 +3045,7 @@
       "type": "pillar",
       "solid": true,
       "x": 648,
-      "y": 2312,
+      "y": 2120,
       "width": 24,
       "height": 24,
       "wallTexture": "CWTILEW"
@@ -3156,8 +3055,8 @@
       "name": "Column",
       "type": "pillar",
       "solid": true,
-      "x": 840,
-      "y": 1928,
+      "x": 648,
+      "y": 2312,
       "width": 24,
       "height": 24,
       "wallTexture": "CWTILEW"
@@ -3168,7 +3067,7 @@
       "type": "pillar",
       "solid": true,
       "x": 840,
-      "y": 2120,
+      "y": 1928,
       "width": 24,
       "height": 24,
       "wallTexture": "CWTILEW"
@@ -3179,20 +3078,20 @@
       "type": "pillar",
       "solid": true,
       "x": 840,
-      "y": 2312,
+      "y": 2120,
       "width": 24,
       "height": 24,
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_359",
-      "name": "Facade",
+      "id": "wall_338",
+      "name": "Column",
       "type": "pillar",
       "solid": true,
-      "x": 1584,
-      "y": 1824,
-      "width": 880,
-      "height": 8,
+      "x": 840,
+      "y": 2312,
+      "width": 24,
+      "height": 24,
       "wallTexture": "CWTILEW"
     },
     {
@@ -3201,7 +3100,7 @@
       "type": "pillar",
       "solid": true,
       "x": 1584,
-      "y": 2456,
+      "y": 1824,
       "width": 880,
       "height": 8,
       "wallTexture": "CWTILEW"
@@ -3212,13 +3111,24 @@
       "type": "pillar",
       "solid": true,
       "x": 1584,
+      "y": 2456,
+      "width": 880,
+      "height": 8,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_362",
+      "name": "Facade",
+      "type": "pillar",
+      "solid": true,
+      "x": 1584,
       "y": 1824,
       "width": 8,
       "height": 640,
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_362",
+      "id": "wall_363",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -3229,24 +3139,13 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_364",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1592,
-      "y": 1832,
-      "width": 640,
-      "height": 8,
-      "wallTexture": "CWTILEW"
-    },
-    {
       "id": "wall_365",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
       "x": 1592,
-      "y": 2448,
-      "width": 640,
+      "y": 1832,
+      "width": 864,
       "height": 8,
       "wallTexture": "CWTILEW"
     },
@@ -3256,9 +3155,9 @@
       "type": "pillar",
       "solid": true,
       "x": 1592,
-      "y": 1840,
-      "width": 8,
-      "height": 608,
+      "y": 2448,
+      "width": 864,
+      "height": 8,
       "wallTexture": "CWTILEW"
     },
     {
@@ -3266,157 +3165,69 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 2224,
+      "x": 1592,
       "y": 1840,
       "width": 8,
       "height": 608,
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_369",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2232,
-      "y": 1832,
-      "width": 224,
-      "height": 8,
-      "wallTexture": "ADGREYW"
-    },
-    {
-      "id": "wall_370",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2232,
-      "y": 2136,
-      "width": 224,
-      "height": 8,
-      "wallTexture": "ADGREYW"
-    },
-    {
-      "id": "wall_371",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2232,
-      "y": 1840,
-      "width": 8,
-      "height": 296,
-      "wallTexture": "ADGREYW"
-    },
-    {
-      "id": "wall_372",
+      "id": "wall_368",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
       "x": 2448,
       "y": 1840,
       "width": 8,
-      "height": 296,
-      "wallTexture": "ADGREYW"
+      "height": 608,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_373",
+      "name": "Column",
+      "type": "pillar",
+      "solid": true,
+      "x": 1688,
+      "y": 1928,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
     },
     {
       "id": "wall_374",
-      "name": "Wall",
+      "name": "Column",
       "type": "pillar",
       "solid": true,
-      "x": 2232,
-      "y": 2144,
-      "width": 224,
-      "height": 8,
-      "wallTexture": "ADGREYW"
+      "x": 1688,
+      "y": 2120,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
     },
     {
       "id": "wall_375",
-      "name": "Wall",
+      "name": "Column",
       "type": "pillar",
       "solid": true,
-      "x": 2232,
-      "y": 2448,
-      "width": 224,
-      "height": 8,
-      "wallTexture": "ADGREYW"
+      "x": 1688,
+      "y": 2312,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
     },
     {
       "id": "wall_376",
-      "name": "Wall",
+      "name": "Column",
       "type": "pillar",
       "solid": true,
-      "x": 2232,
-      "y": 2152,
-      "width": 8,
-      "height": 296,
-      "wallTexture": "ADGREYW"
+      "x": 1880,
+      "y": 2120,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
     },
     {
       "id": "wall_377",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2448,
-      "y": 2152,
-      "width": 8,
-      "height": 296,
-      "wallTexture": "ADGREYW"
-    },
-    {
-      "id": "wall_384",
-      "name": "Column",
-      "type": "pillar",
-      "solid": true,
-      "x": 1688,
-      "y": 1928,
-      "width": 24,
-      "height": 24,
-      "wallTexture": "CWTILEW"
-    },
-    {
-      "id": "wall_385",
-      "name": "Column",
-      "type": "pillar",
-      "solid": true,
-      "x": 1688,
-      "y": 2120,
-      "width": 24,
-      "height": 24,
-      "wallTexture": "CWTILEW"
-    },
-    {
-      "id": "wall_386",
-      "name": "Column",
-      "type": "pillar",
-      "solid": true,
-      "x": 1688,
-      "y": 2312,
-      "width": 24,
-      "height": 24,
-      "wallTexture": "CWTILEW"
-    },
-    {
-      "id": "wall_387",
-      "name": "Column",
-      "type": "pillar",
-      "solid": true,
-      "x": 1880,
-      "y": 1928,
-      "width": 24,
-      "height": 24,
-      "wallTexture": "CWTILEW"
-    },
-    {
-      "id": "wall_388",
-      "name": "Column",
-      "type": "pillar",
-      "solid": true,
-      "x": 1880,
-      "y": 2120,
-      "width": 24,
-      "height": 24,
-      "wallTexture": "CWTILEW"
-    },
-    {
-      "id": "wall_389",
       "name": "Column",
       "type": "pillar",
       "solid": true,
@@ -3427,7 +3238,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_390",
+      "id": "wall_378",
       "name": "Column",
       "type": "pillar",
       "solid": true,
@@ -3438,7 +3249,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_391",
+      "id": "wall_379",
       "name": "Column",
       "type": "pillar",
       "solid": true,
@@ -3449,7 +3260,7 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_392",
+      "id": "wall_380",
       "name": "Column",
       "type": "pillar",
       "solid": true,
@@ -3460,7 +3271,40 @@
       "wallTexture": "CWTILEW"
     },
     {
-      "id": "wall_413",
+      "id": "wall_381",
+      "name": "Column",
+      "type": "pillar",
+      "solid": true,
+      "x": 2264,
+      "y": 1928,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_382",
+      "name": "Column",
+      "type": "pillar",
+      "solid": true,
+      "x": 2264,
+      "y": 2120,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_383",
+      "name": "Column",
+      "type": "pillar",
+      "solid": true,
+      "x": 2264,
+      "y": 2312,
+      "width": 24,
+      "height": 24,
+      "wallTexture": "CWTILEW"
+    },
+    {
+      "id": "wall_401",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -3471,7 +3315,7 @@
       "wallTexture": "AXW23"
     },
     {
-      "id": "wall_414",
+      "id": "wall_402",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -3482,7 +3326,7 @@
       "wallTexture": "AXW23"
     },
     {
-      "id": "wall_415",
+      "id": "wall_403",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -3493,7 +3337,7 @@
       "wallTexture": "AXW23"
     },
     {
-      "id": "wall_416",
+      "id": "wall_404",
       "name": "Facade",
       "type": "pillar",
       "solid": true,
@@ -3504,47 +3348,157 @@
       "wallTexture": "AXW23"
     },
     {
-      "id": "wall_418",
+      "id": "wall_406",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
       "x": 1592,
       "y": 2728,
-      "width": 192,
+      "width": 216,
       "height": 8,
       "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_407",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1592,
+      "y": 2928,
+      "width": 216,
+      "height": 8,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_408",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1592,
+      "y": 2736,
+      "width": 8,
+      "height": 192,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_409",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1800,
+      "y": 2736,
+      "width": 8,
+      "height": 192,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_411",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1592,
+      "y": 2936,
+      "width": 216,
+      "height": 8,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_412",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1592,
+      "y": 3216,
+      "width": 216,
+      "height": 8,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_413",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1592,
+      "y": 2944,
+      "width": 8,
+      "height": 272,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_414",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1800,
+      "y": 2944,
+      "width": 8,
+      "height": 272,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_416",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1808,
+      "y": 2728,
+      "width": 336,
+      "height": 8,
+      "wallTexture": "AXW86"
+    },
+    {
+      "id": "wall_417",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1808,
+      "y": 2952,
+      "width": 336,
+      "height": 8,
+      "wallTexture": "AXW86"
+    },
+    {
+      "id": "wall_418",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1808,
+      "y": 2736,
+      "width": 8,
+      "height": 216,
+      "wallTexture": "AXW86"
     },
     {
       "id": "wall_419",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1592,
-      "y": 2968,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_420",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1592,
+      "x": 2136,
       "y": 2736,
       "width": 8,
-      "height": 232,
-      "wallTexture": "AXW12"
+      "height": 216,
+      "wallTexture": "AXW86"
     },
     {
       "id": "wall_421",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1776,
-      "y": 2736,
-      "width": 8,
-      "height": 232,
+      "x": 1808,
+      "y": 2960,
+      "width": 336,
+      "height": 8,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_422",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 1808,
+      "y": 3216,
+      "width": 336,
+      "height": 8,
       "wallTexture": "AXW12"
     },
     {
@@ -3552,87 +3506,87 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1592,
-      "y": 2976,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW86"
+      "x": 1808,
+      "y": 2968,
+      "width": 8,
+      "height": 248,
+      "wallTexture": "AXW12"
     },
     {
       "id": "wall_424",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1592,
-      "y": 3216,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_425",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1592,
-      "y": 2984,
+      "x": 2136,
+      "y": 2968,
       "width": 8,
-      "height": 232,
-      "wallTexture": "AXW86"
+      "height": 248,
+      "wallTexture": "AXW12"
     },
     {
       "id": "wall_426",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1776,
-      "y": 2984,
-      "width": 8,
-      "height": 232,
-      "wallTexture": "AXW86"
+      "x": 2144,
+      "y": 2728,
+      "width": 312,
+      "height": 8,
+      "wallTexture": "AXW12"
+    },
+    {
+      "id": "wall_427",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 2144,
+      "y": 3024,
+      "width": 312,
+      "height": 8,
+      "wallTexture": "AXW12"
     },
     {
       "id": "wall_428",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1784,
-      "y": 2728,
-      "width": 208,
-      "height": 8,
-      "wallTexture": "AXW86"
+      "x": 2144,
+      "y": 2736,
+      "width": 8,
+      "height": 288,
+      "wallTexture": "AXW12"
     },
     {
       "id": "wall_429",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1784,
-      "y": 3000,
-      "width": 208,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_430",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1784,
+      "x": 2448,
       "y": 2736,
       "width": 8,
-      "height": 264,
-      "wallTexture": "AXW86"
+      "height": 288,
+      "wallTexture": "AXW12"
     },
     {
       "id": "wall_431",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1984,
-      "y": 2736,
-      "width": 8,
-      "height": 264,
+      "x": 2144,
+      "y": 3032,
+      "width": 312,
+      "height": 8,
+      "wallTexture": "AXW86"
+    },
+    {
+      "id": "wall_432",
+      "name": "Wall",
+      "type": "pillar",
+      "solid": true,
+      "x": 2144,
+      "y": 3216,
+      "width": 312,
+      "height": 8,
       "wallTexture": "AXW86"
     },
     {
@@ -3640,220 +3594,22 @@
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1992,
-      "y": 2728,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW12"
+      "x": 2144,
+      "y": 3040,
+      "width": 8,
+      "height": 176,
+      "wallTexture": "AXW86"
     },
     {
       "id": "wall_434",
       "name": "Wall",
       "type": "pillar",
       "solid": true,
-      "x": 1992,
-      "y": 3000,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_435",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1992,
-      "y": 2736,
-      "width": 8,
-      "height": 264,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_436",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2176,
-      "y": 2736,
-      "width": 8,
-      "height": 264,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_438",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1784,
-      "y": 3008,
-      "width": 208,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_439",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1784,
-      "y": 3216,
-      "width": 208,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_440",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1784,
-      "y": 3016,
-      "width": 8,
-      "height": 200,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_441",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1984,
-      "y": 3016,
-      "width": 8,
-      "height": 200,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_443",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1992,
-      "y": 3008,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_444",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1992,
-      "y": 3216,
-      "width": 192,
-      "height": 8,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_445",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 1992,
-      "y": 3016,
-      "width": 8,
-      "height": 200,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_446",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2176,
-      "y": 3016,
-      "width": 8,
-      "height": 200,
-      "wallTexture": "AXW86"
-    },
-    {
-      "id": "wall_448",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 2728,
-      "width": 272,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_449",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 2984,
-      "width": 272,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_450",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 2736,
-      "width": 8,
-      "height": 248,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_451",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
       "x": 2448,
-      "y": 2736,
+      "y": 3040,
       "width": 8,
-      "height": 248,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_453",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 2992,
-      "width": 272,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_454",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 3216,
-      "width": 272,
-      "height": 8,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_455",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2184,
-      "y": 3000,
-      "width": 8,
-      "height": 216,
-      "wallTexture": "AXW12"
-    },
-    {
-      "id": "wall_456",
-      "name": "Wall",
-      "type": "pillar",
-      "solid": true,
-      "x": 2448,
-      "y": 3000,
-      "width": 8,
-      "height": 216,
-      "wallTexture": "AXW12"
+      "height": 176,
+      "wallTexture": "AXW86"
     },
     {
       "id": "door_83",
@@ -3862,16 +3618,16 @@
       "width": 16,
       "height": 56,
       "type": "door",
-      "name": "Door",
+      "name": "Locked door",
       "theme": "nbc_precinct",
       "wallTexture": "CWDOORS",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
       "id": "door_84",
-      "x": 472,
+      "x": 392,
       "y": 2976,
       "width": 56,
       "height": 16,
@@ -3886,7 +3642,7 @@
     {
       "id": "door_85",
       "x": 984,
-      "y": 3008,
+      "y": 3072,
       "width": 16,
       "height": 56,
       "type": "door",
@@ -3899,21 +3655,21 @@
     },
     {
       "id": "door_86",
-      "x": 896,
+      "x": 824,
       "y": 2976,
       "width": 56,
       "height": 16,
       "type": "door",
-      "name": "Door",
+      "name": "Locked door",
       "theme": "nbc_flat",
       "wallTexture": "CWDOOR1",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
       "id": "window_87",
-      "x": 1112,
+      "x": 1032,
       "y": 2952,
       "width": 56,
       "height": 16,
@@ -3928,7 +3684,7 @@
     },
     {
       "id": "window_88",
-      "x": 568,
+      "x": 536,
       "y": 2720,
       "width": 56,
       "height": 8,
@@ -3943,22 +3699,22 @@
     },
     {
       "id": "door_89",
-      "x": 568,
+      "x": 536,
       "y": 2728,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_flat",
       "wallTexture": "CWDOOR1",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
       "id": "window_90",
       "x": 352,
-      "y": 2824,
+      "y": 2784,
       "width": 8,
       "height": 56,
       "type": "window",
@@ -3973,14 +3729,14 @@
     {
       "id": "door_91",
       "x": 360,
-      "y": 2824,
+      "y": 2784,
       "width": 8,
       "height": 56,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_flat",
       "wallTexture": "CWDOOR1",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
@@ -4000,8 +3756,8 @@
       "blocking": false
     },
     {
-      "id": "window_93",
-      "x": 400,
+      "id": "window_94",
+      "x": 536,
       "y": 3216,
       "width": 48,
       "height": 16,
@@ -4016,21 +3772,6 @@
     },
     {
       "id": "window_95",
-      "x": 632,
-      "y": 3216,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "CWTILEW",
-      "lowerTexture": "CWTILEW",
-      "blocking": false
-    },
-    {
-      "id": "window_96",
       "x": 352,
       "y": 3024,
       "width": 16,
@@ -4045,7 +3786,7 @@
       "blocking": false
     },
     {
-      "id": "window_97",
+      "id": "window_96",
       "x": 768,
       "y": 2720,
       "width": 48,
@@ -4060,7 +3801,7 @@
       "blocking": false
     },
     {
-      "id": "window_98",
+      "id": "window_97",
       "x": 768,
       "y": 3216,
       "width": 48,
@@ -4075,22 +3816,7 @@
       "blocking": false
     },
     {
-      "id": "window_99",
-      "x": 880,
-      "y": 3216,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "CWTILEW",
-      "lowerTexture": "CWTILEW",
-      "blocking": false
-    },
-    {
-      "id": "window_100",
+      "id": "window_98",
       "x": 1032,
       "y": 2720,
       "width": 48,
@@ -4105,7 +3831,7 @@
       "blocking": false
     },
     {
-      "id": "window_101",
+      "id": "window_99",
       "x": 1176,
       "y": 2720,
       "width": 48,
@@ -4120,7 +3846,7 @@
       "blocking": false
     },
     {
-      "id": "window_102",
+      "id": "window_100",
       "x": 1312,
       "y": 2768,
       "width": 16,
@@ -4135,7 +3861,7 @@
       "blocking": false
     },
     {
-      "id": "window_103",
+      "id": "window_101",
       "x": 1032,
       "y": 3216,
       "width": 48,
@@ -4150,8 +3876,8 @@
       "blocking": false
     },
     {
-      "id": "window_104",
-      "x": 1200,
+      "id": "window_102",
+      "x": 1184,
       "y": 3216,
       "width": 48,
       "height": 16,
@@ -4165,7 +3891,7 @@
       "blocking": false
     },
     {
-      "id": "window_105",
+      "id": "window_103",
       "x": 1312,
       "y": 3000,
       "width": 16,
@@ -4180,65 +3906,69 @@
       "blocking": false
     },
     {
-      "id": "door_161",
-      "x": 768,
-      "y": 456,
+      "id": "window_104",
+      "x": 1312,
+      "y": 3096,
+      "width": 16,
+      "height": 48,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "CWTILEW",
+      "lowerTexture": "CWTILEW",
+      "blocking": false
+    },
+    {
+      "id": "window_160",
+      "x": 896,
+      "y": 616,
       "width": 16,
       "height": 56,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_flat",
-      "wallTexture": "CWDOOR1",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
+      "type": "window",
+      "name": "Doorway",
+      "floorHeight": 24,
+      "ceilingHeight": 96,
+      "wallTexture": "AXCITY08",
+      "upperTexture": "AXCITY08",
+      "lowerTexture": "AXCITY08",
+      "blocking": false
     },
     {
-      "id": "door_162",
-      "x": 472,
-      "y": 576,
-      "width": 56,
-      "height": 16,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_flat",
-      "wallTexture": "CWDOOR1",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
-    },
-    {
-      "id": "door_163",
-      "x": 1080,
-      "y": 480,
+      "id": "window_161",
+      "x": 632,
+      "y": 408,
       "width": 16,
       "height": 56,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_flat",
-      "wallTexture": "CWDOOR1",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
+      "type": "window",
+      "name": "Doorway",
+      "floorHeight": 24,
+      "ceilingHeight": 96,
+      "wallTexture": "ADGREYW",
+      "upperTexture": "ADGREYW",
+      "lowerTexture": "ADGREYW",
+      "blocking": false
     },
     {
-      "id": "door_164",
-      "x": 808,
-      "y": 584,
+      "id": "window_162",
+      "x": 384,
+      "y": 592,
       "width": 56,
       "height": 16,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_flat",
-      "wallTexture": "CWDOOR1",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
+      "type": "window",
+      "name": "Doorway",
+      "floorHeight": 24,
+      "ceilingHeight": 96,
+      "wallTexture": "ADGREYW",
+      "upperTexture": "ADGREYW",
+      "lowerTexture": "ADGREYW",
+      "blocking": false
     },
     {
-      "id": "window_165",
-      "x": 1192,
-      "y": 584,
+      "id": "window_163",
+      "x": 720,
+      "y": 568,
       "width": 56,
       "height": 16,
       "type": "window",
@@ -4251,8 +3981,23 @@
       "blocking": false
     },
     {
-      "id": "window_166",
-      "x": 384,
+      "id": "window_164",
+      "x": 1184,
+      "y": 568,
+      "width": 56,
+      "height": 16,
+      "type": "window",
+      "name": "Doorway",
+      "floorHeight": 24,
+      "ceilingHeight": 96,
+      "wallTexture": "CWWALL2",
+      "upperTexture": "CWWALL2",
+      "lowerTexture": "CWWALL2",
+      "blocking": false
+    },
+    {
+      "id": "window_165",
+      "x": 984,
       "y": 352,
       "width": 56,
       "height": 8,
@@ -4266,22 +4011,22 @@
       "blocking": false
     },
     {
-      "id": "door_167",
-      "x": 384,
+      "id": "door_166",
+      "x": 984,
       "y": 360,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_flat",
       "wallTexture": "CWDOOR1",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
-      "id": "window_168",
-      "x": 1184,
+      "id": "window_167",
+      "x": 448,
       "y": 808,
       "width": 56,
       "height": 8,
@@ -4295,22 +4040,37 @@
       "blocking": false
     },
     {
-      "id": "door_169",
-      "x": 1184,
+      "id": "door_168",
+      "x": 448,
       "y": 800,
       "width": 56,
       "height": 8,
       "type": "door",
       "name": "Front door",
-      "theme": "nbc_flat",
-      "wallTexture": "CWDOOR1",
+      "theme": "nbc_precinct",
+      "wallTexture": "CWDOORS",
       "lock": 0,
       "speed": 32,
       "wait": 105
     },
     {
+      "id": "window_169",
+      "x": 400,
+      "y": 352,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
       "id": "window_170",
-      "x": 496,
+      "x": 520,
       "y": 352,
       "width": 48,
       "height": 16,
@@ -4325,10 +4085,10 @@
     },
     {
       "id": "window_171",
-      "x": 664,
-      "y": 352,
-      "width": 48,
-      "height": 16,
+      "x": 352,
+      "y": 400,
+      "width": 16,
+      "height": 48,
       "type": "window",
       "name": "Window",
       "floorHeight": 56,
@@ -4340,10 +4100,10 @@
     },
     {
       "id": "window_172",
-      "x": 400,
-      "y": 800,
-      "width": 48,
-      "height": 16,
+      "x": 352,
+      "y": 640,
+      "width": 16,
+      "height": 48,
       "type": "window",
       "name": "Window",
       "floorHeight": 56,
@@ -4355,8 +4115,8 @@
     },
     {
       "id": "window_173",
-      "x": 496,
-      "y": 800,
+      "x": 680,
+      "y": 352,
       "width": 48,
       "height": 16,
       "type": "window",
@@ -4370,37 +4130,7 @@
     },
     {
       "id": "window_174",
-      "x": 664,
-      "y": 800,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "ADBRICK",
-      "lowerTexture": "ADBRICK",
-      "blocking": false
-    },
-    {
-      "id": "window_175",
-      "x": 352,
-      "y": 624,
-      "width": 16,
-      "height": 48,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "ADBRICK",
-      "lowerTexture": "ADBRICK",
-      "blocking": false
-    },
-    {
-      "id": "window_176",
-      "x": 816,
+      "x": 800,
       "y": 352,
       "width": 48,
       "height": 16,
@@ -4414,8 +4144,38 @@
       "blocking": false
     },
     {
+      "id": "window_175",
+      "x": 680,
+      "y": 800,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
+      "id": "window_176",
+      "x": 784,
+      "y": 800,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
       "id": "window_177",
-      "x": 992,
+      "x": 1184,
       "y": 352,
       "width": 48,
       "height": 16,
@@ -4430,51 +4190,6 @@
     },
     {
       "id": "window_178",
-      "x": 816,
-      "y": 800,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "ADBRICK",
-      "lowerTexture": "ADBRICK",
-      "blocking": false
-    },
-    {
-      "id": "window_179",
-      "x": 968,
-      "y": 800,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "ADBRICK",
-      "lowerTexture": "ADBRICK",
-      "blocking": false
-    },
-    {
-      "id": "window_180",
-      "x": 1128,
-      "y": 352,
-      "width": 48,
-      "height": 16,
-      "type": "window",
-      "name": "Window",
-      "floorHeight": 56,
-      "ceilingHeight": 96,
-      "wallTexture": "CWCONCW",
-      "upperTexture": "ADBRICK",
-      "lowerTexture": "ADBRICK",
-      "blocking": false
-    },
-    {
-      "id": "window_181",
       "x": 1312,
       "y": 400,
       "width": 16,
@@ -4489,9 +4204,54 @@
       "blocking": false
     },
     {
+      "id": "window_179",
+      "x": 944,
+      "y": 800,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
+      "id": "window_180",
+      "x": 1096,
+      "y": 800,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
+      "id": "window_181",
+      "x": 1208,
+      "y": 800,
+      "width": 48,
+      "height": 16,
+      "type": "window",
+      "name": "Window",
+      "floorHeight": 56,
+      "ceilingHeight": 96,
+      "wallTexture": "CWCONCW",
+      "upperTexture": "ADBRICK",
+      "lowerTexture": "ADBRICK",
+      "blocking": false
+    },
+    {
       "id": "window_182",
       "x": 1312,
-      "y": 632,
+      "y": 616,
       "width": 16,
       "height": 48,
       "type": "window",
@@ -4504,8 +4264,8 @@
       "blocking": false
     },
     {
-      "id": "window_213",
-      "x": 1624,
+      "id": "window_212",
+      "x": 1752,
       "y": 352,
       "width": 56,
       "height": 8,
@@ -4519,22 +4279,22 @@
       "blocking": false
     },
     {
-      "id": "door_214",
-      "x": 1624,
+      "id": "door_213",
+      "x": 1752,
       "y": 360,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_subway",
       "wallTexture": "CWDOORS",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
-      "id": "window_215",
-      "x": 1704,
+      "id": "window_214",
+      "x": 1624,
       "y": 808,
       "width": 56,
       "height": 8,
@@ -4548,8 +4308,8 @@
       "blocking": false
     },
     {
-      "id": "door_216",
-      "x": 1704,
+      "id": "door_215",
+      "x": 1624,
       "y": 800,
       "width": 56,
       "height": 8,
@@ -4592,7 +4352,7 @@
     },
     {
       "id": "window_236",
-      "x": 2352,
+      "x": 2248,
       "y": 808,
       "width": 56,
       "height": 8,
@@ -4607,7 +4367,7 @@
     },
     {
       "id": "door_237",
-      "x": 2352,
+      "x": 2248,
       "y": 800,
       "width": 56,
       "height": 8,
@@ -4724,7 +4484,7 @@
     },
     {
       "id": "window_284",
-      "x": 536,
+      "x": 528,
       "y": 1560,
       "width": 56,
       "height": 8,
@@ -4739,22 +4499,22 @@
     },
     {
       "id": "door_285",
-      "x": 536,
+      "x": 528,
       "y": 1552,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_industrial",
       "wallTexture": "AXW28",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
       "id": "door_324",
       "x": 1088,
-      "y": 1968,
+      "y": 1944,
       "width": 16,
       "height": 56,
       "type": "door",
@@ -4768,7 +4528,7 @@
     {
       "id": "door_325",
       "x": 1088,
-      "y": 2184,
+      "y": 2336,
       "width": 16,
       "height": 56,
       "type": "door",
@@ -4781,7 +4541,7 @@
     },
     {
       "id": "window_326",
-      "x": 672,
+      "x": 1016,
       "y": 1824,
       "width": 56,
       "height": 8,
@@ -4796,21 +4556,21 @@
     },
     {
       "id": "door_327",
-      "x": 672,
+      "x": 1016,
       "y": 1832,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_subway",
       "wallTexture": "CWDOORS",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
       "id": "window_328",
-      "x": 816,
+      "x": 680,
       "y": 2456,
       "width": 56,
       "height": 8,
@@ -4825,7 +4585,7 @@
     },
     {
       "id": "door_329",
-      "x": 816,
+      "x": 680,
       "y": 2448,
       "width": 56,
       "height": 8,
@@ -4838,36 +4598,8 @@
       "wait": 105
     },
     {
-      "id": "door_378",
-      "x": 2224,
-      "y": 1864,
-      "width": 16,
-      "height": 56,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_subway",
-      "wallTexture": "CWDOORS",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
-    },
-    {
-      "id": "door_379",
-      "x": 2224,
-      "y": 2208,
-      "width": 16,
-      "height": 56,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_subway",
-      "wallTexture": "CWDOORS",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
-    },
-    {
-      "id": "window_380",
-      "x": 2152,
+      "id": "window_369",
+      "x": 1792,
       "y": 1824,
       "width": 56,
       "height": 8,
@@ -4881,8 +4613,8 @@
       "blocking": false
     },
     {
-      "id": "door_381",
-      "x": 2152,
+      "id": "door_370",
+      "x": 1792,
       "y": 1832,
       "width": 56,
       "height": 8,
@@ -4895,8 +4627,8 @@
       "wait": 105
     },
     {
-      "id": "window_382",
-      "x": 1736,
+      "id": "window_371",
+      "x": 2080,
       "y": 2456,
       "width": 56,
       "height": 8,
@@ -4910,37 +4642,23 @@
       "blocking": false
     },
     {
-      "id": "door_383",
-      "x": 1736,
+      "id": "door_372",
+      "x": 2080,
       "y": 2448,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
+      "name": "Locked front door",
       "theme": "nbc_subway",
       "wallTexture": "CWDOORS",
-      "lock": 0,
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
-      "id": "door_457",
-      "x": 2176,
-      "y": 2752,
-      "width": 16,
-      "height": 56,
-      "type": "door",
-      "name": "Door",
-      "theme": "nbc_basement",
-      "wallTexture": "AXW86",
-      "lock": 0,
-      "speed": 32,
-      "wait": 105
-    },
-    {
-      "id": "window_458",
-      "x": 1776,
-      "y": 2832,
+      "id": "window_435",
+      "x": 1800,
+      "y": 3056,
       "width": 16,
       "height": 56,
       "type": "window",
@@ -4953,23 +4671,38 @@
       "blocking": false
     },
     {
-      "id": "door_459",
-      "x": 1704,
-      "y": 2968,
+      "id": "window_436",
+      "x": 1680,
+      "y": 2928,
       "width": 56,
       "height": 16,
+      "type": "window",
+      "name": "Doorway",
+      "floorHeight": 24,
+      "ceilingHeight": 96,
+      "wallTexture": "AXW12",
+      "upperTexture": "AXW12",
+      "lowerTexture": "AXW12",
+      "blocking": false
+    },
+    {
+      "id": "door_437",
+      "x": 2136,
+      "y": 2864,
+      "width": 16,
+      "height": 56,
       "type": "door",
       "name": "Door",
-      "theme": "nbc_basement",
-      "wallTexture": "AXW86",
+      "theme": "nbc_industrial",
+      "wallTexture": "AXW28",
       "lock": 0,
       "speed": 32,
       "wait": 105
     },
     {
-      "id": "door_460",
-      "x": 1864,
-      "y": 3000,
+      "id": "door_438",
+      "x": 1832,
+      "y": 2952,
       "width": 56,
       "height": 16,
       "type": "door",
@@ -4981,39 +4714,9 @@
       "wait": 105
     },
     {
-      "id": "window_461",
-      "x": 1984,
-      "y": 2752,
-      "width": 16,
-      "height": 56,
-      "type": "window",
-      "name": "Doorway",
-      "floorHeight": 24,
-      "ceilingHeight": 96,
-      "wallTexture": "AXW86",
-      "upperTexture": "AXW86",
-      "lowerTexture": "AXW86",
-      "blocking": false
-    },
-    {
-      "id": "window_462",
-      "x": 1984,
-      "y": 3064,
-      "width": 16,
-      "height": 56,
-      "type": "window",
-      "name": "Doorway",
-      "floorHeight": 24,
-      "ceilingHeight": 96,
-      "wallTexture": "AXW86",
-      "upperTexture": "AXW86",
-      "lowerTexture": "AXW86",
-      "blocking": false
-    },
-    {
-      "id": "window_463",
-      "x": 2344,
-      "y": 2984,
+      "id": "window_439",
+      "x": 2376,
+      "y": 3024,
       "width": 56,
       "height": 16,
       "type": "window",
@@ -5026,8 +4729,8 @@
       "blocking": false
     },
     {
-      "id": "window_464",
-      "x": 2072,
+      "id": "window_440",
+      "x": 2336,
       "y": 2720,
       "width": 56,
       "height": 8,
@@ -5041,8 +4744,8 @@
       "blocking": false
     },
     {
-      "id": "door_465",
-      "x": 2072,
+      "id": "door_441",
+      "x": 2336,
       "y": 2728,
       "width": 56,
       "height": 8,
@@ -5055,8 +4758,8 @@
       "wait": 105
     },
     {
-      "id": "window_466",
-      "x": 1656,
+      "id": "window_442",
+      "x": 1712,
       "y": 3224,
       "width": 56,
       "height": 8,
@@ -5070,22 +4773,22 @@
       "blocking": false
     },
     {
-      "id": "door_467",
-      "x": 1656,
+      "id": "door_443",
+      "x": 1712,
       "y": 3216,
       "width": 56,
       "height": 8,
       "type": "door",
-      "name": "Front door",
-      "theme": "nbc_industrial",
-      "wallTexture": "AXW28",
-      "lock": 0,
+      "name": "Locked front door",
+      "theme": "nbc_basement",
+      "wallTexture": "AXW86",
+      "lock": 1,
       "speed": 32,
       "wait": 105
     },
     {
-      "id": "exit_493",
-      "x": 488,
+      "id": "exit_463",
+      "x": 408,
       "y": 3216,
       "width": 64,
       "height": 8,
@@ -5110,7 +4813,7 @@
     },
     {
       "id": "th_108",
-      "type": 3004,
+      "type": 26023,
       "x": 585,
       "y": 2896,
       "angle": 0
@@ -5124,7 +4827,7 @@
     },
     {
       "id": "th_112",
-      "type": 3004,
+      "type": 26023,
       "x": 599,
       "y": 3162,
       "angle": 270
@@ -5138,10 +4841,10 @@
     },
     {
       "id": "th_116",
-      "type": 3004,
-      "x": 766,
-      "y": 2944,
-      "angle": 225
+      "type": 26026,
+      "x": 952,
+      "y": 2892,
+      "angle": 90
     },
     {
       "id": "th_118",
@@ -5152,122 +4855,122 @@
     },
     {
       "id": "th_119",
-      "type": 3004,
-      "x": 766,
-      "y": 3054,
-      "angle": 45
+      "type": 26026,
+      "x": 856,
+      "y": 3118,
+      "angle": 180
     },
     {
-      "id": "th_122",
+      "id": "th_121",
       "type": 26021,
       "x": 1160,
       "y": 2848,
       "angle": 0
     },
     {
-      "id": "th_123",
-      "type": 3004,
-      "x": 1060,
-      "y": 2887,
-      "angle": 270
+      "id": "th_122",
+      "type": 26023,
+      "x": 1110,
+      "y": 2829,
+      "angle": 180
     },
     {
-      "id": "th_125",
+      "id": "th_124",
       "type": 26021,
       "x": 1160,
       "y": 3096,
       "angle": 0
     },
     {
-      "id": "th_126",
-      "type": 3004,
-      "x": 1166,
-      "y": 3053,
-      "angle": 270
+      "id": "th_125",
+      "type": 26023,
+      "x": 1174,
+      "y": 3156,
+      "angle": 90
     },
     {
       "id": "th_185",
       "type": 26021,
-      "x": 568,
-      "y": 472,
+      "x": 504,
+      "y": 480,
       "angle": 0
     },
     {
       "id": "th_186",
-      "type": 3004,
-      "x": 540,
-      "y": 429,
-      "angle": 180
+      "type": 26023,
+      "x": 545,
+      "y": 402,
+      "angle": 315
     },
     {
       "id": "th_188",
       "type": 26021,
-      "x": 568,
-      "y": 696,
+      "x": 504,
+      "y": 704,
       "angle": 0
     },
     {
       "id": "th_189",
-      "type": 3004,
-      "x": 663,
-      "y": 761,
-      "angle": 45
+      "type": 26023,
+      "x": 401,
+      "y": 712,
+      "angle": 180
+    },
+    {
+      "id": "th_191",
+      "type": 26021,
+      "x": 776,
+      "y": 472,
+      "angle": 0
     },
     {
       "id": "th_192",
-      "type": 26021,
-      "x": 936,
-      "y": 480,
-      "angle": 0
-    },
-    {
-      "id": "th_193",
-      "type": 3004,
-      "x": 1028,
-      "y": 417,
-      "angle": 90
-    },
-    {
-      "id": "th_196",
-      "type": 26021,
-      "x": 936,
-      "y": 704,
-      "angle": 0
-    },
-    {
-      "id": "th_197",
-      "type": 3004,
-      "x": 854,
-      "y": 711,
+      "type": 26023,
+      "x": 827,
+      "y": 445,
       "angle": 135
     },
     {
-      "id": "th_199",
+      "id": "th_194",
       "type": 26021,
-      "x": 1208,
-      "y": 480,
+      "x": 776,
+      "y": 696,
       "angle": 0
     },
     {
-      "id": "th_200",
-      "type": 3004,
-      "x": 1228,
-      "y": 397,
+      "id": "th_195",
+      "type": 26023,
+      "x": 779,
+      "y": 691,
+      "angle": 90
+    },
+    {
+      "id": "th_198",
+      "type": 26021,
+      "x": 1112,
+      "y": 472,
+      "angle": 0
+    },
+    {
+      "id": "th_199",
+      "type": 26023,
+      "x": 1223,
+      "y": 438,
       "angle": 270
     },
     {
-      "id": "th_202",
+      "id": "th_201",
       "type": 26021,
-      "x": 1208,
-      "y": 704,
+      "x": 1112,
+      "y": 696,
       "angle": 0
     },
     {
-      "id": "th_203",
-      "type": 3004,
-      "x": 1166,
-      "y": 686,
-      "angle": 45
+      "id": "th_202",
+      "type": 26023,
+      "x": 1127,
+      "y": 706,
+      "angle": 90
     },
     {
       "id": "th_221",
@@ -5278,21 +4981,21 @@
     },
     {
       "id": "th_222",
-      "type": 3004,
+      "type": 26023,
       "x": 1858,
       "y": 617,
       "angle": 90
     },
     {
       "id": "th_223",
-      "type": 3004,
+      "type": 26023,
       "x": 1650,
       "y": 555,
       "angle": 90
     },
     {
       "id": "th_224",
-      "type": 3004,
+      "type": 26023,
       "x": 1727,
       "y": 528,
       "angle": 90
@@ -5306,14 +5009,14 @@
     },
     {
       "id": "th_241",
-      "type": 3004,
-      "x": 2299,
-      "y": 729,
-      "angle": 225
+      "type": 26023,
+      "x": 2328,
+      "y": 665,
+      "angle": 0
     },
     {
       "id": "th_242",
-      "type": 3004,
+      "type": 26023,
       "x": 2293,
       "y": 473,
       "angle": 0
@@ -5327,10 +5030,10 @@
     },
     {
       "id": "th_288",
-      "type": 3004,
-      "x": 542,
-      "y": 1163,
-      "angle": 180
+      "type": 26023,
+      "x": 504,
+      "y": 1195,
+      "angle": 45
     },
     {
       "id": "th_290",
@@ -5341,10 +5044,10 @@
     },
     {
       "id": "th_291",
-      "type": 3004,
-      "x": 511,
-      "y": 1359,
-      "angle": 180
+      "type": 26023,
+      "x": 450,
+      "y": 1425,
+      "angle": 135
     },
     {
       "id": "th_293",
@@ -5355,10 +5058,10 @@
     },
     {
       "id": "th_294",
-      "type": 3004,
-      "x": 893,
-      "y": 1142,
-      "angle": 0
+      "type": 26023,
+      "x": 797,
+      "y": 1145,
+      "angle": 135
     },
     {
       "id": "th_296",
@@ -5369,10 +5072,10 @@
     },
     {
       "id": "th_297",
-      "type": 3004,
-      "x": 919,
-      "y": 1439,
-      "angle": 270
+      "type": 26023,
+      "x": 831,
+      "y": 1433,
+      "angle": 0
     },
     {
       "id": "th_299",
@@ -5383,10 +5086,10 @@
     },
     {
       "id": "th_300",
-      "type": 3004,
-      "x": 1145,
-      "y": 1143,
-      "angle": 315
+      "type": 26023,
+      "x": 1268,
+      "y": 1291,
+      "angle": 45
     },
     {
       "id": "th_302",
@@ -5397,626 +5100,654 @@
     },
     {
       "id": "th_303",
-      "type": 3004,
-      "x": 1150,
-      "y": 1418,
-      "angle": 90
+      "type": 26023,
+      "x": 1002,
+      "y": 1478,
+      "angle": 225
     },
     {
-      "id": "th_339",
+      "id": "th_340",
       "type": 26021,
       "x": 584,
       "y": 2000,
       "angle": 0
     },
     {
-      "id": "th_341",
+      "id": "th_342",
       "type": 26021,
       "x": 584,
       "y": 2288,
       "angle": 0
     },
     {
-      "id": "th_343",
+      "id": "th_344",
       "type": 26021,
       "x": 872,
       "y": 2000,
-      "angle": 0
-    },
-    {
-      "id": "th_345",
-      "type": 26021,
-      "x": 872,
-      "y": 2288,
       "angle": 0
     },
     {
       "id": "th_346",
-      "type": 3004,
-      "x": 914,
-      "y": 2315,
-      "angle": 135
+      "type": 26021,
+      "x": 872,
+      "y": 2288,
+      "angle": 0
     },
     {
       "id": "th_347",
-      "type": 3004,
-      "x": 774,
-      "y": 2287,
-      "angle": 315
-    },
-    {
-      "id": "th_348",
-      "type": 3004,
-      "x": 675,
-      "y": 2175,
+      "type": 26023,
+      "x": 647,
+      "y": 2182,
       "angle": 270
     },
     {
+      "id": "th_348",
+      "type": 26023,
+      "x": 1000,
+      "y": 2100,
+      "angle": 180
+    },
+    {
       "id": "th_349",
-      "type": 3004,
-      "x": 468,
-      "y": 2272,
-      "angle": 90
+      "type": 26023,
+      "x": 946,
+      "y": 1928,
+      "angle": 225
     },
     {
       "id": "th_350",
-      "type": 3004,
-      "x": 715,
-      "y": 2055,
-      "angle": 90
+      "type": 26023,
+      "x": 620,
+      "y": 2029,
+      "angle": 225
     },
     {
-      "id": "th_353",
+      "id": "th_351",
+      "type": 26023,
+      "x": 995,
+      "y": 2368,
+      "angle": 225
+    },
+    {
+      "id": "th_354",
       "type": 26021,
       "x": 1208,
       "y": 1992,
       "angle": 0
     },
     {
-      "id": "th_354",
-      "type": 3004,
-      "x": 1204,
-      "y": 2043,
-      "angle": 270
+      "id": "th_355",
+      "type": 26023,
+      "x": 1247,
+      "y": 1982,
+      "angle": 45
     },
     {
-      "id": "th_357",
+      "id": "th_358",
       "type": 26021,
       "x": 1208,
       "y": 2304,
       "angle": 0
     },
     {
-      "id": "th_358",
-      "type": 3004,
-      "x": 1247,
-      "y": 2292,
-      "angle": 135
+      "id": "th_359",
+      "type": 26023,
+      "x": 1182,
+      "y": 2196,
+      "angle": 45
     },
     {
-      "id": "th_394",
+      "id": "th_385",
       "type": 26021,
-      "x": 1768,
+      "x": 1736,
       "y": 2000,
+      "angle": 0
+    },
+    {
+      "id": "th_387",
+      "type": 26021,
+      "x": 1736,
+      "y": 2288,
+      "angle": 0
+    },
+    {
+      "id": "th_389",
+      "type": 26021,
+      "x": 2024,
+      "y": 2000,
+      "angle": 0
+    },
+    {
+      "id": "th_391",
+      "type": 26021,
+      "x": 2024,
+      "y": 2288,
+      "angle": 0
+    },
+    {
+      "id": "th_393",
+      "type": 26021,
+      "x": 2312,
+      "y": 2000,
+      "angle": 0
+    },
+    {
+      "id": "th_395",
+      "type": 26021,
+      "x": 2312,
+      "y": 2288,
       "angle": 0
     },
     {
       "id": "th_396",
-      "type": 26021,
-      "x": 1768,
-      "y": 2288,
-      "angle": 0
-    },
-    {
-      "id": "th_398",
-      "type": 26021,
-      "x": 2056,
-      "y": 2000,
-      "angle": 0
-    },
-    {
-      "id": "th_400",
-      "type": 26021,
-      "x": 2056,
-      "y": 2288,
-      "angle": 0
-    },
-    {
-      "id": "th_401",
-      "type": 3004,
-      "x": 1656,
-      "y": 2245,
-      "angle": 45
-    },
-    {
-      "id": "th_402",
-      "type": 3004,
-      "x": 2002,
-      "y": 1925,
-      "angle": 135
-    },
-    {
-      "id": "th_403",
-      "type": 3004,
-      "x": 1864,
-      "y": 2240,
-      "angle": 225
-    },
-    {
-      "id": "th_404",
-      "type": 3004,
-      "x": 2079,
-      "y": 1902,
-      "angle": 225
-    },
-    {
-      "id": "th_405",
-      "type": 3004,
-      "x": 2029,
-      "y": 2411,
-      "angle": 180
-    },
-    {
-      "id": "th_408",
-      "type": 26021,
-      "x": 2344,
-      "y": 1992,
-      "angle": 0
-    },
-    {
-      "id": "th_409",
-      "type": 3004,
-      "x": 2282,
-      "y": 2033,
-      "angle": 45
-    },
-    {
-      "id": "th_411",
-      "type": 26021,
-      "x": 2344,
-      "y": 2304,
-      "angle": 0
-    },
-    {
-      "id": "th_412",
-      "type": 3004,
-      "x": 2416,
-      "y": 2370,
-      "angle": 315
-    },
-    {
-      "id": "th_469",
-      "type": 26021,
-      "x": 1688,
-      "y": 2856,
-      "angle": 0
-    },
-    {
-      "id": "th_470",
-      "type": 3004,
-      "x": 1650,
-      "y": 2914,
-      "angle": 180
-    },
-    {
-      "id": "th_472",
-      "type": 26021,
-      "x": 1688,
-      "y": 3104,
-      "angle": 0
-    },
-    {
-      "id": "th_473",
-      "type": 3004,
-      "x": 1652,
-      "y": 3085,
-      "angle": 225
-    },
-    {
-      "id": "th_475",
-      "type": 26021,
-      "x": 1888,
-      "y": 2872,
-      "angle": 0
-    },
-    {
-      "id": "th_476",
-      "type": 3004,
-      "x": 1955,
-      "y": 2894,
-      "angle": 315
-    },
-    {
-      "id": "th_478",
-      "type": 26021,
-      "x": 2088,
-      "y": 2872,
-      "angle": 0
-    },
-    {
-      "id": "th_479",
-      "type": 3004,
-      "x": 2099,
-      "y": 2931,
-      "angle": 270
-    },
-    {
-      "id": "th_481",
-      "type": 26021,
-      "x": 1888,
-      "y": 3120,
-      "angle": 0
-    },
-    {
-      "id": "th_482",
-      "type": 3004,
-      "x": 1878,
-      "y": 3162,
-      "angle": 45
-    },
-    {
-      "id": "th_484",
-      "type": 26021,
-      "x": 2088,
-      "y": 3120,
-      "angle": 0
-    },
-    {
-      "id": "th_485",
-      "type": 3004,
-      "x": 2093,
-      "y": 3173,
-      "angle": 315
-    },
-    {
-      "id": "th_487",
-      "type": 26021,
-      "x": 2320,
-      "y": 2864,
-      "angle": 0
-    },
-    {
-      "id": "th_488",
-      "type": 3004,
-      "x": 2249,
-      "y": 2915,
+      "type": 26023,
+      "x": 1676,
+      "y": 2278,
       "angle": 90
     },
     {
-      "id": "th_490",
-      "type": 26021,
-      "x": 2320,
-      "y": 3112,
+      "id": "th_397",
+      "type": 26023,
+      "x": 2404,
+      "y": 2257,
+      "angle": 315
+    },
+    {
+      "id": "th_398",
+      "type": 26023,
+      "x": 2225,
+      "y": 2098,
       "angle": 0
     },
     {
-      "id": "th_491",
-      "type": 3004,
-      "x": 2312,
-      "y": 3095,
+      "id": "th_399",
+      "type": 26023,
+      "x": 1764,
+      "y": 1948,
+      "angle": 135
+    },
+    {
+      "id": "th_400",
+      "type": 26023,
+      "x": 2261,
+      "y": 1890,
+      "angle": 0
+    },
+    {
+      "id": "th_445",
+      "type": 26021,
+      "x": 1704,
+      "y": 2832,
+      "angle": 0
+    },
+    {
+      "id": "th_446",
+      "type": 26023,
+      "x": 1697,
+      "y": 2856,
+      "angle": 225
+    },
+    {
+      "id": "th_448",
+      "type": 26021,
+      "x": 1704,
+      "y": 3080,
+      "angle": 0
+    },
+    {
+      "id": "th_449",
+      "type": 26023,
+      "x": 1644,
+      "y": 2977,
       "angle": 45
     },
     {
-      "id": "th_492",
+      "id": "th_451",
+      "type": 26021,
+      "x": 1976,
+      "y": 2848,
+      "angle": 0
+    },
+    {
+      "id": "th_452",
+      "type": 26023,
+      "x": 1928,
+      "y": 2884,
+      "angle": 315
+    },
+    {
+      "id": "th_454",
+      "type": 26021,
+      "x": 1976,
+      "y": 3096,
+      "angle": 0
+    },
+    {
+      "id": "th_455",
+      "type": 26023,
+      "x": 2037,
+      "y": 3014,
+      "angle": 45
+    },
+    {
+      "id": "th_457",
+      "type": 26021,
+      "x": 2304,
+      "y": 2880,
+      "angle": 0
+    },
+    {
+      "id": "th_458",
+      "type": 26023,
+      "x": 2192,
+      "y": 2767,
+      "angle": 0
+    },
+    {
+      "id": "th_460",
+      "type": 26021,
+      "x": 2304,
+      "y": 3128,
+      "angle": 0
+    },
+    {
+      "id": "th_461",
+      "type": 26023,
+      "x": 2296,
+      "y": 3114,
+      "angle": 90
+    },
+    {
+      "id": "th_462",
       "type": 1,
       "x": 1456,
       "y": 224,
       "angle": 90
     },
     {
-      "id": "th_495",
+      "id": "th_464",
+      "type": 26028,
+      "x": 440,
+      "y": 3192,
+      "angle": 270
+    },
+    {
+      "id": "th_465",
+      "type": 26027,
+      "x": 440,
+      "y": 3120,
+      "angle": 270
+    },
+    {
+      "id": "th_466",
+      "type": 13,
+      "x": 2200,
+      "y": 584,
+      "angle": 0
+    },
+    {
+      "id": "th_468",
       "type": 26020,
       "x": 288,
       "y": 288,
       "angle": 45
     },
     {
-      "id": "th_496",
-      "type": 3004,
-      "x": 176,
-      "y": 943,
-      "angle": 180
-    },
-    {
-      "id": "th_497",
-      "type": 3004,
-      "x": 298,
-      "y": 944,
+      "id": "th_469",
+      "type": 26236,
+      "x": 274,
+      "y": 177,
       "angle": 0
     },
     {
-      "id": "th_498",
-      "type": 3004,
-      "x": 255,
-      "y": 2659,
-      "angle": 45
+      "id": "th_470",
+      "type": 26023,
+      "x": 231,
+      "y": 991,
+      "angle": 270
     },
     {
-      "id": "th_499",
-      "type": 3004,
-      "x": 241,
-      "y": 1303,
-      "angle": 0
+      "id": "th_471",
+      "type": 26023,
+      "x": 284,
+      "y": 3399,
+      "angle": 315
     },
     {
-      "id": "th_500",
-      "type": 3004,
-      "x": 233,
-      "y": 578,
-      "angle": 45
+      "id": "th_472",
+      "type": 26023,
+      "x": 285,
+      "y": 2743,
+      "angle": 90
     },
     {
-      "id": "th_501",
-      "type": 3004,
-      "x": 1512,
-      "y": 1791,
+      "id": "th_473",
+      "type": 26023,
+      "x": 260,
+      "y": 1297,
       "angle": 135
     },
     {
-      "id": "th_502",
-      "type": 3004,
-      "x": 1483,
-      "y": 948,
+      "id": "th_474",
+      "type": 26023,
+      "x": 273,
+      "y": 786,
+      "angle": 225
+    },
+    {
+      "id": "th_475",
+      "type": 26025,
+      "x": 209,
+      "y": 2308,
+      "angle": 90
+    },
+    {
+      "id": "th_476",
+      "type": 26025,
+      "x": 224,
+      "y": 2795,
+      "angle": 90
+    },
+    {
+      "id": "th_477",
+      "type": 26546,
+      "x": 1449,
+      "y": 1625,
+      "angle": 270
+    },
+    {
+      "id": "th_478",
+      "type": 26023,
+      "x": 1449,
+      "y": 2391,
+      "angle": 90
+    },
+    {
+      "id": "th_479",
+      "type": 26023,
+      "x": 1516,
+      "y": 2213,
       "angle": 0
     },
     {
-      "id": "th_503",
-      "type": 3004,
-      "x": 1514,
-      "y": 346,
+      "id": "th_480",
+      "type": 26023,
+      "x": 1494,
+      "y": 754,
+      "angle": 0
+    },
+    {
+      "id": "th_481",
+      "type": 26023,
+      "x": 1382,
+      "y": 2566,
+      "angle": 315
+    },
+    {
+      "id": "th_482",
+      "type": 26023,
+      "x": 1453,
+      "y": 2310,
+      "angle": 135
+    },
+    {
+      "id": "th_483",
+      "type": 26023,
+      "x": 2526,
+      "y": 2572,
+      "angle": 270
+    },
+    {
+      "id": "th_484",
+      "type": 26023,
+      "x": 2537,
+      "y": 3389,
       "angle": 45
     },
     {
+      "id": "th_485",
+      "type": 26023,
+      "x": 2651,
+      "y": 774,
+      "angle": 45
+    },
+    {
+      "id": "th_486",
+      "type": 26023,
+      "x": 2617,
+      "y": 604,
+      "angle": 180
+    },
+    {
+      "id": "th_487",
+      "type": 26023,
+      "x": 2560,
+      "y": 1922,
+      "angle": 315
+    },
+    {
+      "id": "th_488",
+      "type": 26025,
+      "x": 2650,
+      "y": 2329,
+      "angle": 90
+    },
+    {
+      "id": "th_489",
+      "type": 26025,
+      "x": 2586,
+      "y": 3229,
+      "angle": 45
+    },
+    {
+      "id": "th_490",
+      "type": 26546,
+      "x": 1622,
+      "y": 160,
+      "angle": 270
+    },
+    {
+      "id": "th_491",
+      "type": 26023,
+      "x": 2481,
+      "y": 240,
+      "angle": 135
+    },
+    {
+      "id": "th_492",
+      "type": 26023,
+      "x": 1974,
+      "y": 255,
+      "angle": 225
+    },
+    {
+      "id": "th_493",
+      "type": 26023,
+      "x": 1738,
+      "y": 186,
+      "angle": 90
+    },
+    {
+      "id": "th_494",
+      "type": 26023,
+      "x": 1683,
+      "y": 299,
+      "angle": 270
+    },
+    {
+      "id": "th_495",
+      "type": 26245,
+      "x": 677,
+      "y": 941,
+      "angle": 90
+    },
+    {
+      "id": "th_496",
+      "type": 26023,
+      "x": 1040,
+      "y": 882,
+      "angle": 90
+    },
+    {
+      "id": "th_497",
+      "type": 26023,
+      "x": 2230,
+      "y": 1013,
+      "angle": 90
+    },
+    {
+      "id": "th_498",
+      "type": 26023,
+      "x": 517,
+      "y": 987,
+      "angle": 90
+    },
+    {
+      "id": "th_499",
+      "type": 26023,
+      "x": 383,
+      "y": 986,
+      "angle": 180
+    },
+    {
+      "id": "th_500",
+      "type": 26257,
+      "x": 687,
+      "y": 1755,
+      "angle": 90
+    },
+    {
+      "id": "th_501",
+      "type": 26023,
+      "x": 984,
+      "y": 1629,
+      "angle": 0
+    },
+    {
+      "id": "th_502",
+      "type": 26023,
+      "x": 1623,
+      "y": 1664,
+      "angle": 135
+    },
+    {
+      "id": "th_503",
+      "type": 26023,
+      "x": 2421,
+      "y": 1671,
+      "angle": 270
+    },
+    {
       "id": "th_504",
-      "type": 3004,
-      "x": 1470,
-      "y": 3348,
+      "type": 26023,
+      "x": 506,
+      "y": 1695,
       "angle": 45
     },
     {
       "id": "th_505",
-      "type": 3004,
-      "x": 1453,
-      "y": 1321,
-      "angle": 90
+      "type": 26023,
+      "x": 2300,
+      "y": 2555,
+      "angle": 135
     },
     {
       "id": "th_506",
-      "type": 26546,
-      "x": 2530,
-      "y": 1765,
-      "angle": 180
+      "type": 26023,
+      "x": 1194,
+      "y": 2611,
+      "angle": 90
     },
     {
       "id": "th_507",
-      "type": 3004,
-      "x": 2554,
-      "y": 2879,
-      "angle": 270
+      "type": 26023,
+      "x": 2213,
+      "y": 2633,
+      "angle": 45
     },
     {
       "id": "th_508",
-      "type": 3004,
-      "x": 2538,
-      "y": 2963,
+      "type": 26023,
+      "x": 1101,
+      "y": 2644,
       "angle": 315
     },
     {
       "id": "th_509",
-      "type": 3004,
-      "x": 2593,
-      "y": 2520,
-      "angle": 90
+      "type": 26023,
+      "x": 1530,
+      "y": 3314,
+      "angle": 135
     },
     {
       "id": "th_510",
-      "type": 3004,
-      "x": 2524,
-      "y": 1155,
-      "angle": 135
-    },
-    {
-      "id": "th_511",
-      "type": 3004,
-      "x": 2552,
-      "y": 3302,
-      "angle": 225
-    },
-    {
-      "id": "th_512",
-      "type": 3004,
-      "x": 2385,
-      "y": 192,
+      "type": 26023,
+      "x": 1203,
+      "y": 3310,
       "angle": 180
     },
     {
-      "id": "th_513",
-      "type": 3004,
-      "x": 2023,
-      "y": 276,
-      "angle": 315
-    },
-    {
-      "id": "th_514",
-      "type": 3004,
-      "x": 2125,
-      "y": 242,
-      "angle": 135
-    },
-    {
-      "id": "th_515",
-      "type": 3004,
-      "x": 148,
-      "y": 152,
-      "angle": 225
-    },
-    {
-      "id": "th_516",
-      "type": 26245,
-      "x": 1934,
-      "y": 943,
+      "id": "th_511",
+      "type": 26023,
+      "x": 1969,
+      "y": 3326,
       "angle": 90
     },
     {
+      "id": "th_512",
+      "type": 26023,
+      "x": 566,
+      "y": 3341,
+      "angle": 135
+    },
+    {
+      "id": "th_513",
+      "type": 26025,
+      "x": 668,
+      "y": 3386,
+      "angle": 270
+    },
+    {
+      "id": "th_514",
+      "type": 26025,
+      "x": 1033,
+      "y": 3383,
+      "angle": 0
+    },
+    {
+      "id": "th_515",
+      "type": 26004,
+      "x": 2485,
+      "y": 899,
+      "angle": 0
+    },
+    {
+      "id": "th_516",
+      "type": 26004,
+      "x": 1524,
+      "y": 947,
+      "angle": 180
+    },
+    {
       "id": "th_517",
-      "type": 3004,
-      "x": 481,
-      "y": 935,
+      "type": 26004,
+      "x": 261,
+      "y": 708,
       "angle": 180
     },
     {
       "id": "th_518",
-      "type": 3004,
-      "x": 2073,
-      "y": 980,
-      "angle": 180
+      "type": 2035,
+      "x": 441,
+      "y": 953,
+      "angle": 90
     },
     {
       "id": "th_519",
-      "type": 3004,
-      "x": 1585,
-      "y": 918,
-      "angle": 270
-    },
-    {
-      "id": "th_520",
-      "type": 3004,
-      "x": 2029,
-      "y": 916,
-      "angle": 0
-    },
-    {
-      "id": "th_521",
-      "type": 26245,
-      "x": 1605,
-      "y": 1715,
-      "angle": 270
-    },
-    {
-      "id": "th_522",
-      "type": 3004,
-      "x": 2085,
-      "y": 1741,
-      "angle": 180
-    },
-    {
-      "id": "th_523",
-      "type": 3004,
-      "x": 1676,
-      "y": 1722,
-      "angle": 90
-    },
-    {
-      "id": "th_524",
-      "type": 3004,
-      "x": 1410,
-      "y": 1641,
-      "angle": 135
-    },
-    {
-      "id": "th_525",
-      "type": 3004,
-      "x": 1240,
-      "y": 1692,
-      "angle": 135
-    },
-    {
-      "id": "th_526",
-      "type": 3004,
-      "x": 443,
-      "y": 2563,
-      "angle": 180
-    },
-    {
-      "id": "th_527",
-      "type": 3004,
-      "x": 2453,
-      "y": 2613,
-      "angle": 0
-    },
-    {
-      "id": "th_528",
-      "type": 3004,
-      "x": 1377,
-      "y": 2528,
-      "angle": 270
-    },
-    {
-      "id": "th_529",
-      "type": 3004,
-      "x": 1980,
-      "y": 2547,
-      "angle": 270
-    },
-    {
-      "id": "th_530",
-      "type": 26245,
-      "x": 2045,
-      "y": 3325,
-      "angle": 90
-    },
-    {
-      "id": "th_531",
-      "type": 3004,
-      "x": 472,
-      "y": 3404,
-      "angle": 90
-    },
-    {
-      "id": "th_532",
-      "type": 3004,
-      "x": 1802,
-      "y": 3318,
-      "angle": 0
-    },
-    {
-      "id": "th_533",
-      "type": 3004,
-      "x": 580,
-      "y": 3319,
-      "angle": 0
-    },
-    {
-      "id": "th_534",
-      "type": 3004,
-      "x": 861,
-      "y": 3288,
-      "angle": 45
-    },
-    {
-      "id": "th_535",
-      "type": 26004,
-      "x": 2635,
-      "y": 269,
-      "angle": 270
-    },
-    {
-      "id": "th_536",
-      "type": 26004,
-      "x": 2276,
-      "y": 3362,
-      "angle": 270
-    },
-    {
-      "id": "th_537",
-      "type": 26004,
-      "x": 1299,
-      "y": 3348,
-      "angle": 0
-    },
-    {
-      "id": "th_538",
       "type": 2035,
-      "x": 2536,
-      "y": 868,
-      "angle": 270
-    },
-    {
-      "id": "th_539",
-      "type": 2035,
-      "x": 2512,
-      "y": 2535,
-      "angle": 180
+      "x": 1457,
+      "y": 3008,
+      "angle": 0
     }
   ],
   "source": "profile"

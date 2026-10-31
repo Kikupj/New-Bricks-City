@@ -80,3 +80,183 @@ map NBC_CRWN "The Crown"
   secretnext = "NBC_HUB"
   nointermission
 }
+
+map NBC_D09 "Ossory Rooftops"
+{
+  levelnum = 310
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D10 "Broadmoor Station"
+{
+  levelnum = 311
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D11 "Haddon Street"
+{
+  levelnum = 312
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D12 "Lattimer Green"
+{
+  levelnum = 313
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D13 "Fenwick Boiler Works"
+{
+  levelnum = 314
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D14 "Marlow Towers"
+{
+  levelnum = 315
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D15 "Canal Foundry"
+{
+  levelnum = 316
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D16 "Garnet Heights"
+{
+  levelnum = 317
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D17 "Line 9 Interchange"
+{
+  levelnum = 318
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D18 "Corbin Avenue"
+{
+  levelnum = 319
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D19 "The Old Reservoir"
+{
+  levelnum = 320
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D20 "The Cisterns"
+{
+  levelnum = 321
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D21 "The Ninety Houses"
+{
+  levelnum = 322
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D22 "Gasworks Row"
+{
+  levelnum = 323
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D23 "Kiln Street Roofs"
+{
+  levelnum = 324
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D24 "Orchard Terminal"
+{
+  levelnum = 325
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D25 "Brigid Square"
+{
+  levelnum = 326
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D26 "Quill Lane Basements"
+{
+  levelnum = 327
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D27 "Ashgrove Estate"
+{
+  levelnum = 328
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}
+
+map NBC_D28 "Kettle Wharf"
+{
+  levelnum = 329
+  sky1 = "CITYSKY", 0
+  next = "NBC_HUB"
+  secretnext = "NBC_HUB"
+  nointermission
+}

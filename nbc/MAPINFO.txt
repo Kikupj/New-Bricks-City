@@ -1,7 +1,7 @@
 // New Bricks City — MAPINFO
 gameinfo
 {
-	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager", "NBC_Orders", "NBC_Grenades", "NBC_TacticalHandler"
+	AddEventHandlers = "NBC_Loot", "NBC_KitRunner", "NBC_RunManager", "NBC_Orders", "NBC_Grenades", "NBC_TacticalHandler", "NBC_Breach"
 	PlayerClasses = "NBC_Player"
 	StatusBarClass = "NBC_StatusBar"
 	// the title: the splash (tools/art/make_title_art.py) stays up behind the main menu; no demo loop
@@ -87,6 +87,14 @@ DoomEdNums
 	26020 = NBC_RoofStart
 	26021 = NBC_RoomLight
 	26022 = NBC_StreetLight
+	26023 = NBC_SpotGround
+	26024 = NBC_SpotPerch
+	26025 = NBC_SpotReinforce
+	26026 = NBC_SpotIdle
+	26027 = NBC_LeaderSpot
+	26028 = NBC_Extraction
+	26030 = NBC_RoomMarker
+	26031 = NBC_HubBay
 }
 
 // New Game starts at the hub (PLAN M2).

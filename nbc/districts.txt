@@ -8,3 +8,23 @@ NBC_D05 "Sutter Storm Drains" underground
 NBC_D06 "Cypress Houses" towers
 NBC_D07 "Carver Row" streets
 NBC_D08 "Arden Docks" industrial
+NBC_D09 "Ossory Rooftops" rooftops
+NBC_D10 "Broadmoor Station" subway
+NBC_D11 "Haddon Street" streets
+NBC_D12 "Lattimer Green" parks
+NBC_D13 "Fenwick Boiler Works" underground
+NBC_D14 "Marlow Towers" towers
+NBC_D15 "Canal Foundry" industrial
+NBC_D16 "Garnet Heights" rooftops
+NBC_D17 "Line 9 Interchange" subway
+NBC_D18 "Corbin Avenue" streets
+NBC_D19 "The Old Reservoir" parks
+NBC_D20 "The Cisterns" underground
+NBC_D21 "The Ninety Houses" towers
+NBC_D22 "Gasworks Row" industrial
+NBC_D23 "Kiln Street Roofs" rooftops
+NBC_D24 "Orchard Terminal" subway
+NBC_D25 "Brigid Square" parks
+NBC_D26 "Quill Lane Basements" underground
+NBC_D27 "Ashgrove Estate" towers
+NBC_D28 "Kettle Wharf" industrial

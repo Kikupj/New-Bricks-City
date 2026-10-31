@@ -49,8 +49,12 @@ const T = {
     tvStand: 26469, kitchen: 26472, washer: 26475, dryer: 26476, pantry: 26477, drums: 26580, cylinders: 26581,
     rackStocked: 26578, rackSparse: 26579, palletBoxes: 26574, palletCrates: 26575, cone: 26516, hazardBarrel: 26515,
     pumpMotor: 26522, trashBag: 26546, caseGreen: 26524,
-    roomLight: 26021, streetLight: 26022, winLit: 26459, winDark: 26458, vent: 26460
+    roomLight: 26021, streetLight: 26022, winLit: 26459, winDark: 26458, vent: 26460,
+    // raid markers (nbc/zscript/nbc/raidmarks.zs)
+    spotGround: 26023, spotPerch: 26024, spotReinforce: 26025, spotIdle: 26026, leaderSpot: 26027, extraction: 26028,
+    roomMarker: 26030, redCard: 13
 };
+const SPOT_TYPE = { ground: T.spotGround, perch: T.spotPerch, reinforce: T.spotReinforce, idle: T.spotIdle };
 // footprints (depth along the facing, width across it) from the furniture classes; sprites get a small square
 const SIZE = {
     [T.sofa]: [36, 84], [T.armchair]: [32, 32], [T.coffee]: [28, 48], [T.roundTable]: [32, 32], [T.chair]: [24, 24],
@@ -183,7 +187,7 @@ class Builder {
         return null;
     }
     // a gang member spot: clear of walls, props, doorways and other spots
-    spot(area, z = 0) {
+    spot(area, z = 0, role = 'ground') {
         for (let tries = 0; tries < 12; tries++) {
             if (area.w < 64 || area.h < 64) return false;
             const x = area.x + 28 + this.r() * (area.w - 56);
@@ -191,8 +195,8 @@ class Builder {
             const rect = { x: x - 22, y: y - 22, w: 44, h: 44 };
             if (!this.free(rect, 2)) continue;
             if (this.spots.some(s => dist(s.x, s.y, x, y) < 72)) continue;
-            this.thing(T.gang, x, y, this.pick([0, 45, 90, 135, 180, 225, 270, 315]));
-            this.spots.push({ x, y, z });
+            this.thing(SPOT_TYPE[role] || T.spotGround, x, y, this.pick([0, 45, 90, 135, 180, 225, 270, 315]));
+            this.spots.push({ x, y, z, role });
             this.solid.push({ x: x - 16, y: y - 16, w: 32, h: 32 });
             return true;
         }
@@ -441,7 +445,8 @@ function building(b, B, o) {
         const p = snap(e.lo + 20 + b.r() * (e.hi - e.lo - 40 - w));
         const rect = e.axis === 'x' ? R(e.c - 8, p, 16, w) : R(p, e.c - 8, w, 16);
         const tA = themes[link.a.theme], tB = themes[link.b.theme];
-        if (link.door) b.opening({ type: 'door', name: 'Door', theme: link.a.theme, wallTexture: tA.door || tB.door, lock: 0, speed: 32, wait: 105 }, rect);
+        const lock = link.door && o.lockDoors && b.chance(o.lockDoors) ? 1 : 0;
+        if (link.door) b.opening({ type: 'door', name: lock ? 'Locked door' : 'Door', theme: link.a.theme, wallTexture: tA.door || tB.door, lock, speed: 32, wait: 105 }, rect);
         else b.opening({ type: 'window', name: 'Doorway', floorHeight: floor, ceilingHeight: floor + 72, wallTexture: tA.wall, upperTexture: tA.wall, lowerTexture: tA.wall, blocking: false }, rect);
         const clear = e.axis === 'x' ? R(e.c - 56, p - 8, 112, w + 16) : R(p - 8, e.c - 56, w + 16, 112);
         b.keepClear.push(clear);
@@ -464,7 +469,8 @@ function building(b, B, o) {
         else { header = R(B.x + B.w - 8, p, 8, w); door = R(B.x + B.w - 16, p, 8, w); clear = R(B.x + B.w - 96, p - 16, 160, w + 32); }
         const t = themes[ent.leaf.theme];
         b.opening({ type: 'window', name: 'Entrance', floorHeight: o.outsideFloor ?? floor, ceilingHeight: floor + 72, wallTexture: facade, upperTexture: facade, lowerTexture: facade, blocking: false }, header);
-        b.opening({ type: 'door', name: 'Front door', theme: ent.leaf.theme, wallTexture: o.frontDoor || t.door, lock: 0, speed: 32, wait: 105 }, door);
+        const lockFront = o.lockFront && b.chance(o.lockFront) ? 1 : 0;
+        b.opening({ type: 'door', name: lockFront ? 'Locked front door' : 'Front door', theme: ent.leaf.theme, wallTexture: o.frontDoor || t.door, lock: lockFront, speed: 32, wait: 105 }, door);
         b.keepClear.push(clear);
         ent.leaf.openings.push(clear);
         entrances.push({ side: ent.side, x: cx(door), y: cy(door), rect: door });
@@ -506,7 +512,8 @@ function building(b, B, o) {
         roomLights(b, leaf, o, themes);
         const area = leaf.area.w * leaf.area.h;
         const n = Math.max(1, Math.min(5, Math.round(area / (o.spotArea || 70000))));
-        for (let i = 0; i < n; i++) b.spot(leaf.area, floor);
+        const sleepy = ['flat', 'den', 'barracks', 'laundry', 'penthouse'].includes(leaf.kind);
+        for (let i = 0; i < n; i++) b.spot(leaf.area, floor, sleepy && b.chance(0.5) ? 'idle' : 'ground');
     }
     return { leaves, entrances, rect: B };
 }
@@ -571,7 +578,7 @@ function deck(b, D, o) {
     b.decks.push({ rect: D, floor, area, stairSide: side });
     for (const type of o.props || []) b.propIn(area, type);
     const n = Math.max(1, Math.min(3, Math.round(D.w * D.h / 120000)));
-    for (let i = 0; i < n; i++) b.spot(area, floor);
+    for (let i = 0; i < n; i++) b.spot(area, floor, 'perch');
     return room;
 }
 
@@ -893,6 +900,16 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     b.thing(T.start, startX, startY, 90);
     b.keepClear.push(R(startX - 96, startY - 96, 192, 192));
     placeExit(b, strongBuilding);
+    const keyRooms = built.filter(k => k && k !== strongBuilding).flatMap(k => k.leaves).filter(l => l.area.w >= 96 && l.area.h >= 96);
+    for (let tries = 0; tries < 8 && keyRooms.length; tries++) {
+        const leaf = b.pick(keyRooms);
+        const a = inset(leaf.area, 24);
+        const x = snap(a.x + b.r() * a.w), y = snap(a.y + b.r() * a.h), rect = R(x - 12, y - 12, 24, 24);
+        if (!b.free(rect, 4)) continue;
+        b.thing(T.redCard, x, y, 0);
+        b.solid.push(rect);
+        break;
+    }
 
     // the roof starts: on the decks nearest the middle of the map (two at most); indoor maps get a shaft to the sky
     const decksByMiddle = [...b.decks].sort((p, q) => dist(cx(p.rect), cy(p.rect), W / 2, H / 2) - dist(cx(q.rect), cy(q.rect), W / 2, H / 2));
@@ -911,11 +928,11 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     const streets = [];
     for (let col = 0; col <= P.cols; col++) {
         const x = col === 0 ? E : colX[col] - P.street;
-        streets.push({ rect: R(x, margin - P.street, P.street, innerH + 2 * P.street), vertical: true });
+        streets.push({ rect: R(x, margin - P.street, P.street, innerH + 2 * P.street), vertical: true, edge: col === 0 || col === P.cols });
     }
     for (let row = 0; row <= P.rows; row++) {
         const y = row === 0 ? E : rowY[row] - P.street;
-        streets.push({ rect: R(margin - P.street, y, innerW + 2 * P.street, P.street), vertical: false });
+        streets.push({ rect: R(margin - P.street, y, innerW + 2 * P.street, P.street), vertical: false, edge: row === P.rows });
     }
     for (const s of streets) {
         const lane = P.alley ? null : inset(s.rect, 24);
@@ -935,12 +952,17 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
         }
         const nSpots = Math.round((s.vertical ? s.rect.h : s.rect.w) / 700);
         for (let i = 0; i < nSpots; i++) b.spot(lane, 0);
+        // the far half of an edge street: where reinforcements come in
+        if (s.edge) {
+            const far = s.vertical ? R(lane.x, lane.y + lane.h / 2, lane.w, lane.h / 2) : lane;
+            for (let i = 0; i < 2; i++) b.spot(far, 0, 'reinforce');
+        }
     }
     if (P.alley) {
         // the roof plane's outer ring and the alleys below: lookouts up top, a few down in the alleys
         for (const s of streets) {
             const n = Math.round((s.vertical ? s.rect.h : s.rect.w) / 500);
-            for (let i = 0; i < n; i++) b.spot(inset(s.rect, 40), 0);
+            for (let i = 0; i < n; i++) b.spot(inset(s.rect, 40), 0, s.edge && i % 2 ? 'reinforce' : 'ground');
         }
         for (const k of others.filter(k => k.kind === 'hut' || k.kind === 'roofplant' || k.kind === 'mass')) {
             const ring = [R(k.rect.x, k.rect.y, k.rect.w, 64), R(k.rect.x, k.rect.y + k.rect.h - 64, k.rect.w, 64)];
@@ -974,12 +996,16 @@ function fillBlock(b, k, P, env, sky) {
             o.layout = P.strongLayout || o.layout;
             if (o.layout === 'hall') { o.hallKind = 'warehouse'; o.hallTheme = 'nbc_industrial'; o.officeKind = 'armory'; o.officeTheme = 'nbc_stairwell'; o.hallCeil = 160; o.hallColumns = true; }
             o.entranceSides = ['S', 'W', 'E'];
+            // breach points: most of the stronghold's ways in and some doors inside are locked (the red key, or a
+            // charge: nbc/zscript/nbc/breach.zs)
+            o.lockFront = 0.75; o.lockDoors = 0.4;
             const built = building(b, B, o);
             built.stronghold = true;
             return built;
         }
         case 'tenement': case 'tower': case 'shops': case 'warehouse': case 'boiler': case 'station': case 'hut': case 'pavilion': {
             const o = buildingOptions(b, k.kind, P);
+            o.lockFront = 0.15;
             const shrink = k.kind === 'hut' || k.kind === 'pavilion' ? Math.min(B.w, B.h) * 0.25 : 0;
             return building(b, shrink ? inset(B, snap(shrink)) : B, o);
         }
@@ -998,7 +1024,7 @@ function fillBlock(b, k, P, env, sky) {
             // a roof with machinery and a low hut: cover and perches at roof level
             const area = inset(B, 32);
             for (const type of [T.waterTower, T.acUnit, T.acUnit, T.tank, T.generator, T.crates, T.scaffold]) b.propIn(area, type);
-            for (let i = 0; i < 2; i++) b.spot(area, floor);
+            for (let i = 0; i < 2; i++) b.spot(area, floor, 'perch');
             return null;
         }
         case 'yard': case 'parking': case 'containers': case 'court': {
@@ -1070,10 +1096,12 @@ function placeExit(b, built) {
             b.opening({ type: 'exit', name: 'Exit', floorHeight: leaf.ceil, ceilingHeight: leaf.ceil, lowerTexture: 'NBCSWEX1', upperTexture: 'NBCSWEX1', wallTexture: 'CWCONCW', lightLevel: 192 }, niche);
             b.keepClear.push(R(x - 16, r.y + r.h - 112, 96, 104));
             built.exit = { x: x + 32, y: r.y + r.h - 8 };
+            b.thing(T.extraction, x + 32, r.y + r.h - 32, 270);
+            b.thing(T.leaderSpot, x + 32, Math.max(r.y + 40, r.y + r.h - 104), 270);
             return;
         }
     }
     throw new Error('no wall for the exit');
 }
 
-module.exports = { generateDistrict, ENV, T };
+module.exports = { generateDistrict, ENV, T, Builder, R, inset, grow, cx, cy, snap, overlaps, roomLights, facadeDecor, fence, mass, editorTheme, TENEMENT_THEMES, ROOM_PROPS, CARS, FACADE_LIT };

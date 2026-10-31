@@ -28,6 +28,9 @@ class NBC_RunData : Thinker
 	int backing;
 	// the Crown's gang (gangs.txt, crown = 1) + 1; 0: no Crown this case
 	int crownSlot;
+	// the districts this case runs on: indices into the district pool (nbc/districts.txt), in raid board order.
+	// Empty (a case saved before the pool grew): the pool's first eight.
+	Array<int> caseDistricts;
 	// the case so far, for the case summary when it ends
 	int caseRaids, caseTaken, caseRetreats, caseDowns, caseLost, caseMerit, caseBackingLow;
 	// the case summary waits at the precinct once the case ends (the UI opens it, like the after-action report)
@@ -121,8 +124,9 @@ class NBC_RunData : Thinker
 		return lo + r;
 	}
 
-	// gangCount and districtCount include the Crown's (crownGang, crownDistrict; -1 for none), which isn't dealt
-	void NewCase(int newSeed, int gangCount, int districtCount, int crownGang = -1, int crownDistrict = -1)
+	// gangCount includes the Crown's gang (crownGang, -1 for none), which isn't dealt; poolEnvs: the environment of
+	// every district in the pool, perCase how many this case runs on (the Crown's district comes after them)
+	void NewCase(int newSeed, int gangCount, out Array<String> poolEnvs, int perCase, int crownGang = -1)
 	{
 		caseActive = true;
 		caseResult = NBC_CASE_RUNNING;
@@ -147,6 +151,9 @@ class NBC_RunData : Thinker
 
 		gangToppled.Clear(); gangAlert.Clear();
 		for (int i = 0; i < gangCount; i++) { gangToppled.Push(false); gangAlert.Push(0); }
+		PickDistricts(poolEnvs, perCase);
+		int districtCount = caseDistricts.Size() + (crownGang >= 0 ? 1 : 0);
+		int crownDistrict = crownGang >= 0 ? caseDistricts.Size() : -1;
 
 		// shuffle the gangs, then deal them round the districts so every gang holds at least one; the Crown holds
 		// its own tower
@@ -164,6 +171,36 @@ class NBC_RunData : Thinker
 			if (d == crownDistrict) districtGang.Push(CrownGang());
 			else districtGang.Push(deck.Size() > 0 ? deck[k++ % deck.Size()] : -1);
 		}
+	}
+
+	// The districts a case runs on: one of every environment first, then any others, up to want, drawn from a
+	// shuffle of the pool
+	void PickDistricts(out Array<String> envs, int want)
+	{
+		caseDistricts.Clear();
+		Array<int> order;
+		for (int i = 0; i < envs.Size(); i++) order.Push(i);
+		for (int i = order.Size() - 1; i > 0; i--)
+		{
+			int j = Rand(0, i);
+			int t = order[i]; order[i] = order[j]; order[j] = t;
+		}
+		Array<String> seen;
+		for (int i = 0; i < order.Size() && caseDistricts.Size() < want; i++)
+		{
+			String env = envs[order[i]].MakeLower();
+			if (seen.Find(env) != seen.Size()) continue;
+			seen.Push(env);
+			caseDistricts.Push(order[i]);
+		}
+		for (int i = 0; i < order.Size() && caseDistricts.Size() < want; i++)
+			if (caseDistricts.Find(order[i]) == caseDistricts.Size()) caseDistricts.Push(order[i]);
+		// the raid board lists them in the pool's order
+		for (int i = 1; i < caseDistricts.Size(); i++)
+			for (int j = i; j > 0 && caseDistricts[j - 1] > caseDistricts[j]; j--)
+			{
+				int t = caseDistricts[j]; caseDistricts[j] = caseDistricts[j - 1]; caseDistricts[j - 1] = t;
+			}
 	}
 
 	// A case saved before Backing and the Crown: start them now (gangCount and the Crown as in NewCase).

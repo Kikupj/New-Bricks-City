@@ -20,7 +20,8 @@
 class NBC_Spot
 {
 	Vector3 pos;
-	static NBC_Spot Make(Vector3 at) { let s = new("NBC_Spot"); s.pos = at; return s; }
+	int role;          // NBC_GangSpot.ROLE_*: a map's raid markers (raidmarks.zs); monster spots are ground
+	static NBC_Spot Make(Vector3 at, int role = 0) { let s = new("NBC_Spot"); s.pos = at; s.role = role; return s; }
 }
 
 class NBC_RunManager : EventHandler
@@ -34,7 +35,9 @@ class NBC_RunManager : EventHandler
 	const PAR_SECS_PER_CREW = 8;
 
 	Array<NBC_GangDef> gangs;
-	Array<String> districtMaps, districtTitles, districtEnvs;
+	const PER_CASE = 8;                 // districts a case runs on (from the pool)
+	Array<String> districtMaps, districtTitles, districtEnvs;     // this case's districts (and the Crown's, last)
+	Array<String> poolMaps, poolTitles, poolEnvs;                 // every district (nbc/districts.txt)
 	Array<String> roofMaps;             // the helicopter's rooftop map per district (nbc/rooftops.txt)
 	int crownGang, crownDistrict;       // the Crown's gang and its district (the last one; gangs.txt), -1: none
 
@@ -63,24 +66,13 @@ class NBC_RunManager : EventHandler
 	override void WorldLoaded(WorldEvent e)
 	{
 		NBC_Gangs.LoadGangs(gangs);
-		NBC_Gangs.LoadDistricts(districtMaps, districtTitles, districtEnvs);
-		// the Crown: its own district after the dealt ones
-		crownGang = -1; crownDistrict = -1;
-		for (int i = 0; i < gangs.Size(); i++)
-		{
-			let g = gangs[i];
-			if (!g.crown || g.crownMap == "") continue;
-			crownGang = i;
-			crownDistrict = districtMaps.Size();
-			districtMaps.Push(g.crownMap);
-			districtTitles.Push(g.crownTurf != "" ? g.crownTurf : g.name);
-			districtEnvs.Push(g.crownEnv != "" ? g.crownEnv : "towers");
-			break;
-		}
-		NBC_Gangs.LoadRooftops(districtMaps, roofMaps);
+		NBC_Gangs.LoadDistricts(poolMaps, poolTitles, poolEnvs);
+		crownGang = -1;
+		for (int i = 0; i < gangs.Size() && crownGang < 0; i++) if (gangs[i].crown && gangs[i].crownMap != "") crownGang = i;
+		let rdSaved = NBC_RunData.Find();
+		BuildDistricts(rdSaved);
 		let saved = NBC_Department.Find();
 		if (saved) saved.PadLocker();
-		let rdSaved = NBC_RunData.Find();
 		if (rdSaved) while (rdSaved.raidIssued.Size() < NBC_Cat.IT_COUNT) rdSaved.raidIssued.Push(0);
 		if (rdSaved && rdSaved.caseActive) rdSaved.Upgrade(gangs.Size(), districtMaps.Size(), crownGang, crownDistrict);
 		if (e.IsSaveGame) return;
@@ -103,7 +95,34 @@ class NBC_RunManager : EventHandler
 					"CHECKPOINT 9. Talk to the captain, or open a case at the raid board.", 35 * (radio != "" ? 10 : 6));
 			}
 			StaffHQ(dept);
+			ParkMotorPool(dept);
 		}
+	}
+
+	// This case's districts out of the pool (the case's picks, else the pool's first PER_CASE), then the Crown's,
+	// and each one's rooftop map if it has one
+	void BuildDistricts(NBC_RunData rd)
+	{
+		districtMaps.Clear(); districtTitles.Clear(); districtEnvs.Clear();
+		Array<int> picks;
+		if (rd && rd.caseDistricts.Size()) picks.Copy(rd.caseDistricts);
+		else for (int i = 0; i < poolMaps.Size() && i < PER_CASE; i++) picks.Push(i);
+		for (int i = 0; i < picks.Size(); i++)
+		{
+			int d = picks[i];
+			if (d < 0 || d >= poolMaps.Size()) continue;
+			districtMaps.Push(poolMaps[d]); districtTitles.Push(poolTitles[d]); districtEnvs.Push(poolEnvs[d]);
+		}
+		crownDistrict = -1;
+		let g = GangAt(crownGang);
+		if (g)
+		{
+			crownDistrict = districtMaps.Size();
+			districtMaps.Push(g.crownMap);
+			districtTitles.Push(g.crownTurf != "" ? g.crownTurf : g.name);
+			districtEnvs.Push(g.crownEnv != "" ? g.crownEnv : "towers");
+		}
+		NBC_Gangs.LoadRooftops(districtMaps, roofMaps);
 	}
 
 	// The officers fit for duty stand around the HQ (NBC_HQSpot things, in order); the hospital keeps the rest.
@@ -129,6 +148,27 @@ class NBC_RunManager : EventHandler
 			npc.angle = spots[k].angle;
 			npc.Dress(o);
 			k++;
+		}
+	}
+
+	// The motor pool's vehicles stand in the yard's bays (NBC_HubBay things, in map order): cars, vans and trucks in
+	// the car bays, the helicopter on the pad. A vehicle with no bay left stays out of sight.
+	void ParkMotorPool(NBC_Department dept)
+	{
+		Array<NBC_HubBay> lots, pads;
+		let it = ThinkerIterator.Create("NBC_HubBay");
+		NBC_HubBay s;
+		while ((s = NBC_HubBay(it.Next()))) { if (s.Pad()) pads.Push(s); else lots.Push(s); }
+		int l = 0, p = 0;
+		for (int i = 0; i < dept.garage.Size(); i++)
+		{
+			let v = dept.garage[i];
+			NBC_HubBay at = null;
+			if (NBC_Motor.Flies(v.type)) { if (p < pads.Size()) at = pads[p++]; }
+			else if (l < lots.Size()) at = lots[l++];
+			if (!at) continue;
+			let mo = Actor.Spawn(NBC_Motor.TYPE_ACTOR[clamp(v.type, 0, NBC_Motor.V_COUNT - 1)], at.pos, NO_REPLACE);
+			if (mo) mo.angle = at.angle;
 		}
 	}
 
@@ -435,6 +475,17 @@ class NBC_RunManager : EventHandler
 			}
 		}
 		for (int i = 0; i < remove.Size(); i++) if (remove[i]) remove[i].Destroy();
+		// the map's raid markers (raidmarks.zs): gang spots by role, the leader's place, the extraction point
+		Array<NBC_Spot> leaderSpots;
+		bool hasExtraction = false;
+		Vector3 extraction;
+		it = ThinkerIterator.Create("NBC_RaidMarker");
+		while ((mo = Actor(it.Next())))
+		{
+			if (mo is "NBC_GangSpot") spots.Push(NBC_Spot.Make(mo.pos, NBC_GangSpot(mo).Role()));
+			else if (mo is "NBC_LeaderSpot") leaderSpots.Push(NBC_Spot.Make(mo.pos));
+			else if (mo is "NBC_Extraction" && !hasExtraction) { hasExtraction = true; extraction = mo.pos; }
+		}
 		let kr = NBC_KitRunner(EventHandler.Find("NBC_KitRunner"));
 		NBC_KitGen kit = kr ? kr.kit : null;
 		if (kit)
@@ -447,9 +498,10 @@ class NBC_RunManager : EventHandler
 			}
 		}
 
-		// 2. the exit: the kit's, else an exit switch or line
+		// 2. the exit: the kit's, else the extraction marker, else an exit switch or line
 		exitFound = false;
 		if (kit) { exitPos = (kit.exitPos, kit.FloorAt(kit.exitPos)); exitFound = true; }
+		else if (hasExtraction) { exitPos = extraction; exitFound = true; }
 		for (int i = 0; i < level.Lines.Size() && !exitFound; i++)
 		{
 			int sp = level.Lines[i].special;
@@ -463,10 +515,14 @@ class NBC_RunManager : EventHandler
 			}
 		}
 
-		// 3. far spots only, shuffled with the case RNG
-		Array<NBC_Spot> cand;
+		// 3. far spots only, shuffled with the case RNG; reinforcement spots are kept for later
+		Array<NBC_Spot> cand, reinforce;
 		for (int i = 0; i < spots.Size(); i++)
-			if ((spots[i].pos.xy - p.pos.xy).Length() > SAFE_RADIUS) cand.Push(spots[i]);
+		{
+			if ((spots[i].pos.xy - p.pos.xy).Length() <= SAFE_RADIUS) continue;
+			if (spots[i].role == NBC_GangSpot.ROLE_REINFORCE) reinforce.Push(spots[i]);
+			else cand.Push(spots[i]);
+		}
 		for (int i = cand.Size() - 1; i > 0; i--)
 		{
 			int j = rd.Rand(0, i);
@@ -489,18 +545,19 @@ class NBC_RunManager : EventHandler
 		int offGuard = clamp(g.OffGuardAt(w) + NBC_Clock.EV_OFFGUARD[ev], 0, 90);
 		blockAwake = false; fireStrike = false;
 
-		// 4. the leader, nearest the exit, with escorts
+		// 4. the leader at the leader's place (a marker), else nearest the exit; escorts round them
 		int leaderSpot = -1;
 		double best = 1e12;
-		for (int i = 0; i < cand.Size(); i++)
+		for (int i = 0; i < cand.Size() && !leaderSpots.Size(); i++)
 		{
 			double d = (cand[i].pos.xy - exitPos.xy).Length();
 			if (d < best) { best = d; leaderSpot = i; }
 		}
-		if (leaderSpot >= 0)
+		if (leaderSpot >= 0 || leaderSpots.Size())
 		{
-			Vector3 lp = cand[leaderSpot].pos;
-			cand.Delete(leaderSpot);
+			Vector3 lp;
+			if (leaderSpots.Size()) lp = leaderSpots[rd.Rand(0, leaderSpots.Size() - 1)].pos;
+			else { lp = cand[leaderSpot].pos; cand.Delete(leaderSpot); }
 			leader = SpawnMember(g.leader, lp, g, rd, g.leaderHealth);
 			if (leader)
 			{
@@ -530,13 +587,24 @@ class NBC_RunManager : EventHandler
 		{
 			int r = rd.Rand(0, 99);
 			int tier = r < 60 - alert * 5 ? 1 : (r < 90 ? 2 : 3);
+			// a perch gets a shooter, rarely asleep; an idle spot is where they sleep it off
+			int role = cand[k].role;
+			if (role == NBC_GangSpot.ROLE_PERCH) tier = max(tier, 2);
+			int og = role == NBC_GangSpot.ROLE_IDLE ? min(95, offGuard * 2 + 20) : (role == NBC_GangSpot.ROLE_PERCH ? offGuard / 3 : offGuard);
 			let a = SpawnMember(PickRoster(g, rd, tier), cand[k].pos, g, rd, hpMul);
 			k++;
 			if (!a) continue;
 			crew.Push(a);
 			placed++;
-			if (rd.Rand(0, 99) < offGuard) { a.GiveInventoryType("NBC_OffGuard"); asleep++; }
+			if (rd.Rand(0, 99) < og) { a.GiveInventoryType("NBC_OffGuard"); asleep++; }
 		}
+		// reinforcements come from the reinforcement spots first, then the spots nobody took
+		for (int i = reinforce.Size() - 1; i > 0; i--)
+		{
+			int j = rd.Rand(0, i);
+			NBC_Spot t = reinforce[i]; reinforce[i] = reinforce[j]; reinforce[j] = t;
+		}
+		for (int i = 0; i < reinforce.Size(); i++) spareSpots.Push(reinforce[i]);
 		for (; k < cand.Size(); k++) spareSpots.Push(cand[k]);
 		allSpots.Copy(spots);
 		startCount = crew.Size();
@@ -566,6 +634,21 @@ class NBC_RunManager : EventHandler
 		if (developer) Console.Printf("nbc raid: %s (%s), %s. %d spawn spots; the game placed %d crew + %s, %d officers, %d vehicles parked. %s, %d off guard. Exit %s.",
 			level.MapName, kit ? kit.VariantName() : TurfEnv(rd.raidDistrict), g.name, spots.Size(), startCount,
 			leader ? "leader" : "no leader", squad.Size(), parked, NBC_Clock.WindowLine(w), asleep, exitFound ? "found" : "not found (far spot)");
+		if (developer)
+		{
+			int nGround = 0, nPerch = 0, nReinforce = 0, nIdle = 0;
+			for (int i = 0; i < spots.Size(); i++)
+			{
+				int r = spots[i].role;
+				if (r == NBC_GangSpot.ROLE_PERCH) nPerch++;
+				else if (r == NBC_GangSpot.ROLE_REINFORCE) nReinforce++;
+				else if (r == NBC_GangSpot.ROLE_IDLE) nIdle++;
+				else nGround++;
+			}
+			Console.Printf("nbc raid markers: spots %d ground, %d perch, %d reinforcement, %d off guard; the leader %s; the exit %s; %d spare spots for reinforcements.",
+				nGround, nPerch, nReinforce, nIdle,
+				leaderSpots.Size() ? "at the leader's place" : "nearest the exit", hasExtraction ? "at the extraction point" : "from the exit line", spareSpots.Size());
+		}
 		String title = TurfTitle(rd.raidDistrict);
 		if (kit) title = String.Format("%s, %s", title, kit.VariantName());
 		if (rd.raidMode == NBC_Motor.MODE_CRASH) { CrashSite(p, rd, g); return; }
@@ -1272,7 +1355,8 @@ class NBC_RunManager : EventHandler
 		int choice = e.Args[0];
 		if (choice == -1)
 		{
-			rd.NewCase(NewSeed(), gangs.Size(), districtMaps.Size(), crownGang, crownDistrict);
+			rd.NewCase(NewSeed(), gangs.Size(), poolEnvs, PER_CASE, crownGang);
+			BuildDistricts(rd);
 			dept.NewCase();
 			Announce(String.Format("New case opened (seed %d). %d gangs, %d districts, %d days.%s",
 				rd.seed, rd.RegularGangs(), districtMaps.Size() - (crownDistrict >= 0 ? 1 : 0), NBC_RunData.MAX_DAYS,
@@ -1383,6 +1467,7 @@ class NBC_RunManager : EventHandler
 		Console.Printf("nbc case: active %d result %d seed %d rng steps %d day %d strikes %d cash %d backing %d",
 			rd.caseActive, rd.caseResult, rd.seed, rd.rngSteps, rd.day, rd.strikes, rd.cash, rd.backing);
 		let dm = NBC_Department.Find();
+		Console.Printf("  districts: %d of a pool of %d (%s)", districtMaps.Size() - (crownDistrict >= 0 ? 1 : 0), poolMaps.Size(), rd.caseDistricts.Size() ? "this case's picks" : "the pool's first");
 		Console.Printf("  crown: %s, %d of %d gangs toppled; case raids %d (taken %d, retreats %d, down %d), lost %d, merit %d (banked %d)",
 			rd.crownSlot <= 0 ? "none" : (rd.CrownTaken() ? "taken" : (rd.CrownOpen() ? "open" : "shut")), rd.ToppledCount(), rd.RegularGangs(),
 			rd.caseRaids, rd.caseTaken, rd.caseRetreats, rd.caseDowns, rd.caseLost, rd.caseMerit, dm ? dm.merit : 0);

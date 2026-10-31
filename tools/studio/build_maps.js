@@ -4,15 +4,16 @@
 // layout from district-gen.js goes in as a new project (batched edits), gets its map lump and sky, is validated
 // and Map Checked, saved as an editor project, and exported into nbc/maps/<LUMP>.wad. Then this writes the mod's
 // side: nbc/mapinfo/studio_maps.txt, nbc/districts.txt (the raid board's pool) and a copy of every project in
-// tools/studio/projects/ (open one in the editor to change a map by hand; rebuilding overwrites it).
+// tools/studio/projects/ (open one in the editor to change a map by hand; rebuilding overwrites it). Checkpoint 9
+// (NBC_HUB, precinct-gen.js) is built the same way; its MAPINFO entry stays in nbc/MAPINFO.txt.
 //
 //   node tools/studio/build_maps.js                     # every map
-//   node tools/studio/build_maps.js NBC_D03 NBC_CRWN    # some of them
+//   node tools/studio/build_maps.js NBC_D03 NBC_HUB     # some of them
 //
 // iDoom Studio: IDOOM_STUDIO_DIR (default ../idoom-studio-map-editor next to this repo), its npm packages
 // installed. The editor server (New Bricks City profile) is used if it's running at IDOOM_STUDIO_URL (default
 // http://127.0.0.1:3456); otherwise this starts one pointed at this repo's nbc/ folder. A server started before
-// this repo gained a map thing (NBC_RoofStart) doesn't know it: restart it.
+// this repo gained a map thing (the raid markers, NBC_HubBay) doesn't know it: restart it.
 
 const fs = require('fs');
 const path = require('path');
@@ -20,6 +21,7 @@ const http = require('http');
 const { spawn } = require('child_process');
 const { createRequire } = require('module');
 const { generateDistrict } = require('./district-gen');
+const { generatePrecinct } = require('./precinct-gen');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const NBC = path.join(ROOT, 'nbc');
@@ -28,7 +30,8 @@ const URL_BASE = process.env.IDOOM_STUDIO_URL || 'http://127.0.0.1:3456';
 const PROJECTS = path.join(__dirname, 'projects');
 const STUDIO_MAPS = path.resolve(process.env.IDOOM_MAPS_DIR || path.join(STUDIO, 'maps'));   // where the editor saves projects
 
-// The district pool, in raid board order (names and environments as before), and the Crown. levelnum 301+.
+// The district pool, in raid board order, the Crown, and Checkpoint 9. levelnum 301+ (not the hub's). The case
+// deals 8 of the pool's districts to its gangs, at least one of each environment (NBC_RunData.NewCase).
 const MAPS = [
     { lump: 'NBC_D01', name: 'Pike Water Towers', env: 'rooftops', seed: 101 },
     { lump: 'NBC_D02', name: 'Fulton Junction', env: 'subway', seed: 202 },
@@ -38,9 +41,30 @@ const MAPS = [
     { lump: 'NBC_D06', name: 'Cypress Houses', env: 'towers', seed: 606 },
     { lump: 'NBC_D07', name: 'Carver Row', env: 'streets', seed: 707 },
     { lump: 'NBC_D08', name: 'Arden Docks', env: 'industrial', seed: 808 },
-    { lump: 'NBC_CRWN', name: 'The Crown', env: 'crown', seed: 909, crown: true }
+    { lump: 'NBC_CRWN', name: 'The Crown', env: 'crown', seed: 909, crown: true },
+    { lump: 'NBC_D09', name: 'Ossory Rooftops', env: 'rooftops', seed: 1009 },
+    { lump: 'NBC_D10', name: 'Broadmoor Station', env: 'subway', seed: 1010 },
+    { lump: 'NBC_D11', name: 'Haddon Street', env: 'streets', seed: 1011 },
+    { lump: 'NBC_D12', name: 'Lattimer Green', env: 'parks', seed: 1012 },
+    { lump: 'NBC_D13', name: 'Fenwick Boiler Works', env: 'underground', seed: 1013 },
+    { lump: 'NBC_D14', name: 'Marlow Towers', env: 'towers', seed: 1014 },
+    { lump: 'NBC_D15', name: 'Canal Foundry', env: 'industrial', seed: 1015 },
+    { lump: 'NBC_D16', name: 'Garnet Heights', env: 'rooftops', seed: 1016 },
+    { lump: 'NBC_D17', name: 'Line 9 Interchange', env: 'subway', seed: 1017 },
+    { lump: 'NBC_D18', name: 'Corbin Avenue', env: 'streets', seed: 1018 },
+    { lump: 'NBC_D19', name: 'The Old Reservoir', env: 'parks', seed: 1019 },
+    { lump: 'NBC_D20', name: 'The Cisterns', env: 'underground', seed: 1020 },
+    { lump: 'NBC_D21', name: 'The Ninety Houses', env: 'towers', seed: 1021 },
+    { lump: 'NBC_D22', name: 'Gasworks Row', env: 'industrial', seed: 1022 },
+    { lump: 'NBC_D23', name: 'Kiln Street Roofs', env: 'rooftops', seed: 1023 },
+    { lump: 'NBC_D24', name: 'Orchard Terminal', env: 'subway', seed: 1024 },
+    { lump: 'NBC_D25', name: 'Brigid Square', env: 'parks', seed: 1025 },
+    { lump: 'NBC_D26', name: 'Quill Lane Basements', env: 'underground', seed: 1026 },
+    { lump: 'NBC_D27', name: 'Ashgrove Estate', env: 'towers', seed: 1027 },
+    { lump: 'NBC_D28', name: 'Kettle Wharf', env: 'industrial', seed: 1028 },
+    { lump: 'NBC_HUB', name: 'Checkpoint 9', env: 'precinct', seed: 9, precinct: true }
 ];
-const SKY_FOR = { rooftops: 'nbc_dusk', subway: 'nbc_dusk', streets: 'nbc_dusk', parks: 'nbc_day', underground: 'nbc_dusk', towers: 'nbc_dusk', industrial: 'nbc_morning', crown: 'nbc_dusk' };
+const SKY_FOR = { rooftops: 'nbc_dusk', subway: 'nbc_dusk', streets: 'nbc_dusk', parks: 'nbc_day', underground: 'nbc_dusk', towers: 'nbc_dusk', industrial: 'nbc_morning', crown: 'nbc_dusk', precinct: 'nbc_dusk' };
 
 function get(url) {
     return new Promise((resolve, reject) => {
@@ -78,7 +102,8 @@ async function connect() {
 }
 
 async function buildOne(call, map) {
-    const { project, stats } = generateDistrict({ env: map.env, seed: map.seed, name: map.name, mapLump: map.lump, skybox: SKY_FOR[map.env] });
+    const gen = map.precinct ? generatePrecinct : generateDistrict;
+    const { project, stats } = gen({ env: map.env, seed: map.seed, name: map.name, mapLump: map.lump, skybox: SKY_FOR[map.env] });
     let { revision } = await call('idoom_get_project');
     let r = await call('idoom_create_project', { revision, template: 'nbc_blank', name: map.name });
     revision = r.revision;
@@ -110,12 +135,12 @@ async function buildOne(call, map) {
 }
 
 function writeModSide(built, all) {
-    const entries = all.map((map, i) => [
+    const entries = all.filter(m => !m.precinct).map((map, i) => [
         `map ${map.lump} "${map.name}"`, '{', `  levelnum = ${301 + i}`, '  sky1 = "CITYSKY", 0', '  next = "NBC_HUB"', '  secretnext = "NBC_HUB"', '  nointermission', '}', ''
     ].join('\n'));
     fs.writeFileSync(path.join(NBC, 'mapinfo', 'studio_maps.txt'),
         `// Generated by tools/studio/build_maps.js: the districts and the Crown built in iDoom Studio. Rebuild; don't edit.\n\n${entries.join('\n')}`);
-    const districts = all.filter(m => !m.crown).map(m => `${m.lump} "${m.name}" ${m.env}`);
+    const districts = all.filter(m => !m.crown && !m.precinct).map(m => `${m.lump} "${m.name}" ${m.env}`);
     fs.writeFileSync(path.join(NBC, 'districts.txt'),
         '// District pool for the raid board: map lump, title, environment. Built in iDoom Studio by tools/studio/build_maps.js\n' +
         '// (PLAN.md M2e); the game assigns gangs to these at the start of a case. The Crown (NBC_CRWN) is in gangs.txt.\n' + districts.join('\n') + '\n');
@@ -131,7 +156,8 @@ async function main() {
     try {
         const catalog = await call('idoom_get_catalog');
         if (catalog.profile?.id !== 'new-bricks-city' || !catalog.profile?.modLoaded) throw new Error('iDoom Studio is not on the New Bricks City profile with the mod loaded');
-        if (!catalog.things.some(t => t.type === 26020)) throw new Error('iDoom Studio does not know NBC_RoofStart (26020): restart it so it rereads the mod');
+        for (const [type, cls] of [[26020, 'NBC_RoofStart'], [26027, 'NBC_LeaderSpot'], [26031, 'NBC_HubBay']])
+            if (!catalog.things.some(t => t.type === type)) throw new Error(`iDoom Studio does not know ${cls} (${type}): restart it so it rereads the mod`);
         for (const map of todo) built.push(await buildOne(call, map));
         writeModSide(built, MAPS);
     } finally {

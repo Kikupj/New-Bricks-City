@@ -1,5 +1,9 @@
 """Build nbc/maps/NBC_HUB.wad: Checkpoint 9, the precinct post built into the Wall (PLAN M2).
 
+SUPERSEDED (2026-10-31, PLAN.md M2e): Checkpoint 9 is built in iDoom Studio now, by
+`node tools/studio/build_maps.js NBC_HUB` from tools/studio/precinct-gen.js. Kept as a record of the first
+one-room hub; don't run it, it would overwrite the new hub.
+
     python tools/make_hub_map.py
 
 One UDMF room furnished with the ported Corpo Wars props (nbc/mapinfo/cw_props.txt):
