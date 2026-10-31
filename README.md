@@ -74,11 +74,15 @@ dialogue, image and sound in the mod is original.
    The vehicles' seats have to carry everyone. **ROLL OUT** / **WHEELS UP** starts the raid.
 5. **The raid.** You land in the district with your squad behind you. The game clears the map's own
    monsters and fills it with the holding gang, at the map's gang spots (some up on the decks, some asleep in the
-   flats). The leader waits at the far end with escorts, and reinforcements come in from the edges once most of
-   the crew is down. A **locked door** is a breach point: Use it without the key to set a charge (stay by the
+   flats). The leader waits at the far end with escorts. Once the block's awake, more of them come in waves
+   (the gang's threat budget: its tier, its alert, the gangs you've toppled), out of sight, walking in from the
+   edges. Now and then one is an **elite** (gold; aim at one to read its name): Armored, Wired, Volatile, a Shot
+   Caller who calls for backup, or the Landlord's Own. The HUD's SWEEP line counts them down: with the leader
+   down and three in four of them down, the gang breaks: **BLOCK SECURE**. The ones left kneel; cuff them with
+   Use before they run. A **locked door** is a breach point: Use it without the key to set a charge (stay by the
    door: two seconds, one with a Breacher officer alongside), and it blows: the door's open for good, whoever's
    behind it reels, and the whole block hears it. Find the red keycard and it opens the quiet way. Command the squad, take down the leader and leave
-   by the exit to **topple** the gang. Leaving with the leader alive is a **retreat**, and the gang goes
+   by the exit once the block is secure to **topple** the gang. Leaving before that is a **retreat**, and the gang goes
    on alert. A lethal hit means **OFFICER DOWN**: you're pulled out with a strike against you.
 6. **The after-action report.** You get a letter grade (S to D, out of 100: the body count, your accuracy,
    health lost, time against par, the officers), kills, time and health lost. Officers earn XP, go to
@@ -342,15 +346,23 @@ follow Hamburger Hill's:
 
 ## The gangs
 
-Gangs are data: `nbc/gangs.txt` holds their rosters, traits, damage profiles, leaders and escorts.
+Gangs are data: `nbc/gangs.txt` holds their rosters, traits, damage profiles, leaders and escorts. A case deals
+four of the six to its districts; the Crown is always there.
 
 | Gang | Tier | Trait |
 |---|---|---|
-| The Stoop Kings | 1 | Swarm: more of them on every stoop, but they drop fast |
-| The Rust Saints | 1 | Pyros: fire and explosives, and fire won't touch them |
+| The Stoop Kings | 1 | Swarm: more of them on every stoop, but they drop fast, and they give up at half |
+| The Rust Saints | 1 | Pyros: explosive barrels everywhere, elites that go up, and fire won't touch them |
 | The Iron Pit | 2 | Roiders: they shrug off stagger; fire hurts them half again |
-| The Collectors | 2 | Vests: pistol and SMG rounds do less; bring shells or rifles |
+| The Collectors | 2 | Vests: pistol and SMG rounds do less; bring shells or rifles. They hit the alarm when they see you |
+| The Wall Watch | 2 | Long guns: dead shots at range, sandbags in every room, a beat slow up close |
+| The Quiet | 3 | Ninjas and cyborgs: few of them, every one of them dangerous |
 | The Landlord's Own (the Crown) | 3 | Private military: armored, drilled, never off guard. Opens after three gangs fall |
+
+**The spawn director** (`director.zs`) gives each raid a threat budget: the crew you find at the start, then
+up to three more waves once the block is awake, bigger with the gang's tier, its alert and every gang you've
+toppled. **Elites** (`elites.zs`) are 5-20% of them, by the gang's tier. Only one enemy rocket, grenade or
+Molotov is ever in the air at a time, each with a wind-up you can hear (`enemyfire.zs`).
 
 Every attack has a damage type (`NBC_Light`, `NBC_Shell`, `NBC_Rifle`, `Melee`, `Fire`, `Blunt`), so the
 right gun for the gang matters. The enemies themselves are the DeeDeeOZ **DeePayback** pack: thugs,

@@ -720,7 +720,8 @@ The full city map, staging flat, intel and gang tick stay in M7b and later.
 
 ---
 
-### M4 — Spawn director, enemy tiers, elites and the "Sweep" objective
+### M4 — Spawn director, enemy tiers, elites and the "Sweep" objective — ✅ BUILT, NEEDS PLAYTEST (2026-10-31, by Claude)
+*Done (2026-10-31; see STATUS): the threat budget for a whole district (§6.2's four floors and the leader's) and the director's waves (`director.zs`: the placed crew is wave 1, then 1-3 more once the block's awake, out of sight, walking in on the nav graph); elites with all five modifiers, the gold translation and the name under the crosshair (`elites.zs`); `NBC_Objective` and the Sweep, BLOCK SECURE, surrender with cuffs and runners (`objective.zs`); the explosives cap and the Wall Watch's marksmen (`enemyfire.zs`); the Collectors' alarm, morale, dressing; the Wall Watch and the Quiet in `gangs.txt`, a case dealing four of the six; `nbc_debug_director`, `nbc_debug_wave`, `nbc_debug_goto`. Adapted to what was built since the plan was written: the crew M3 places (sleepers and all) is the first wave; the exit stays usable, but a block is taken only once it's secure (leaving before is a retreat, as in M3). Left for M9 as the plan says: lookouts, ambush, cover blowing faster; the Intel shard waits for M7.*
 **Prompt:**
 > Do PLAN.md milestone M4 using §6.2 and §6.9. Implement `NBC_EnemyTiers`, `NBC_Director`, `NBC_Elites`, the `NBC_Objective` base class and its first objective, `Sweep` (clear the threat budget). Fill `nbc/gangs.txt` with every gang's roster per tier (the choice classes in §6.9), damage-factor profile and identity flags. Apply the profile to each spawned enemy with a hidden `NBC_GangProfile` inventory item whose `ModifyDamage` (passive) scales incoming damage by type. Implement these identity mechanics now:
 > - swarm (budget and health)

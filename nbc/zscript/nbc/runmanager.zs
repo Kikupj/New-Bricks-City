@@ -1052,14 +1052,17 @@ class NBC_RunManager : EventHandler
 			if (d < bd) { bd = d; best = mo; }
 		}
 		if (!best) { Console.Printf("nbc: nothing to go to"); return; }
-		double dist = kind == 1 ? 52 : 160;
+		static const double dists[] = { 160, 112, 224, 80 };
+		Vector3 was = p.pos;
 		Vector2 dir = (p.pos.xy - best.pos.xy);
 		dir = dir.Length() > 0 ? dir.Unit() : (1, 0);
-		for (int a = 0; a < 360; a += 30)
+		for (int k = (kind == 1 ? 1 : 0); k < 4; k++)
 		{
-			Vector2 at = best.pos.xy + Actor.RotateVector(dir, a) * dist;
-			if (p.TeleportMove((at, best.pos.z), false))
+			for (int a = 0; a < 360; a += 30)
 			{
+				Vector2 at = best.pos.xy + Actor.RotateVector(dir, a) * dists[k];
+				if (!p.TeleportMove((at, best.pos.z), false)) continue;
+				if (!p.CheckSight(best, SF_IGNOREVISIBILITY)) continue;     // somewhere you can see it from
 				Vector2 d = best.pos.xy - at;
 				p.angle = VectorAngle(d.x, d.y);
 				p.pitch = 0;
@@ -1067,7 +1070,8 @@ class NBC_RunManager : EventHandler
 				return;
 			}
 		}
-		Console.Printf("nbc: no room next to it");
+		p.TeleportMove(was, false);
+		Console.Printf("nbc: nowhere in sight of it");
 	}
 
 	// where a runner makes for: the map's edge (a reinforcement spot, else any spot) away from you
