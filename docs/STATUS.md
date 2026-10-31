@@ -6,6 +6,12 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Squad grenades used more (2026-10-31, by Claude)
+- **Owner request:** officers should use flashbangs and smoke more often to disorient the gang.
+- **Flashbangs** (`NBC_Ally.TryGrenade`): thrown at targets 96-576 away (was 128-448), when you're 224+ away (was 320), on any ROE but RECON, whenever the target has company, is an elite or the leader, or the officer is hit or under 80% health (was 60%), and otherwise one time in three. Cooldown 4 s (was 8).
+- **Smoke:** thrown when the officer is under 70% health (was 45%), or hit recently and under 90% (was 75%), or three or more gang members are in sight, or you're under half health (cover for you); 160+ away (was 192); cooldown 5 s (was 10).
+- They can only throw what's in their pouches (AUTO KIT fills them; the locker starts with 3 of each), so stock more flashbangs and smoke at the requisition counter ($45 / $35) for a squad that uses them. Compiles and boots; not scripted-tested.
+
 ### Balance pass after the owner's playtest (2026-10-31, by Claude)
 - **Feedback:** the raids are brutal (too many of them, hitting too hard); not enough weapons and ammo to fight the stronger gangs; some gold (elite) enemies are extremely tanky.
 - **Fewer of them:** the starting crew is down by about a quarter (tier 1 / 2 / 3: 22 / 18 / 16 to 16 / 13 / 11 before the gang's, the hour's and the alert's multipliers). The director's budget was `(base x 3 + 10)`, now `(base x 2 + 6)`, and later waves are 20-40% of it (they used to be 30% or whatever the crew left over, and the crew often cost more than the budget on top), in one or two waves (was up to three).

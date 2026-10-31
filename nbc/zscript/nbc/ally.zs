@@ -487,27 +487,37 @@ class NBC_Ally : Actor
 	{
 		if (nadeTics > 0 || !enemy) return false;
 		double d = Distance2D(enemy);
+		// a flashbang at a gang member 96-576 away (not on RECON, not where it would catch you): when they have
+		// company, when it's an elite or the leader, when we're hurt or someone's pinned down, or just now and then
 		int k = PouchOf(NBC_Cat.IT_FLASH);
-		if (k >= 0 && roe != NBC_Orders.ROE_RECON && d > 128 && d < 448 && (!p || p.Distance2D(enemy) > 320))
+		if (k >= 0 && roe != NBC_Orders.ROE_RECON && d > 96 && d < 576 && (!p || p.Distance2D(enemy) > 224))
 		{
 			int near = 0;
-			let it = BlockThingsIterator.Create(enemy, 220);
-			while (it.Next()) if (it.thing != enemy && IsGangMember(it.thing) && enemy.Distance2D(it.thing) < 220) near++;
-			if (near >= 1 || health * 100 < maxHp * 60)
+			let it = BlockThingsIterator.Create(enemy, 260);
+			while (it.Next()) if (it.thing != enemy && IsGangMember(it.thing) && enemy.Distance2D(it.thing) < 260) near++;
+			bool big = enemy.FindInventory("NBC_Elite") || enemy.FindInventory("NBC_LeaderToken");
+			bool pinnedDown = lastHitBy && level.maptime - lastHitTic < 35 * 3;
+			if (near >= 1 || big || pinnedDown || health * 100 < maxHp * 80 || random[nbcnade](0, 99) < 35)
 			{
 				pouch[k] = -1;
-				nadeTics = 35 * 8;
+				nadeTics = 35 * 4;
 				Lob("NBC_FlashbangThrown", enemy.pos);
 				NBC_Orders.Say(String.Format("%s: Flashbang out!", GetTag()), Font.CR_WHITE);
 				return true;
 			}
 		}
+		// smoke, halfway to them: when we're hit or under three quarters health, or three or more of them are in
+		// sight, or the player's hurt (cover for you)
 		k = PouchOf(NBC_Cat.IT_SMOKE);
-		bool pinned = lastHitBy && level.maptime - lastHitTic < 35 * 2 && health * 100 < maxHp * 75;
-		if (k >= 0 && d > 192 && (health * 100 < maxHp * 45 || pinned))
+		bool pinned = lastHitBy && level.maptime - lastHitTic < 35 * 3 && health * 100 < maxHp * 90;
+		int seen = 0;
+		let sit = BlockThingsIterator.Create(self, 640);
+		while (sit.Next()) if (IsGangMember(sit.thing) && CheckSight(sit.thing, SF_IGNOREVISIBILITY)) seen++;
+		bool playerHurt = p && p.health * 100 < p.SpawnHealth() * 50;
+		if (k >= 0 && d > 160 && (health * 100 < maxHp * 70 || pinned || seen >= 3 || playerHurt))
 		{
 			pouch[k] = -1;
-			nadeTics = 35 * 10;
+			nadeTics = 35 * 5;
 			Lob("NBC_SmokeGrenadeThrown", pos + (AngleToVector(AngleTo(enemy), min(d * 0.45, 288)), 0));
 			NBC_Orders.Say(String.Format("%s: Popping smoke!", GetTag()), Font.CR_GRAY);
 			return true;
