@@ -9,6 +9,22 @@
 // The keycards themselves are ours too (sprites/keys/: an ID card on a lanyard in the key's colour), and the
 // HUD bar shows the ones you carry.
 
+// Lights the iDoom Studio maps place (tools/studio/district-gen.js): a warm pool under a ceiling fixture, and a sodium
+// glow under a street lamp. Invisible things that attach a dynamic light (GL / Vulkan; the software renderer has the
+// fixture sector's own light). Map things 26021 and 26022.
+class NBC_RoomLight : Actor
+{
+	Default { +NOBLOCKMAP; +NOGRAVITY; +NOINTERACTION; +DONTSPLASH; RenderStyle "None"; }
+	virtual void Light() { SetZ(ceilingz - 6); A_AttachLight('glow', DynamicLight.PointLight, 0xFFE2B8, 144, 0, DynamicLight.LF_ATTENUATE); }
+	override void PostBeginPlay() { Super.PostBeginPlay(); Light(); }
+	States { Spawn: TNT1 A -1; Stop; }
+}
+
+class NBC_StreetLight : NBC_RoomLight
+{
+	override void Light() { SetZ(floorz + 112); A_AttachLight('glow', DynamicLight.PointLight, 0xFFB45A, 240, 0, DynamicLight.LF_ATTENUATE); }
+}
+
 class NBC_MapMarks play
 {
 	// a lock number's colour: 0 none, 1 red, 2 blue, 3 yellow

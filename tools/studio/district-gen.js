@@ -48,7 +48,8 @@ const T = {
     barrier: 26257, sandbags: 26258,
     tvStand: 26469, kitchen: 26472, washer: 26475, dryer: 26476, pantry: 26477, drums: 26580, cylinders: 26581,
     rackStocked: 26578, rackSparse: 26579, palletBoxes: 26574, palletCrates: 26575, cone: 26516, hazardBarrel: 26515,
-    pumpMotor: 26522, trashBag: 26546, caseGreen: 26524
+    pumpMotor: 26522, trashBag: 26546, caseGreen: 26524,
+    roomLight: 26021, streetLight: 26022, winLit: 26459, winDark: 26458, vent: 26460
 };
 // footprints (depth along the facing, width across it) from the furniture classes; sprites get a small square
 const SIZE = {
@@ -177,9 +178,9 @@ class Builder {
             if (!this.free(rect, 24)) continue;
             this.thing(type, x, y, a);
             this.solid.push(rect);
-            return true;
+            return { x, y };
         }
-        return false;
+        return null;
     }
     // a gang member spot: clear of walls, props, doorways and other spots
     spot(area, z = 0) {
@@ -347,6 +348,60 @@ function sharedEdge(a, c) {
     return null;
 }
 
+// Upper storeys on a facade: rows of window sprites (Corpo Wars' lit and dark brick windows, now and then a vent)
+// hung on the outside face at 80-320 up, above the real windows. Only brick and concrete fronts; the lit-window
+// facades have their windows painted in. sides: the faces that look out (N, S, W, E); top: the sky over the street.
+const DECOR_FACADES = new Set([...['ADBRICK', 'AXW84', 'AXW85'], ...['CWCONCW', 'AXW43A', 'AXW24', 'ADCONC1']]);
+function facadeDecor(b, F, texture, top, sides) {
+    if (!DECOR_FACADES.has(texture) || !top) return;
+    for (const side of sides) {
+        const horizontalSide = side === 'S' || side === 'N';
+        const lo = horizontalSide ? F.x : F.y, len = horizontalSide ? F.w : F.h;
+        for (let z = 160; z <= top - 24; z += 80) {
+            for (let u = lo + 40; u + 64 <= lo + len - 40; u += 96) {
+                if (b.chance(0.12)) continue;
+                const roll = b.r();
+                const type = roll < 0.35 ? T.winLit : (roll < 0.92 ? T.winDark : T.vent);
+                if (side === 'N') b.thing(type, u, F.y + F.h + 1, 90, { z });
+                else if (side === 'S') b.thing(type, u + 64, F.y - 1, 270, { z });
+                else if (side === 'E') b.thing(type, F.x + F.w + 1, u + 64, 0, { z });
+                else b.thing(type, F.x - 1, u, 180, { z });
+            }
+        }
+    }
+}
+
+// A room's lights: a ceiling fixture (a small sector with a light flat, a little brighter) with a dynamic light under
+// it (NBC_RoomLight), one in a room, a grid of them in a hall or a long corridor. Flats, dens and penthouses get a rug
+// first, so the fixture keeps the rug's floor.
+function roomLights(b, leaf, o, themes) {
+    const a = leaf.area;
+    const t = themes[leaf.theme] || {};
+    const base = { prefix: 'fixture', floor: leaf.floor, ceil: leaf.ceil, theme: leaf.theme, ...(t.overrides || {}) };
+    const light = o.light(leaf.kind);
+    let rug = null, rugTex = null;
+    if (['flat', 'den', 'penthouse', 'office'].includes(leaf.kind) && a.w >= 160 && a.h >= 160 && b.chance(0.75)) {
+        rugTex = leaf.kind === 'penthouse' ? 'CWCARP2' : b.pick(['CWCARP1', 'CWCARP2', 'CWCARP3']);
+        rug = inset(a, snap(Math.max(40, Math.min(a.w, a.h) * 0.22)));
+        b.room(rug, { ...base, prefix: 'rug', name: 'Rug', light, floorTexture: rugTex });
+    }
+    const centers = [];
+    const long = Math.max(a.w, a.h) > 448;
+    if (leaf.hall || long) {
+        const g = inset(a, 96);
+        const step = leaf.hall ? 288 : 256;
+        for (let x = g.x + (g.w % step) / 2; x <= g.x + g.w; x += step)
+            for (let y = g.y + (g.h % step) / 2; y <= g.y + g.h; y += step) centers.push([snap(x), snap(y)]);
+    } else centers.push([snap(cx(a)), snap(cy(a))]);
+    const fixture = b.pick(['ADCLRND', 'ADCLITE']);
+    for (const [x, y] of centers) {
+        const f = R(x - 16, y - 16, 32, 32);
+        const onRug = rug && overlaps(rug, f, -1);
+        b.room(f, { ...base, name: 'Light', light: Math.min(255, light + 24), ceilingTexture: fixture, ...(onRug ? { floorTexture: rugTex } : {}) });
+        b.thing(T.roomLight, x, y, 0);
+    }
+}
+
 // Puts a building on the map: leaf rooms, their wall bands, the facade ring, openings, windows, exterior doors,
 // props and spots. Returns the leaves (for the exit and the start).
 function building(b, B, o) {
@@ -365,6 +420,7 @@ function building(b, B, o) {
     b.wall(R(B.x, B.y + B.h - 8, B.w, 8), facade, 'Facade');
     b.wall(R(B.x, B.y, 8, B.h), facade, 'Facade');
     b.wall(R(B.x + B.w - 8, B.y, 8, B.h), facade, 'Facade');
+    facadeDecor(b, B, facade, o.facadeTop, ['N', 'S', 'W', 'E']);
     for (const leaf of leaves) {
         const t = themes[leaf.theme];
         const hallCeil = leaf.hall ? floor + (o.hallCeil || o.roomCeil || 96) : (leaf.kind === 'lobby' ? ceil + 16 : ceil);
@@ -447,6 +503,7 @@ function building(b, B, o) {
             if (b.chance(p * (o.propDensity || 1))) b.propOnWall(leaf.area, type, b.pick(sides));
         }
         if (leaf.hall && o.hallColumns) hallColumns(b, leaf, o);
+        roomLights(b, leaf, o, themes);
         const area = leaf.area.w * leaf.area.h;
         const n = Math.max(1, Math.min(5, Math.round(area / (o.spotArea || 70000))));
         for (let i = 0; i < n; i++) b.spot(leaf.area, floor);
@@ -466,6 +523,11 @@ function hallColumns(b, leaf, o) {
             b.wall(rect, o.columnTexture || 'ADMETL1', 'Column');
         }
     }
+}
+
+// a lamp post placed in the open gets its glow
+function lit(b, at, type) {
+    if (at && type === T.lampPost) b.thing(T.streetLight, at.x, at.y, 0);
 }
 
 // a raised deck reached by stairs: perches for the gang, a roof start for the helicopter
@@ -540,7 +602,9 @@ function fencedYard(b, Y, o) {
 
 // a solid block with a facade: the city around and between
 function mass(b, M, textures) {
-    b.wall(M, b.pick(textures), 'Building');
+    const tex = b.pick(textures);
+    b.wall(M, tex, 'Building');
+    return tex;
 }
 
 // ------------------------------------------------------------------ environments
@@ -574,7 +638,8 @@ const LABELS = { flat: 'Flat', corridor: 'Corridor', lobby: 'Lobby', shop: 'Corn
 const LIGHT = { flat: 152, corridor: 136, lobby: 176, shop: 176, office: 168, den: 128, warehouse: 144, boiler: 112, laundry: 160, station: 160, stairhut: 128, penthouse: 184, barracks: 136, armory: 152 };
 
 function buildingOptions(b, kind, P) {
-    const base = { themes: TENEMENT_THEMES.themes, label: k => LABELS[k] || 'Room', light: k => LIGHT[k] || 152, floor: P.blockFloor, outsideFloor: P.blockFloor, trim: 'CWCONCW' };
+    const base = { themes: TENEMENT_THEMES.themes, label: k => LABELS[k] || 'Room', light: k => LIGHT[k] || 152, floor: P.blockFloor, outsideFloor: P.blockFloor, trim: 'CWCONCW',
+        facadeTop: P.indoor ? 0 : P.ground.ceil };
     switch (kind) {
         case 'tenement': return { ...base, layout: 'corridor', facade: b.pick(FACADE_BRICK), corridorTheme: 'nbc_tenement', flatKinds: ['flat', 'flat', 'flat', 'den', 'laundry'],
             flatTheme: k => (k === 'den' ? 'nbc_den' : k === 'laundry' ? 'nbc_stairwell' : 'nbc_flat'), flatMin: 192, flatMax: 320, doorChance: 0.6, entranceSides: ['W', 'E', 'S', 'N'] };
@@ -681,9 +746,11 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     // the edge of the map: a ring of buildings (the city round the district)
     const E = P.edge;
     let u = 0;
-    while (u < W) { const w = Math.min(W - u, snap(b.int(192, 512))); mass(b, R(u, 0, w, E), P.edgeFacades); mass(b, R(u, H - E, w, E), P.edgeFacades); u += w; }
+    const skyTop = P.indoor ? 0 : G.ceil;
+    const ring = (rect, side) => facadeDecor(b, rect, mass(b, rect, P.edgeFacades), skyTop, [side]);
+    while (u < W) { const w = Math.min(W - u, snap(b.int(192, 512))); ring(R(u, 0, w, E), 'N'); ring(R(u, H - E, w, E), 'S'); u += w; }
     u = E;
-    while (u < H - E) { const h = Math.min(H - E - u, snap(b.int(192, 512))); mass(b, R(0, u, E, h), P.edgeFacades); mass(b, R(W - E, u, E, h), P.edgeFacades); u += h; }
+    while (u < H - E) { const h = Math.min(H - E - u, snap(b.int(192, 512))); ring(R(0, u, E, h), 'E'); ring(R(W - E, u, E, h), 'W'); u += h; }
 
     // the block grid
     const margin = E + P.street;
@@ -820,7 +887,9 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     }
 
     // the player's start: the south street, facing north; and the exit in the stronghold
-    const startX = snap(W / 2), startY = E + snap(P.street / 2);
+    // at the south end of a street between two columns, looking up it (rooftops: on the roof plane, between blocks)
+    const gap = Math.max(1, Math.floor(P.cols / 2));
+    const startX = P.alley || P.cols < 2 ? snap(W / 2) : snap(colX[gap] - P.street / 2), startY = E + snap(P.street / 2);
     b.thing(T.start, startX, startY, 90);
     b.keepClear.push(R(startX - 96, startY - 96, 192, 192));
     placeExit(b, strongBuilding);
@@ -856,11 +925,12 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
             for (let i = 0; i < n; i++) b.propIn(lane, b.pick(CARS), s.vertical ? b.pick([90, 270]) : b.pick([0, 180]));
         }
         if (b.chance(0.5)) b.propIn(lane, b.pick([T.dumpster, T.barrier, T.crates, T.trashBag]));
+        if (!P.indoor) for (let i = b.int(2, 4); i > 0; i--) b.propIn(lane, b.pick([T.trashBag, T.bin, T.cone, T.trashBag, T.planter]));
         if (P.lamps && !P.indoor) {
             for (let t = 384; t < (s.vertical ? s.rect.h : s.rect.w) - 256; t += 640) {
                 const x = s.vertical ? s.rect.x + 12 : s.rect.x + t, y = s.vertical ? s.rect.y + t : s.rect.y + 12;
                 const rect = R(x - 8, y - 8, 16, 16);
-                if (b.free(rect, 8)) { b.thing(T.lampPost, x, y, 0); b.solid.push(rect); }
+                if (b.free(rect, 8)) { b.thing(T.lampPost, x, y, 0); b.thing(T.streetLight, x, y, 0); b.solid.push(rect); }
             }
         }
         const nSpots = Math.round((s.vertical ? s.rect.h : s.rect.w) / 700);
@@ -948,7 +1018,7 @@ function fillBlock(b, k, P, env, sky) {
         }
         case 'plot': {
             const area = inset(B, 32);
-            for (const type of [T.planter, T.planter, T.pew, T.pew, T.lampPost, T.bin, T.planter]) b.propIn(area, type);
+            for (const type of [T.planter, T.planter, T.pew, T.pew, T.lampPost, T.bin, T.planter]) lit(b, b.propIn(area, type), type);
             if (b.chance(0.6)) {
                 // a fountain: a statue in a pool of water
                 const f = R(cx(B) - 96, cy(B) - 96, 192, 192);
@@ -966,7 +1036,7 @@ function fillBlock(b, k, P, env, sky) {
             b.top({ type: 'pool', name: 'Pond', hazard: 'water', floorHeight: -16, floorTexture: 'CWWATER', ceilingTexture: 'F_SKY1', ceilingHeight: sky, lightLevel: 168 }, f);
             b.solid.push(f);
             const area = inset(B, 16);
-            for (const type of [T.pew, T.planter, T.lampPost]) b.propIn(area, type);
+            for (const type of [T.pew, T.planter, T.lampPost]) lit(b, b.propIn(area, type), type);
             b.spot(area, floor);
             return null;
         }

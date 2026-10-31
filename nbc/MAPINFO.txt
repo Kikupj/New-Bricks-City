@@ -85,6 +85,8 @@ DoomEdNums
 	26014 = NBC_Pilot
 	26015 = NBC_HQSpot
 	26020 = NBC_RoofStart
+	26021 = NBC_RoomLight
+	26022 = NBC_StreetLight
 }
 
 // New Game starts at the hub (PLAN M2).

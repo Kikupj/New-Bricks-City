@@ -375,6 +375,10 @@ The districts are built in **iDoom Studio** (see below) by `tools/studio/build_m
 | NBC_D08 | Arden Docks | industrial: warehouses, container yards, loading decks |
 | NBC_CRWN | The Crown | the Landlord's tower: the penthouse floor, a plaza dug in with sandbags, roof gardens |
 
+The sky over every district is a 3D skyline (rings of towers in lit-window facades, seeded per map) behind the
+ring of buildings at the map's edge; fronts have storeys of windows, rooms have ceiling lights with dynamic light
+under them (`NBC_RoomLight`, 26021) and street lamps a sodium glow (`NBC_StreetLight`, 26022).
+
 Each district has its roofs in the same map: a helicopter insertion starts on one of its `NBC_RoofStart`
 things (map thing 26020; underground districts have an access shaft open to the sky). The old Obsidian
 districts (`NBC_CT01-08`, rooftops `NBC_RF01-08`) are still in `nbc/maps/` but out of the pool.
