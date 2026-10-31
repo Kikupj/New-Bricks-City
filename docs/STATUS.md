@@ -6,6 +6,12 @@ Codex: read this first, then `AGENTS.md`, then the milestone you were given in `
 
 ## Done
 
+### Rooftop maps: the roof's edge instead of a wall (2026-10-31, by Claude)
+- **Owner feedback:** the building wall round the rooftop maps looks odd, and the map doesn't read as large rooftops.
+- **What it was:** the same ring of tall lit-window buildings as the street maps, so you stood in a courtyard.
+- **Now** (`rooftopEdge` in `district-gen.js`, environments with `rim: true`: the rooftop maps NBC_D01, D09, D16, D23): the edge is a 40-high concrete parapet round the roof plane (you can shoot over it, not walk over it), and beyond it a drop to a street 320 below with the neighbouring buildings' lower roofs at different heights (-112 to -272) and a brick wall across the street. The drop's ceiling is a sky flat at -64, under your eyes, so you see out over all of it to the 3D skyline: you stand on top of a block with the city around you. The alleys, bridges, decks and everything inside are unchanged.
+- Rebuilt all four; Map Check 0 errors; smoke PASS on all four; GL screenshots at the edge of D01 (parapet, the skyline over it). I haven't looked down over the edge at the lower roofs in a screenshot: check how they read, and whether you want more on them (AC units, antennas, lit windows on the facing wall, cars in the street).
+
 ### Squad grenades used more (2026-10-31, by Claude)
 - **Owner request:** officers should use flashbangs and smoke more often to disorient the gang.
 - **Flashbangs** (`NBC_Ally.TryGrenade`): thrown at targets 96-576 away (was 128-448), when you're 224+ away (was 320), on any ROE but RECON, whenever the target has company, is an elite or the leader, or the officer is hit or under 80% health (was 60%), and otherwise one time in three. Cooldown 4 s (was 8).

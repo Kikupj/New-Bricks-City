@@ -729,7 +729,7 @@ const ENV = {
         alley: { floor: -224, theme: 'nbc_street', lowerTexture: 'ADBRICK', wallTexture: 'ADBRICK', light: 120 },
         blockFloor: 0, edgeFacades: FACADE_LIT,
         mix: [['hut', 4], ['deck', 4], ['roofplant', 3], ['mass', 1]],
-        cars: 0, lamps: false, bridges: true, strongLayout: 'bsp'
+        cars: 0, lamps: false, bridges: true, strongLayout: 'bsp', rim: true
     },
     industrial: {
         width: 3328, height: 3584, cols: 3, rows: 3, street: 256, edge: 96, sidewalk: 0,
@@ -771,6 +771,43 @@ const ENV = {
     }
 };
 
+// The edge of a rooftop map: not a wall but the edge of the roof. A 40-high parapet round the roof plane, then a
+// drop (to a sunken street 320 down) with the lower roofs of the neighbouring buildings below, at different
+// heights, and across the street the next building's wall. The ring's ceiling is a sky flat well under your eyes
+// (as are the lower roofs'), so you see out over all of it to the skyline in the sky box: you stand on top of a
+// city block, not in a courtyard.
+function rooftopEdge(b, W, H, E, P) {
+    const RIM = 16, DEPTH = E - RIM, FLOOR_DROP = -320, CEIL_DROP = -64;
+    const drop = (rect, name) => b.room(rect, { prefix: 'drop', name, theme: 'nbc_street', floor: FLOOR_DROP, ceil: CEIL_DROP, light: 112,
+        ceilingTexture: 'F_SKY1', floorTexture: 'CWASPH', wallTexture: b.pick(FACADE_LIT), lowerTexture: 'ADBRICK', upperTexture: 'ADBRICK' });
+    const strips = [R(0, 0, W, DEPTH), R(0, H - DEPTH, W, DEPTH), R(0, DEPTH, DEPTH, H - 2 * DEPTH), R(W - DEPTH, DEPTH, DEPTH, H - 2 * DEPTH)];
+    for (const r of strips) drop(r, 'Street below');
+    // the parapet: concrete, 40 high (you can shoot over it, not step over it), the roof's own rim
+    const rimTop = (rect) => b.top({ type: 'pillar', solid: false, name: 'Roof edge', floorHeight: 40, ceilingHeight: P.ground.ceil, ceilingTexture: 'F_SKY1',
+        floorTexture: 'CWCONCF', wallTexture: 'CWCONCW', lowerTexture: 'CWCONCW' }, rect);
+    rimTop(R(DEPTH, DEPTH, W - 2 * DEPTH, RIM)); rimTop(R(DEPTH, H - DEPTH - RIM, W - 2 * DEPTH, RIM));
+    rimTop(R(DEPTH, DEPTH + RIM, RIM, H - 2 * DEPTH - 2 * RIM)); rimTop(R(W - DEPTH - RIM, DEPTH + RIM, RIM, H - 2 * DEPTH - 2 * RIM));
+    // the neighbours' lower roofs down in the drop: slabs at different heights with a brick lip, inside the street's
+    // 112 so a gap of street shows on both sides
+    const roofs = [];
+    const slab = (rect) => {
+        const floor = b.pick([-112, -144, -176, -208, -240, -272]);
+        roofs.push(rect);
+        b.top({ type: 'pillar', solid: false, name: 'Lower roof', floorHeight: floor, ceilingHeight: CEIL_DROP, ceilingTexture: 'F_SKY1',
+            floorTexture: b.pick(['AXF05', 'CWCONCF', 'AXF02']), wallTexture: b.pick(['ADBRICK', 'AXW85', 'CWCONCW']), lowerTexture: 'ADBRICK' }, rect);
+    };
+    for (const [horiz, base] of [[true, 0], [true, H - DEPTH], [false, 0], [false, W - DEPTH]]) {
+        const len = horiz ? W : H;
+        let t = horiz ? 0 : DEPTH;
+        const end = horiz ? W : H - DEPTH;
+        while (t < end - 96) {
+            const l = Math.min(end - t, snap(b.int(160, 384)));
+            if (b.chance(0.7)) slab(horiz ? R(t, base + 24, l, DEPTH - 48) : R(base + 24, t, DEPTH - 48, l));
+            t += l + snap(b.int(24, 56));
+        }
+    }
+}
+
 // ------------------------------------------------------------------ a district
 function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     const P = ENV[env];
@@ -788,9 +825,10 @@ function generateDistrict({ env, seed, name, mapLump, skybox = 'nbc_dusk' }) {
     let u = 0;
     const skyTop = P.indoor ? 0 : G.ceil;
     const ring = (rect, side) => facadeDecor(b, rect, mass(b, rect, P.edgeFacades), skyTop, [side]);
-    while (u < W) { const w = Math.min(W - u, snap(b.int(192, 512))); ring(R(u, 0, w, E), 'N'); ring(R(u, H - E, w, E), 'S'); u += w; }
+    if (P.rim) rooftopEdge(b, W, H, E, P);
+    else while (u < W) { const w = Math.min(W - u, snap(b.int(192, 512))); ring(R(u, 0, w, E), 'N'); ring(R(u, H - E, w, E), 'S'); u += w; }
     u = E;
-    while (u < H - E) { const h = Math.min(H - E - u, snap(b.int(192, 512))); ring(R(0, u, E, h), 'E'); ring(R(W - E, u, E, h), 'W'); u += h; }
+    if (!P.rim) while (u < H - E) { const h = Math.min(H - E - u, snap(b.int(192, 512))); ring(R(0, u, E, h), 'E'); ring(R(W - E, u, E, h), 'W'); u += h; }
 
     // the block grid
     const margin = E + P.street;
