@@ -5,7 +5,7 @@
 // on the thrower: the pin, or the launcher's click), never goes at something the thrower can't see, and the same
 // enemy waits 8 seconds before the next. Everything the enemy pack throws or fires that explodes comes through
 // here: its rockets (MiniRocket: the Rocketeer and BruteGL's three-rocket volley, now one at a time) and anything
-// named a grenade or a Molotov; the player's and the officers' are never touched.
+// named a grenade or a Molotov (not the rockets' trails); the player's and the officers' are never touched.
 //
 // Marksmen (the Wall Watch: gangs.txt marksman = 1): 25% more accurate past 512 units (their tracers turned a
 // quarter of the way back onto you), and slow up close: a one-second reaction delay when they open fire within 256.
@@ -22,12 +22,15 @@ class NBC_EnemyFire : EventHandler
 	int busyUntil;
 	int marksmanShots;              // long-range rounds a marksman put back on target (nbc_debug_director)
 
+	// the explosives themselves: the pack's rockets, and anything named a grenade or a Molotov (not their trails and
+	// flames: a rocket's RocketFlameSpawner, RocketFlame and RPG8RocketTrail are missiles fired by the rocket)
 	static bool IsExplosive(Actor mo)
 	{
 		if (mo is "MiniRocket") return true;
-		String c = mo.GetClassName();
+		String c = String.Format("%s", mo.GetClassName());
 		c = c.MakeLower();
-		return c.IndexOf("grenade") >= 0 || c.IndexOf("molotov") >= 0 || c.IndexOf("rocket") >= 0;
+		if (c.IndexOf("trail") >= 0 || c.IndexOf("flame") >= 0 || c.IndexOf("smoke") >= 0) return false;
+		return c.IndexOf("grenade") >= 0 || c.IndexOf("molotov") >= 0;
 	}
 
 	static bool IsGangShot(Actor mo)
